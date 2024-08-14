@@ -1,18 +1,13 @@
 [tool.poetry]
-    name        = "TODOPROJECTNAME"
+    name        = "mypypi2"
     version     = "0.1.0"
-    description = "TODODESC"
+    description = "Simple pull-through PyPi cache"
     license     = "MIT"
     readme      = "README.md"
-    authors     = ["TODONAME <TODOEMAIL>"]
-    homepage    = "https://github.com/TODOREPO"
-    repository  = "https://github.com/TODOREPO.git"
-    # TODO DETERMINE
+    authors     = ["Nathan Vaughn <nath@nvaughn.email>"]
+    homepage    = "https://github.com/NathanVaughn/mypypi2"
+    repository  = "https://github.com/NathanVaughn/mypypi2.git"
     package-mode = false
-    # packages     = [{ include = "TODO" }]
-
-[tool.poetry.urls]
-    Issues = "https://github.com/TODOREPO/issues"
 
 [tool.poetry.dependencies]
     python = "^3.12"
