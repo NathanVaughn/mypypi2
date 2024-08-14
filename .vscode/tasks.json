@@ -21,6 +21,11 @@
             "label": "tests",
             "command": "poetry run pytest --cov=TODO/ --cov-report html",
             "type": "shell"
+        },
+        {
+            "label": "run",
+            "command": "poetry run python -m flask --app app.app:create_app run",
+            "type": "shell"
         }
     ]
 }
