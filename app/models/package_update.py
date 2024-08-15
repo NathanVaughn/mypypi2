@@ -1,5 +1,6 @@
 import datetime
 
+from flask import current_app
 from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,3 +19,12 @@ class PackageUpdate(Base):
     """
     Last time we checked the available versions and files for this package
     """
+
+    @property
+    def is_current(self) -> bool:
+        """
+        Is the package data up-to-date?
+        """
+        return self.last_updated > datetime.datetime.now() - datetime.timedelta(
+            minutes=current_app.config["PACKAGE_UPDATE_INTERVAL_MINUTES"]
+        )

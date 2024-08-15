@@ -1,3 +1,4 @@
+from flask import current_app, url_for
 from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -44,8 +45,22 @@ class PackageVersionFilename(Base):
     """
     Have we already downloaded this package?
     """
+    metadata_sha256_hash: Mapped[str] = mapped_column(String, default=None)
+    """
+    SHA256 hash of the metadata file, if available
+    """
 
     @property
     def cached_url(self) -> str:
-        cached_url_prefix = "https://files.nathanv.me/pypi"
+        cached_url_prefix = current_app.config["S3_PUBLIC_URL_PREFIX"].removesuffix("/")
         return f"{cached_url_prefix}/{self.package}/{self.version}/{self.filename}"
+
+    @property
+    def download_url(self) -> str:
+        return url_for(
+            "file.file_route",
+            package=self.package,
+            version=self.version,
+            filename=self.filename,
+            _external=True,
+        )

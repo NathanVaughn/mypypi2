@@ -5,7 +5,7 @@ import app.data.packages
 simple_bp = Blueprint("simple", __name__, url_prefix="/simple")
 
 
-@simple_bp.route("/<string:package>")
+@simple_bp.route("/<string:package>/")
 def simple_route(package: str):
     """
     This route is used to provide a simple index of a specific package

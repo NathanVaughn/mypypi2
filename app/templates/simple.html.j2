@@ -9,7 +9,7 @@
 <body>
     <h1>Links for {{ package }}</h1>
     {% for pvf in package_version_filenamess -%}
-        <a href="{{ pvf.cached_url }}#sha256={{ pvf.sha256_hash }}" data-requires-python="{{ pvf.python_requires | escape }}" >{{ pvf.filename }}</a><br />
+        <a href="{{ pvf.download_url }}#sha256={{ pvf.sha256_hash }}" data-requires-python="{{ pvf.python_requires | escape }}" >{{ pvf.filename }}</a><br />
     {% endfor %}
 </body>
 
