@@ -1,5 +1,6 @@
 import datetime
 
+import lxml.html
 import pyjson5
 import requests
 import s3fs
@@ -26,8 +27,6 @@ def update_package_data(package: str) -> None:
     """
     logger.info(f"Updating {package}")
 
-    # TODO get metadata hash
-
     # update stored package data
     upstream = current_app.config["UPSTREAM_JSON_URL_PREFIX"].removesuffix("/")
     url = f"{upstream}/{package}/json"
@@ -35,7 +34,7 @@ def update_package_data(package: str) -> None:
     upstream_data = pyjson5.decode_buffer(requests.get(url).content)
 
     # keep track of new additions for batch query
-    new_obj = []
+    new_pvfs: dict[str, PackageVersionFilename] = {}
 
     # go through each release
     for version in upstream_data["releases"].keys():
@@ -47,23 +46,43 @@ def update_package_data(package: str) -> None:
             # if not, add it
             if not package_version_filename:
                 logger.info(f"Adding {package}/{version}/{filename}")
-                new_obj.append(
-                    PackageVersionFilename(
-                        package=package,
-                        version=version,
-                        filename=filename,
-                        python_requires=file_data["requires_python"],
-                        blake2b_256_hash=file_data["digests"]["blake2b_256"],
-                        md5_hash=file_data["digests"]["md5"],
-                        sha256_hash=file_data["digests"]["sha256"],
-                        upstream_url=file_data["url"],
-                    )
+                new_pvfs[filename] = PackageVersionFilename(
+                    package=package,
+                    version=version,
+                    filename=filename,
+                    python_requires=file_data["requires_python"],
+                    blake2b_256_hash=file_data["digests"]["blake2b_256"],
+                    md5_hash=file_data["digests"]["md5"],
+                    sha256_hash=file_data["digests"]["sha256"],
+                    upstream_url=file_data["url"],
                 )
 
-    # record the last time we've updated this package
-    new_obj.append(PackageUpdate(package=package, last_updated=datetime.datetime.now()))
+    # load metadata from simple endpoint
+    upstream = current_app.config["UPSTREAM_SIMPLE_URL_PREFIX"].removesuffix("/")
+    url = f"{upstream}/{package}"
+    # use lxml for performance
+    upstream_tree = lxml.html.fromstring(requests.get(url).content)
+    for anchor_tag in upstream_tree.iter("a"):
+        # inner text is filename
+        filename = anchor_tag.text
 
-    db.session.add_all(new_obj)
+        # grab the sha256 hash from the data-dist-info-metadata attribute
+        dist_info_metadata = anchor_tag.attrib.get("data-dist-info-metadata", "")
+        if dist_info_metadata.startswith("sha256="):
+            new_pvfs[
+                filename
+            ].dist_info_metadata_sha256_hash = dist_info_metadata.split("=")[1]
+        # grab the sha256 hash from the data-dist-info-metadata attribute
+        core_metadata = anchor_tag.attrib.get("data-core-metadata", "")
+        if core_metadata.startswith("sha256="):
+            new_pvfs[filename].core_metadata_sha256_hash = core_metadata.split("=")[1]
+
+    # record the last time we've updated this package
+    package_update = PackageUpdate(
+        package=package, last_updated=datetime.datetime.now()
+    )
+
+    db.session.add_all(list(new_pvfs.values()) + [package_update])
     db.session.commit()
 
 
@@ -125,7 +144,10 @@ def cache_file(package_version_filename: PackageVersionFilename) -> None:
                 fp.write(chunk)
 
     # also stream the metadata if available
-    if package_version_filename.metadata_sha256_hash:
+    if (
+        package_version_filename.dist_info_metadata_sha256_hash
+        or package_version_filename.core_metadata_sha256_hash
+    ):
         metadata_url = f"{package_version_filename.upstream_url}.metadata"
         metadata_s3_path = f"{s3_path}.metadata"
         logger.info(f"Uploading {metadata_url} to {metadata_s3_path}")

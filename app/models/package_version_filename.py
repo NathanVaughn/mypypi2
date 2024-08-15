@@ -45,7 +45,15 @@ class PackageVersionFilename(Base):
     """
     Have we already downloaded this package?
     """
-    metadata_sha256_hash: Mapped[str] = mapped_column(String, default=None)
+    dist_info_metadata_sha256_hash: Mapped[str] = mapped_column(
+        String, nullable=True, default=None
+    )
+    """
+    SHA256 hash of the metadata file, if available
+    """
+    core_metadata_sha256_hash: Mapped[str] = mapped_column(
+        String, nullable=True, default=None
+    )
     """
     SHA256 hash of the metadata file, if available
     """
