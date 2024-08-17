@@ -1,7 +1,8 @@
-from flask import current_app, url_for
+from flask import url_for
 from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
+import app.data.s3.path
 from app.models.database import Base
 
 
@@ -17,7 +18,7 @@ class PackageVersionFilename(Base):
     """
     Package version
     """
-    filename: Mapped[str] = mapped_column(String, unique=True)
+    filename: Mapped[str] = mapped_column(String, unique=True, index=True)
     """
     Package filename. Guaranteed to be unique.
     """
@@ -60,8 +61,7 @@ class PackageVersionFilename(Base):
 
     @property
     def cached_url(self) -> str:
-        cached_url_prefix = current_app.config["S3_PUBLIC_URL_PREFIX"].removesuffix("/")
-        return f"{cached_url_prefix}/{self.package}/{self.version}/{self.filename}"
+        return app.data.s3.path.download_path(self)
 
     @property
     def download_url(self) -> str:
