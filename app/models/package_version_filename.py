@@ -1,15 +1,30 @@
-from flask import url_for
-from sqlalchemy import Boolean, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from __future__ import annotations
 
-import app.data.s3.path
+from typing import TYPE_CHECKING
+
+from flask import url_for
+from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+import app.data.storage.s3.path
 from app.models.database import Base
+
+if TYPE_CHECKING:
+    from app.models.repository import Repository
 
 
 class PackageVersionFilename(Base):
     __tablename__ = "package_version_filename"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    """
+    Unique identifier
+    """
+    repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
+    repository: Mapped[Repository] = relationship("Repository")
+    """
+    The parent repository
+    """
     package: Mapped[str] = mapped_column(String)
     """
     Package name
@@ -26,11 +41,11 @@ class PackageVersionFilename(Base):
     """
     Python version requirements
     """
-    blake2b_256_hash: Mapped[str] = mapped_column(String)
+    blake2b_256_hash: Mapped[str] = mapped_column(String, nullable=True)
     """
     BLAKE2b-256 hash of the file
     """
-    md5_hash: Mapped[str] = mapped_column(String)
+    md5_hash: Mapped[str] = mapped_column(String, nullable=True)
     """
     MD5 hash of the file
     """
@@ -61,7 +76,7 @@ class PackageVersionFilename(Base):
 
     @property
     def cached_url(self) -> str:
-        return app.data.s3.path.download_path(self)
+        return app.data.storage.s3.path.download_path(self)
 
     @property
     def download_url(self) -> str:

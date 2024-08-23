@@ -21,6 +21,7 @@ def init_db(flask_app: Flask) -> None:
     from app.models.package_update import PackageUpdate  # noqa
     from app.models.package_version_filename import PackageVersionFilename  # noqa
     from app.models.url_cache import URLCache  # noqa
+    from app.models.repository import Repository  # noqa
 
     with flask_app.app_context():
         db.create_all()

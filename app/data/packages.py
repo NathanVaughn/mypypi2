@@ -8,8 +8,8 @@ from flask import current_app
 from loguru import logger
 
 import app.data.proxy
-import app.data.s3.path
-import app.data.s3.upload
+import app.data.storage.s3.path
+import app.data.storage.s3.upload
 from app.models.database import db
 from app.models.package_update import PackageUpdate
 from app.models.package_version_filename import PackageVersionFilename
@@ -170,9 +170,9 @@ def cache_file(package_version_filename: PackageVersionFilename) -> None:
     s3_options = current_app.config.get_namespace("S3_")
 
     # upload the main file
-    s3_path = app.data.s3.path.upload_path(package_version_filename)
+    s3_path = app.data.storage.s3.path.upload_path(package_version_filename)
     uploads.append(
-        lambda: app.data.s3.upload.upload_file(
+        lambda: app.data.storage.s3.upload.upload_file(
             s3_options, package_version_filename.upstream_url, s3_path
         )
     )
@@ -185,7 +185,7 @@ def cache_file(package_version_filename: PackageVersionFilename) -> None:
         metadata_url = f"{package_version_filename.upstream_url}.metadata"
         metadata_s3_path = f"{s3_path}.metadata"
         uploads.append(
-            lambda: app.data.s3.upload.upload_file(
+            lambda: app.data.storage.s3.upload.upload_file(
                 s3_options, metadata_url, metadata_s3_path
             )
         )
