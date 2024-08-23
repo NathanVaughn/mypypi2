@@ -14,7 +14,7 @@ class BaseStorage(abc.ABC):
         """
         Build the path to the file in storage
         """
-        return f"{package_version_filename.package}/{package_version_filename.version}/{package_version_filename}"
+        return f"{package_version_filename.repository.slug}/{package_version_filename.package}/{package_version_filename.version}/{package_version_filename}"
 
     @abc.abstractmethod
     def cache_file(self, package_version_filename: PackageVersionFilename) -> None:
