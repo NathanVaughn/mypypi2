@@ -1,19 +1,29 @@
-import datetime
+from __future__ import annotations
 
-from flask import current_app
-from sqlalchemy import BLOB, DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import BLOB, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
+
+if TYPE_CHECKING:
+    from app.models.repository import Repository
 
 
 class URLCache(Base):
     __tablename__ = "url_cache"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    url: Mapped[str] = mapped_column(String, unique=True)
+    url: Mapped[str] = mapped_column(String)
     """
     URL that was cached
+    """
+    repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
+    repository: Mapped[Repository] = relationship("Repository")
+    """
+    The parent repository
     """
     http_response_code: Mapped[int] = mapped_column(Integer)
     """
@@ -34,5 +44,5 @@ class URLCache(Base):
         Is the package data up-to-date?
         """
         return self.last_updated > datetime.datetime.now() - datetime.timedelta(
-            minutes=current_app.config["PACKAGE_UPDATE_INTERVAL_MINUTES"]
+            minutes=int(Repository.cache_minutes)  # type: ignore
         )

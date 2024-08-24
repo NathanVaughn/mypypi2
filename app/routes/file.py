@@ -1,29 +1,34 @@
 import http
 
-from flask import Blueprint, abort, redirect
+from flask import Blueprint, abort
 
 import app.data.packages
 import app.data.sql
+import app.data.storage.active
 
 file_bp = Blueprint("file", __name__)
 
 
-@file_bp.route("/<string:repository_slug>/file/<string:package>/<string:version>/<string:filename>")
+@file_bp.route(
+    "/<string:repository_slug>/file/<string:package>/<string:version>/<string:filename>"
+)
 def file_route(repository_slug: str, package: str, version: str, filename: str):
     """
     This route is used to download a specific file
     """
     # try to find the file in the database
     package_version_filename = app.data.sql.lookup_package_version_filename(
-        repository_slug, filename)
+        repository_slug, filename
+    )
 
     if not package_version_filename:
         # refresh the package data
-        app.data.packages.update_package_data(package)
+        app.data.packages.update_package_data(repository_slug, package)
 
         # try again
         package_version_filename = app.data.sql.lookup_package_version_filename(
-            repository_slug, filename)
+            repository_slug, filename
+        )
 
         # now fail if still not found
         if not package_version_filename:
@@ -34,6 +39,6 @@ def file_route(repository_slug: str, package: str, version: str, filename: str):
         app.data.packages.cache_file(package_version_filename)
 
     # return a redirect to the cached file
-    return redirect(
-        package_version_filename.cached_url, http.HTTPStatus.PERMANENT_REDIRECT
+    return app.data.storage.active.ActiveStorage.provider.download_file(
+        package_version_filename
     )

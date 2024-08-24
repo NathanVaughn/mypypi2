@@ -36,17 +36,19 @@ class PackageVersionFilename(Base):
     """
     Package filename. Guaranteed to be unique.
     """
-    python_requires: Mapped[str] = mapped_column(
-        String, nullable=True, default=None)
+    python_requires: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None
+    )
     """
     Python version requirements
     """
-    blake2b_256_hash: Mapped[str] = mapped_column(
-        String, nullable=True, default=None)
+    blake2b_256_hash: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None
+    )
     """
     BLAKE2b-256 hash of the file
     """
-    md5_hash: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    md5_hash: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     """
     MD5 hash of the file
     """
@@ -62,13 +64,13 @@ class PackageVersionFilename(Base):
     """
     Have we already downloaded this package?
     """
-    dist_info_metadata_sha256_hash: Mapped[str] = mapped_column(
+    dist_info_metadata_sha256_hash: Mapped[str | None] = mapped_column(
         String, nullable=True, default=None
     )
     """
     SHA256 hash of the metadata file, if available
     """
-    core_metadata_sha256_hash: Mapped[str] = mapped_column(
+    core_metadata_sha256_hash: Mapped[str | None] = mapped_column(
         String, nullable=True, default=None
     )
     """

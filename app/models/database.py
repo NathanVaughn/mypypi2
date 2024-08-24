@@ -25,3 +25,24 @@ def init_db(flask_app: Flask) -> None:
 
     with flask_app.app_context():
         db.create_all()
+
+        # load configured repositories
+        import app.data.sql
+
+        for repository in flask_app.config["repositories"]:
+            repository_obj = app.data.sql.lookup_repository(repository["slug"])
+            if repository_obj is None:
+                # create new repository if it doesn't exist
+                db.session.add(
+                    Repository(
+                        slug=repository["slug"],
+                        simple_url=repository["simple_url"],
+                        cache_minutes=repository["cache_minutes"],
+                    )
+                )
+            else:
+                # update existing repository
+                repository_obj.simple_url = repository["simple_url"]
+                repository_obj.cache_minutes = repository["cache_minutes"]
+
+        db.session.commit()

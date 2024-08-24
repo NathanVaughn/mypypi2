@@ -24,7 +24,9 @@ class BaseStorage(abc.ABC):
         ...
 
     @abc.abstractmethod
-    def download_file(self, package_version_filename: PackageVersionFilename) -> flask.Response:
+    def download_file(
+        self, package_version_filename: PackageVersionFilename
+    ) -> flask.Response:
         """
         Download a file
         """

@@ -16,7 +16,16 @@ from app.data.storage.base import BaseStorage
 
 
 class S3Storage(BaseStorage):
-    def __init__(self, endpoint_url: str, bucket_name: str, access_key_id: str, secret_access_key: str, public_url_prefix: str, region_name: str | None = None, bucket_prefix: str = "") -> None:
+    def __init__(
+        self,
+        endpoint_url: str,
+        bucket_name: str,
+        access_key_id: str,
+        secret_access_key: str,
+        public_url_prefix: str,
+        region_name: str | None = None,
+        bucket_prefix: str = "",
+    ) -> None:
         self._bucket_name = bucket_name
         self._bucket_prefix = bucket_prefix.removesuffix("/")
         self._public_url_prefix = public_url_prefix.removesuffix("/")
@@ -53,8 +62,13 @@ class S3Storage(BaseStorage):
                 for chunk in response.iter_content(chunk_size=8192):
                     fp.write(chunk)
 
-    def download_file(self, package_version_filename: PackageVersionFilename) -> flask.BaseResponse:
+    def download_file(
+        self, package_version_filename: PackageVersionFilename
+    ) -> flask.BaseResponse:
         """
         Download a file
         """
-        return flask.redirect(self._download_path(package_version_filename), code=http.HTTPStatus.PERMANENT_REDIRECT)
+        return flask.redirect(
+            self._download_path(package_version_filename),
+            code=http.HTTPStatus.PERMANENT_REDIRECT,
+        )

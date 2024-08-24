@@ -4,7 +4,8 @@ from flask import Flask
 
 def create_app():
     flask_app = Flask(__name__)
-    flask_app.config.from_file("config.toml", load=tomllib.load)
+    with open("config.toml", "rb") as f:
+        flask_app.config.update(tomllib.load(f))
 
     # setup database
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = flask_app.config["database"]["uri"]
@@ -15,6 +16,7 @@ def create_app():
 
     # setup storage
     import app.data.storage.active
+
     app.data.storage.active.ActiveStorage.init_app(flask_app)
 
     # setup routes

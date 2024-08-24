@@ -38,7 +38,9 @@ class LocalStorage(BaseStorage):
                 for chunk in response.iter_content(chunk_size=8192):
                     fp.write(chunk)
 
-    def download_file(self, package_version_filename: PackageVersionFilename) -> flask.BaseResponse:
+    def download_file(
+        self, package_version_filename: PackageVersionFilename
+    ) -> flask.BaseResponse:
         """
         Download a file
         """

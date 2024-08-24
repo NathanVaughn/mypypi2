@@ -6,11 +6,12 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-class _ActiveStorage():
+class _ActiveStorage:
     def init_app(self, flask_app: Flask) -> None:
         with flask_app.app_context():
             if flask_app.config["storage"]["driver"] == "s3":
                 import app.data.storage.s3
+
                 s3_config = flask_app.config["storage"]["s3"]
 
                 self.provider = app.data.storage.s3.S3Storage(
@@ -24,6 +25,7 @@ class _ActiveStorage():
                 )
             elif flask_app.config["storage"]["driver"] == "local":
                 import app.data.storage.local
+
                 local_config = flask_app.config["storage"]["local"]
 
                 self.provider = app.data.storage.local.LocalStorage(

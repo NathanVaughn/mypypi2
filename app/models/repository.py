@@ -1,4 +1,3 @@
-
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,4 +15,8 @@ class Repository(Base):
     simple_url: Mapped[str] = mapped_column(String)
     """
     The repository simple URL
+    """
+    cache_minutes: Mapped[int] = mapped_column(Integer)
+    """
+    Number of minutes to cache package data for
     """

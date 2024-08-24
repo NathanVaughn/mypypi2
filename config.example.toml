@@ -1,4 +1,5 @@
-[upstream]
+[[repositories]]
+    slug          = "pypi"
     simple_url    = "https://pypi.org/simple/"
     cache_minutes = 10
 

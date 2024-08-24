@@ -3,18 +3,17 @@ import datetime
 import requests
 from loguru import logger
 
+from app.data.sql import lookup_url_cache
 from app.models.database import db
 from app.models.url_cache import URLCache
 
 
-def fetch_url(url: str) -> URLCache:
+def fetch_url(repository_slug: str, url: str) -> URLCache:
     """
     Fetch a URL and return the database object
     """
     # check last updated time
-    url_cache: URLCache | None = db.session.execute(
-        db.select(URLCache).filter_by(url=url)
-    ).scalar_one_or_none()
+    url_cache = lookup_url_cache(repository_slug, url)
 
     # check if url cache is current
     if url_cache is not None and url_cache.is_current:
