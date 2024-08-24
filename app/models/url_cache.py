@@ -44,5 +44,5 @@ class URLCache(Base):
         Is the package data up-to-date?
         """
         return self.last_updated > datetime.datetime.now() - datetime.timedelta(
-            minutes=int(Repository.cache_minutes)  # type: ignore
+            minutes=self.repository.cache_minutes
         )

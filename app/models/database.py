@@ -36,7 +36,7 @@ def init_db(flask_app: Flask) -> None:
                 db.session.add(
                     Repository(
                         slug=repository["slug"],
-                        simple_url=repository["simple_url"],
+                        simple_url=repository["simple_url"].removesuffix("/"),
                         cache_minutes=repository["cache_minutes"],
                     )
                 )

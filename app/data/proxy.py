@@ -3,7 +3,7 @@ import datetime
 import requests
 from loguru import logger
 
-from app.data.sql import lookup_url_cache
+from app.data.sql import lookup_repository, lookup_url_cache
 from app.models.database import db
 from app.models.url_cache import URLCache
 
@@ -25,7 +25,9 @@ def fetch_url(repository_slug: str, url: str) -> URLCache:
 
     # add it to the database
     if url_cache is None:
+        repository = lookup_repository(repository_slug)
         url_cache = URLCache(
+            repository=repository,
             url=url,
             http_response_code=response.status_code,
             contents=response.content,

@@ -81,6 +81,7 @@ class PackageVersionFilename(Base):
     def download_url(self) -> str:
         return url_for(
             "file.file_route",
+            repository_slug=self.repository.slug,
             package=self.package,
             version=self.version,
             filename=self.filename,

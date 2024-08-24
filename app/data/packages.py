@@ -45,6 +45,7 @@ def parse_simple_registry(repository_slug: str, package: str) -> None:
             _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
         else:
             _, version = packaging.utils.parse_sdist_filename(filename)
+        version = str(version)
 
         # get upstream url and sha256 hash
         href = anchor_tag.attrib["href"]

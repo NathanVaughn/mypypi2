@@ -1,5 +1,4 @@
 import datetime
-import functools
 
 from app.models.database import db
 from app.models.package_update import PackageUpdate
@@ -8,13 +7,10 @@ from app.models.repository import Repository
 from app.models.url_cache import URLCache
 
 
-@functools.cache
 def lookup_repository(repository_slug: str) -> Repository | None:
     """
     Lookup a Repository object given the slug
     """
-    print("lookup_repository")
-    print(repository_slug)
     return db.session.execute(
         db.select(Repository).where(Repository.slug == repository_slug)
     ).scalar_one_or_none()
@@ -91,8 +87,9 @@ def update_package_last_updated(repository_slug: str, package: str) -> None:
 
     if package_update is None:
         # create a new record if this is the first time
+        repository = lookup_repository(repository_slug)
         package_update = PackageUpdate(
-            package=package, last_updated=datetime.datetime.now()
+            repository=repository, package=package, last_updated=datetime.datetime.now()
         )
         db.session.add(package_update)
     else:

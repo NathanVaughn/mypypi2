@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from flask import current_app
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,5 +39,5 @@ class PackageUpdate(Base):
         Is the package data up-to-date?
         """
         return self.last_updated > datetime.datetime.now() - datetime.timedelta(
-            minutes=current_app.config["PACKAGE_UPDATE_INTERVAL_MINUTES"]
+            minutes=self.repository.cache_minutes
         )
