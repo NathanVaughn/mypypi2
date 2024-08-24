@@ -15,8 +15,8 @@ from app.data.storage.base import BaseStorage
 
 
 class LocalStorage(BaseStorage):
-    def __init__(self, local_dir: str) -> None:
-        self._local_dir = pathlib.Path(local_dir)
+    def __init__(self, directory: str) -> None:
+        self._local_dir = pathlib.Path(directory)
         self._local_dir.mkdir(parents=True, exist_ok=True)
 
     def _path(self, package_version_filename: PackageVersionFilename) -> pathlib.Path:

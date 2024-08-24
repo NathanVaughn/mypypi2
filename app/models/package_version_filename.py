@@ -6,7 +6,6 @@ from flask import url_for
 from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import app.data.storage.s3.path
 from app.models.database import Base
 
 if TYPE_CHECKING:
@@ -37,15 +36,17 @@ class PackageVersionFilename(Base):
     """
     Package filename. Guaranteed to be unique.
     """
-    python_requires: Mapped[str] = mapped_column(String)
+    python_requires: Mapped[str] = mapped_column(
+        String, nullable=True, default=None)
     """
     Python version requirements
     """
-    blake2b_256_hash: Mapped[str] = mapped_column(String, nullable=True)
+    blake2b_256_hash: Mapped[str] = mapped_column(
+        String, nullable=True, default=None)
     """
     BLAKE2b-256 hash of the file
     """
-    md5_hash: Mapped[str] = mapped_column(String, nullable=True)
+    md5_hash: Mapped[str] = mapped_column(String, nullable=True, default=None)
     """
     MD5 hash of the file
     """
@@ -73,10 +74,6 @@ class PackageVersionFilename(Base):
     """
     SHA256 hash of the metadata file, if available
     """
-
-    @property
-    def cached_url(self) -> str:
-        return app.data.storage.s3.path.download_path(self)
 
     @property
     def download_url(self) -> str:

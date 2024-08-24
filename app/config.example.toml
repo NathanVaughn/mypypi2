@@ -1,0 +1,21 @@
+[upstream]
+    simple_url    = "https://pypi.org/simple/"
+    cache_minutes = 10
+
+[database]
+    uri = "sqlite:///data.sqlite"
+
+[storage]
+    driver = "s3"
+
+[storage.s3]
+    endpoint_url      = ""
+    access_key_id     = ""
+    secret_access_key = ""
+    region_name       = ""
+    bucket_name       = ""
+    bucket_prefix     = ""
+    public_url_prefix = ""
+
+[storage.local]
+    directory = "/data/"
