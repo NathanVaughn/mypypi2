@@ -37,7 +37,9 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         app.data.proxy.fetch_url(repository, package_simple_url).contents
     )
 
-    new_records: list[PackageFile] = []
+    # hold a list of records we parse
+    new_package_code_files: list[PackageCodeFile] = []
+    new_package_metadata_files: list[PackageMetadataFile] = []
 
     # iterate over all anchor tags
     for anchor_tag in upstream_tree.iter("a"):
@@ -72,40 +74,54 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         )
 
         # lookup code file
-        package_code_file = app.data.sql.lookup_package_code_file(repository, filename)
-        if not package_code_file:
-            logger.debug(
-                f"Adding {repository.slug}/{package_name}/{version}/{filename}"
-            )
-            package_code_file = PackageCodeFile(
-                repository=repository,
-                package_name=package_name,
-                version=version,
-                filename=filename,
-                sha256_hash=upstream_sha256_hash,
-                upstream_url=upstream_url,
-                requires_python=requires_python,
-            )
-            new_records.append(package_code_file)
+        package_code_file = PackageCodeFile(
+            repository=repository,
+            package_name=package_name,
+            version=version,
+            filename=filename,
+            sha256_hash=upstream_sha256_hash,
+            upstream_url=upstream_url,
+            requires_python=requires_python,
+        )
+        new_package_code_files.append(package_code_file)
 
         # lookup metadata file
         if metadata_sha256_hash:
-            package_metadata_file = app.data.sql.lookup_package_metadata_file(
-                repository, filename
+            metadata_filename = filename + METDATA_EXTENSION
+            package_metadata_file = PackageMetadataFile(
+                repository=repository,
+                package_name=package_name,
+                version=version,
+                filename=metadata_filename,
+                sha256_hash=metadata_sha256_hash,
+                upstream_url=upstream_url + METDATA_EXTENSION,
+                code_file=package_code_file,
             )
-            if not package_metadata_file:
-                logger.debug(f"Adding {
-                             repository.slug}/{package_name}/{version}/{filename + METDATA_EXTENSION}")
-                package_metadata_file = PackageMetadataFile(
-                    repository=repository,
-                    package_name=package_name,
-                    version=version,
-                    filename=filename + METDATA_EXTENSION,
-                    sha256_hash=metadata_sha256_hash,
-                    upstream_url=upstream_url + METDATA_EXTENSION,
-                    code_file=package_code_file,
-                )
-                new_records.append(package_metadata_file)
+            new_package_metadata_files.append(package_metadata_file)
+
+    # get existing records
+    old_package_code_files = app.data.sql.get_package_code_files(
+        repository, package_name
+    )
+    old_package_metadata_files = app.data.sql.get_package_metadata_files(
+        repository, package_name
+    )
+
+    # not the best way to do this, but it works
+    old_package_code_files_names = set(x.filename for x in old_package_code_files)
+    old_package_metadata_files_names = set(
+        x.filename for x in old_package_metadata_files
+    )
+
+    new_records = [
+        n
+        for n in new_package_code_files
+        if n.filename not in old_package_code_files_names
+    ] + [
+        n
+        for n in new_package_metadata_files
+        if n.filename not in old_package_metadata_files_names
+    ]
 
     # commit changes
     app.data.sql.upload_new_package_files(new_records)

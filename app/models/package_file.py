@@ -32,7 +32,7 @@ class PackageFile(Base):
 
     @declared_attr
     def repository(cls) -> Mapped[Repository]:
-        return relationship("Repository")
+        return relationship("Repository", lazy="joined")
 
     """
     The parent repository

@@ -16,5 +16,5 @@ class PackageMetadataFile(PackageFile):
 
     code_file_id: Mapped[int] = mapped_column(ForeignKey("package_code_file.id"))
     code_file: Mapped[PackageCodeFile] = relationship(
-        "PackageCodeFile", back_populates="metadata_file"
+        "PackageCodeFile", back_populates="metadata_file", lazy="joined"
     )

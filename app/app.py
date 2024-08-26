@@ -8,6 +8,7 @@ def create_app():
         flask_app.config.update(tomllib.load(f))
 
     # setup database
+    # flask_app.config['SQLALCHEMY_ECHO'] = True
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = flask_app.config["database"]["uri"]
     import app.models.database
 

@@ -1,4 +1,5 @@
 import datetime
+from typing import Sequence
 
 from app.constants import METDATA_EXTENSION
 from app.models.database import db
@@ -83,6 +84,26 @@ def lookup_url_cache(repository: Repository, url: str) -> URLCache | None:
     ).scalar_one_or_none()
 
 
+def get_package_metadata_files(
+    repository: Repository, package_name: str
+) -> list[PackageMetadataFile]:
+    """
+    Return a list of PackageMetadataFile objects for a given package
+    """
+    return (
+        db.session.execute(
+            db.select(PackageMetadataFile)
+            .join(PackageMetadataFile.repository)
+            .where(
+                PackageMetadataFile.package_name == package_name,
+                Repository.id == repository.id,
+            )
+        )
+        .scalars()
+        .all()
+    )  # type: ignore
+
+
 def get_package_code_files(
     repository: Repository, package_name: str
 ) -> list[PackageCodeFile]:
@@ -138,7 +159,7 @@ def mark_as_cached(package_file: PackageFile) -> None:
     db.session.commit()
 
 
-def upload_new_package_files(package_files: list[PackageFile]) -> None:
+def upload_new_package_files(package_files: Sequence[PackageFile]) -> None:
     """
     Upload a new package file
     """

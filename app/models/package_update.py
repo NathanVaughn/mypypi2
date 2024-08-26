@@ -20,7 +20,7 @@ class PackageUpdate(Base):
     Unique identifier
     """
     repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
-    repository: Mapped[Repository] = relationship("Repository")
+    repository: Mapped[Repository] = relationship("Repository", lazy="joined")
     """
     The parent repository
     """
