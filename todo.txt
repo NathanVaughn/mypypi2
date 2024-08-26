@@ -1,0 +1,3 @@
+actual error codes (404)
+handle offline upstream
+better logging

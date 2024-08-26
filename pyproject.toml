@@ -18,6 +18,7 @@
     loguru           = "^0.7.2"    # logging
     s3fs             = "^2024.6.1" # S3 filesystem
     lxml             = "^5.3.0"    # fast XML parser
+    packaging        = "^24.1"     # PEP 440 version parsing
 
 [tool.poetry.group.dev.dependencies]
     pytest     = "8.3.2"

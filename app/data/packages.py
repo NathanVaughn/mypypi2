@@ -16,6 +16,38 @@ from app.models.package_metadata_file import PackageMetadataFile
 from app.models.repository import Repository
 
 
+def parse_filename_version(filename: str) -> str:
+    if filename.endswith(".whl"):
+        _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
+        version = str(version)
+    elif filename.endswith(".tar.gz") or filename.endswith(".zip"):
+        _, version = packaging.utils.parse_sdist_filename(filename)
+        version = str(version)
+    elif filename.endswith(".tar.bz2"):
+        # example
+        # coverage-4.0a5.tar.bz2
+        # lie about file extension
+        _, version = packaging.utils.parse_sdist_filename(
+            filename.replace(".tar.bz2", ".tar.gz")
+        )
+        version = str(version)
+    elif filename.endswith(".egg"):
+        # {distribution_name}-{version}-{python_version}.egg
+        # example
+        # lxml-2.0-py2.4-win32.egg
+        version = filename.split("-")[1]
+    elif filename.endswith(".exe") or filename.endswith(".msi"):
+        # examples
+        # lxml-1.3.4.win32-py2.4.exe
+        # lxml-2.2.win32-py2.4.exe
+        # greenlet-0.4.4.win-amd64-py2.6.msi
+        version = filename.split("-")[1].split(".win")[0]
+    else:
+        raise ValueError(f"Unknown file type: {filename}")
+
+    return version
+
+
 def parse_sha256_hash(given: str) -> str | None:
     """
     Parse the sha256 hash from a string
@@ -47,11 +79,7 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         filename = anchor_tag.text
 
         # parse filename
-        if filename.endswith(".whl"):
-            _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
-        else:
-            _, version = packaging.utils.parse_sdist_filename(filename)
-        version = str(version)
+        version = parse_filename_version(filename)
 
         # get upstream url and sha256 hash
         href = anchor_tag.attrib["href"]
@@ -157,7 +185,7 @@ def get_package_code_files(
     if package_update is None or not package_update.is_current:
         update_package_data(repository, package_name)
 
-    # get package version filenames
+    # get package filenames
     return app.data.sql.get_package_code_files(repository, package_name)
 
 
