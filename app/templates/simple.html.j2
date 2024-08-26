@@ -3,13 +3,13 @@
 
 <head>
     <meta name="pypi:repository-version" content="1.1">
-    <title>Links for {{ package }}</title>
+    <title>Links for {{ package_name }}</title>
 </head>
 
 <body>
-    <h1>Links for {{ package }}</h1>
-    {% for pvf in package_version_filenamess -%}
-        <a href="{{ pvf.download_url }}#sha256={{ pvf.sha256_hash }}" data-requires-python="{{ pvf.python_requires | escape }}" {% if pvf.dist_info_metadata_sha256_hash %}data-dist-info-metadata="sha256={{ pvf.dist_info_metadata_sha256_hash }}"{% endif %} {% if pvf.core_metadata_sha256_hash %}data-core-metadata="sha256={{ pvf.core_metadata_sha256_hash }}"{% endif %}>{{ pvf.filename }}</a><br />
+    <h1>Links for {{ package_name }}</h1>
+    {% for pcf in package_code_files -%}
+        <a href="{{ pcf.download_url }}#sha256={{ pcf.sha256_hash }}" data-requires-python="{{ pcf.requires_python | escape }}" {% if pcf.metadata_file %}data-dist-info-metadata="sha256={{ pcf.metadata_file.sha256_hash }}" data-core-metadata="sha256={{ pcf.metadata_file.sha256_hash }}"{% endif %}>{{ pcf.filename }}</a><br />
     {% endfor %}
 </body>
 

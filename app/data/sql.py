@@ -1,8 +1,11 @@
 import datetime
 
+from app.constants import METDATA_EXTENSION
 from app.models.database import db
+from app.models.package_code_file import PackageCodeFile
+from app.models.package_file import PackageFile
+from app.models.package_metadata_file import PackageMetadataFile
 from app.models.package_update import PackageUpdate
-from app.models.package_version_filename import PackageVersionFilename
 from app.models.repository import Repository
 from app.models.url_cache import URLCache
 
@@ -16,57 +19,83 @@ def lookup_repository(repository_slug: str) -> Repository | None:
     ).scalar_one_or_none()
 
 
-def lookup_package_version_filename(
-    repository_slug: str, filename: str
-) -> PackageVersionFilename | None:
+def lookup_package_file(repository: Repository, filename: str) -> PackageFile | None:
+    if filename.endswith(METDATA_EXTENSION):
+        return lookup_package_metadata_file(repository, filename)
+    return lookup_package_code_file(repository, filename)
+
+
+def lookup_package_code_file(
+    repository: Repository, filename: str
+) -> PackageCodeFile | None:
     """
-    Lookup a PackageVersionFilename object given the filename
+    Lookup a PackageCodeFile object given the filename
     """
     return db.session.execute(
-        db.select(PackageVersionFilename)
-        .join(PackageVersionFilename.repository)
+        db.select(PackageCodeFile)
+        .join(PackageCodeFile.repository)
         .where(
-            PackageVersionFilename.filename == filename,
-            Repository.slug == repository_slug,
+            PackageCodeFile.filename == filename,
+            Repository.id == repository.id,
         )
     ).scalar_one_or_none()
 
 
-def lookup_package_update(repository_slug: str, package: str) -> PackageUpdate | None:
+def lookup_package_metadata_file(
+    repository: Repository, filename: str
+) -> PackageMetadataFile | None:
+    """
+    Lookup a PackageMetadataFile object given the filename
+    """
+    return db.session.execute(
+        db.select(PackageMetadataFile)
+        .join(PackageMetadataFile.repository)
+        .where(
+            PackageMetadataFile.filename == filename,
+            Repository.id == repository.id,
+        )
+    ).scalar_one_or_none()
+
+
+def lookup_package_update(
+    repository: Repository, package_name: str
+) -> PackageUpdate | None:
     """
     Lookup a PackageUpdate object given the package name
     """
     return db.session.execute(
         db.select(PackageUpdate)
         .join(PackageUpdate.repository)
-        .where(PackageUpdate.package == package, Repository.slug == repository_slug)
+        .where(
+            PackageUpdate.package_name == package_name, Repository.id == repository.id
+        )
     ).scalar_one_or_none()
 
 
-def lookup_url_cache(repository_slug: str, url: str) -> URLCache | None:
+def lookup_url_cache(repository: Repository, url: str) -> URLCache | None:
     """
     Lookup a URLCache object given the url
     """
     return db.session.execute(
         db.select(URLCache)
         .join(URLCache.repository)
-        .where(URLCache.url == url, Repository.slug == repository_slug)
+        .where(URLCache.url == url, Repository.id == repository.id)
     ).scalar_one_or_none()
 
 
-def get_package_version_filenames(
-    repository_slug: str, package: str
-) -> list[PackageVersionFilename]:
+def get_package_code_files(
+    repository: Repository, package_name: str
+) -> list[PackageCodeFile]:
     """
-    Return a list of PackageVersionFilename objects for a given package
+    Return a list of PackageCodeFile objects for a given package
     """
     return (
         db.session.execute(
-            db.select(PackageVersionFilename)
-            .join(PackageVersionFilename.repository)
+            db.select(PackageCodeFile)
+            .join(PackageCodeFile.repository)
             .where(
-                PackageVersionFilename.package == package,
-                Repository.slug == repository_slug,
+                PackageCodeFile.package_name == package_name,
+                Repository.id == repository.id,
             )
         )
         .scalars()
@@ -74,7 +103,7 @@ def get_package_version_filenames(
     )  # type: ignore
 
 
-def update_package_last_updated(repository_slug: str, package: str) -> None:
+def update_package_last_updated(repository: Repository, package_name: str) -> None:
     """
     Update the package data for a given package in our database
     """
@@ -82,17 +111,36 @@ def update_package_last_updated(repository_slug: str, package: str) -> None:
     package_update = db.session.execute(
         db.select(PackageUpdate)
         .join(PackageUpdate.repository)
-        .where(PackageUpdate.package == package, Repository.slug == repository_slug)
+        .where(
+            PackageUpdate.package_name == package_name, Repository.id == repository.id
+        )
     ).scalar_one_or_none()
 
     if package_update is None:
         # create a new record if this is the first time
-        repository = lookup_repository(repository_slug)
         package_update = PackageUpdate(
-            repository=repository, package=package, last_updated=datetime.datetime.now()
+            repository=repository,
+            package_name=package_name,
+            last_updated=datetime.datetime.now(),
         )
         db.session.add(package_update)
     else:
         package_update.last_updated = datetime.datetime.now()
 
+    db.session.commit()
+
+
+def mark_as_cached(package_file: PackageFile) -> None:
+    """
+    Mark a package file as cached
+    """
+    package_file.is_cached = True
+    db.session.commit()
+
+
+def upload_new_package_files(package_files: list[PackageFile]) -> None:
+    """
+    Upload a new package file
+    """
+    db.session.add_all(package_files)
     db.session.commit()

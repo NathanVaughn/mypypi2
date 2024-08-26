@@ -8,7 +8,7 @@ import requests
 from loguru import logger
 
 if TYPE_CHECKING:
-    from app.models.package_version_filename import PackageVersionFilename
+    from app.models.package_file import PackageFile
 
 
 from app.data.storage.base import BaseStorage
@@ -19,18 +19,18 @@ class LocalStorage(BaseStorage):
         self._local_dir = pathlib.Path(directory)
         self._local_dir.mkdir(parents=True, exist_ok=True)
 
-    def _path(self, package_version_filename: PackageVersionFilename) -> pathlib.Path:
+    def _path(self, package_file: PackageFile) -> pathlib.Path:
         """
         Build the path to the file in local storage
         """
-        return self._local_dir.joinpath(self._get_path(package_version_filename))
+        return self._local_dir.joinpath(self._get_path(package_file))
 
-    def cache_file(self, package_version_filename: PackageVersionFilename) -> None:
+    def cache_file(self, package_file: PackageFile) -> None:
         """
         Take a file from an upstream URL and save it
         """
-        local_path = self._path(package_version_filename)
-        upstream_url = package_version_filename.upstream_url
+        local_path = self._path(package_file)
+        upstream_url = package_file.upstream_url
 
         logger.info(f"Downloading {upstream_url} to {local_path.absolute()}")
         with open(local_path, "wb") as fp:
@@ -38,10 +38,8 @@ class LocalStorage(BaseStorage):
                 for chunk in response.iter_content(chunk_size=8192):
                     fp.write(chunk)
 
-    def download_file(
-        self, package_version_filename: PackageVersionFilename
-    ) -> flask.BaseResponse:
+    def download_file(self, package_file: PackageFile) -> flask.BaseResponse:
         """
         Download a file
         """
-        return flask.send_file(self._path(package_version_filename), as_attachment=True)
+        return flask.send_file(self._path(package_file), as_attachment=True)

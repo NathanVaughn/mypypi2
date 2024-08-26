@@ -19,7 +19,8 @@ db = SQLAlchemy(model_class=Base)
 def init_db(flask_app: Flask) -> None:
     # import models so sqlalchemy knows about them
     from app.models.package_update import PackageUpdate  # noqa
-    from app.models.package_version_filename import PackageVersionFilename  # noqa
+    from app.models.package_code_file import PackageCodeFile  # noqa
+    from app.models.package_metadata_file import PackageMetadataFile  # noqa
     from app.models.url_cache import URLCache  # noqa
     from app.models.repository import Repository  # noqa
 
@@ -42,7 +43,7 @@ def init_db(flask_app: Flask) -> None:
                 )
             else:
                 # update existing repository
-                repository_obj.simple_url = repository["simple_url"]
+                repository_obj.simple_url = repository["simple_url"].removesuffix("/")
                 repository_obj.cache_minutes = repository["cache_minutes"]
 
         db.session.commit()

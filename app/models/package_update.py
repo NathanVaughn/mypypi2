@@ -24,7 +24,7 @@ class PackageUpdate(Base):
     """
     The parent repository
     """
-    package: Mapped[str] = mapped_column(String, unique=True)
+    package_name: Mapped[str] = mapped_column(String, unique=True)
     """
     Package name
     """

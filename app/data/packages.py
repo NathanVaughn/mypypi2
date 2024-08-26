@@ -1,6 +1,4 @@
-import concurrent.futures
 import html
-from typing import Callable
 from urllib.parse import urljoin
 
 import lxml.html
@@ -10,8 +8,12 @@ from loguru import logger
 import app.data.proxy
 import app.data.sql
 import app.data.storage.active
-from app.models.database import db
-from app.models.package_version_filename import PackageVersionFilename
+import app.models.exceptions
+from app.constants import METDATA_EXTENSION
+from app.models.package_code_file import PackageCodeFile
+from app.models.package_file import PackageFile
+from app.models.package_metadata_file import PackageMetadataFile
+from app.models.repository import Repository
 
 
 def parse_sha256_hash(given: str) -> str | None:
@@ -23,19 +25,21 @@ def parse_sha256_hash(given: str) -> str | None:
     return None
 
 
-def parse_simple_registry(repository_slug: str, package: str) -> None:
+def parse_simple_registry(repository: Repository, package_name: str) -> None:
     """
     Parse the simple data from the registry.
     """
     # load metadata from simple endpoint
-    repository = app.data.sql.lookup_repository(repository_slug)
-    assert repository is not None
-    package_simple_url = f"{repository.simple_url}/{package}/"
+    package_simple_url = f"{repository.simple_url}/{package_name}/"
 
     # use lxml for performance
     upstream_tree = lxml.html.fromstring(
-        app.data.proxy.fetch_url(repository_slug, package_simple_url).contents
+        app.data.proxy.fetch_url(repository, package_simple_url).contents
     )
+
+    new_records: list[PackageFile] = []
+
+    # iterate over all anchor tags
     for anchor_tag in upstream_tree.iter("a"):
         # inner text is filename
         filename = anchor_tag.text
@@ -58,104 +62,128 @@ def parse_simple_registry(repository_slug: str, package: str) -> None:
             upstream_sha256_hash = None
 
         # get python requires
-        python_requires = html.unescape(
-            anchor_tag.attrib.get("data-python-requires", "")
+        requires_python = html.unescape(
+            anchor_tag.attrib.get("data-requires-python", "")
         )
 
-        # lookup entry in the database
-        package_version_filename = app.data.sql.lookup_package_version_filename(
-            repository_slug, filename
+        # grab the sha256 hash from the data-dist-info-metadata attribute
+        metadata_sha256_hash = parse_sha256_hash(
+            anchor_tag.attrib.get("data-dist-info-metadata", "")
         )
-        if not package_version_filename:
-            package_version_filename = PackageVersionFilename(
+
+        # lookup code file
+        package_code_file = app.data.sql.lookup_package_code_file(repository, filename)
+        if not package_code_file:
+            logger.debug(
+                f"Adding {repository.slug}/{package_name}/{version}/{filename}"
+            )
+            package_code_file = PackageCodeFile(
                 repository=repository,
-                package=package,
+                package_name=package_name,
                 version=version,
                 filename=filename,
                 sha256_hash=upstream_sha256_hash,
                 upstream_url=upstream_url,
-                python_requires=python_requires,
+                requires_python=requires_python,
             )
-            db.session.add(package_version_filename)
+            new_records.append(package_code_file)
 
-        # grab the sha256 hash from the data-dist-info-metadata attribute
-        dist_info_metadata: str = anchor_tag.attrib.get("data-dist-info-metadata", "")
-        package_version_filename.dist_info_metadata_sha256_hash = parse_sha256_hash(
-            dist_info_metadata
-        )  # type: ignore
-
-        # grab the sha256 hash from the data-dist-info-metadata attribute
-        core_metadata = anchor_tag.attrib.get("data-core-metadata", "")
-        package_version_filename.core_metadata_sha256_hash = parse_sha256_hash(
-            core_metadata
-        )  # type: ignore
+        # lookup metadata file
+        if metadata_sha256_hash:
+            package_metadata_file = app.data.sql.lookup_package_metadata_file(
+                repository, filename
+            )
+            if not package_metadata_file:
+                logger.debug(f"Adding {
+                             repository.slug}/{package_name}/{version}/{filename + METDATA_EXTENSION}")
+                package_metadata_file = PackageMetadataFile(
+                    repository=repository,
+                    package_name=package_name,
+                    version=version,
+                    filename=filename + METDATA_EXTENSION,
+                    sha256_hash=metadata_sha256_hash,
+                    upstream_url=upstream_url + METDATA_EXTENSION,
+                    code_file=package_code_file,
+                )
+                new_records.append(package_metadata_file)
 
     # commit changes
-    db.session.commit()
+    app.data.sql.upload_new_package_files(new_records)
 
 
-def update_package_data(repository_slug: str, package: str) -> None:
+def update_package_data(repository: Repository, package: str) -> None:
     """
     Update the package data for a given package in our database
     """
-    logger.info(f"Updating {package}")
+    logger.info(f"Updating {repository.slug}/{package}")
 
-    parse_simple_registry(repository_slug, package)
+    # parse the simple registry
+    parse_simple_registry(repository, package)
 
     # record the last time we've updated this package
-    app.data.sql.update_package_last_updated(repository_slug, package)
+    app.data.sql.update_package_last_updated(repository, package)
 
 
-def get_package_version_filenames(
-    repository_slug: str, package: str
-) -> list[PackageVersionFilename]:
+def get_package_code_files(
+    repository_slug: str, package_name: str
+) -> list[PackageCodeFile]:
     """
-    Get a list of PackageVersionFilename objects for a given package
+    Get a list of PackageCodeFiles objects for a given package
     """
+    repository = app.data.sql.lookup_repository(repository_slug)
+    if repository is None:
+        raise app.models.exceptions.RepositoryNotFound(repository_slug)
+
     # check last updated time
-    package_update = app.data.sql.lookup_package_update(repository_slug, package)
+    package_update = app.data.sql.lookup_package_update(repository, package_name)
 
     # check if package data is current
     if package_update is None or not package_update.is_current:
-        update_package_data(repository_slug, package)
+        update_package_data(repository, package_name)
 
     # get package version filenames
-    return app.data.sql.get_package_version_filenames(repository_slug, package)
+    return app.data.sql.get_package_code_files(repository, package_name)
 
 
-def cache_file(package_version_filename: PackageVersionFilename) -> None:
+def cache_file(package_file: PackageFile) -> None:
     """
     Cache a file
     """
-    # keep track of the uploads we need to do
-    uploads: list[Callable] = []
-
     # upload the main file
-    uploads.append(
-        lambda: app.data.storage.active.ActiveStorage.provider.cache_file(
-            package_version_filename
-        )
-    )
-
-    # # also upload the metadata if available
-    # if (
-    #     package_version_filename.dist_info_metadata_sha256_hash
-    #     or package_version_filename.core_metadata_sha256_hash
-    # ):
-    #     metadata_url = f"{package_version_filename.upstream_url}.metadata"
-    #     metadata_s3_path = f"{s3_path}.metadata"
-    #     uploads.append(
-    #         lambda: app.data.storage.s3.upload.upload_file(
-    #             s3_options, metadata_url, metadata_s3_path
-    #         )
-    #     )
-
-    # do the uploads
-    with concurrent.futures.ThreadPoolExecutor(2) as executor:
-        futures = [executor.submit(upload) for upload in uploads]
-        # need to wait for the results to actually upload the files
-        [future.result() for future in futures]
+    app.data.storage.active.ActiveStorage.provider.cache_file(package_file)
 
     # update the database
-    package_version_filename.is_cached = True
-    db.session.commit()
+    app.data.sql.mark_as_cached(package_file)
+
+
+def get_package_file(
+    repository_slug: str, package_name: str, filename: str
+) -> PackageFile:
+    """
+    Get a list of PackageCodeFiles objects for a given package
+    """
+    repository = app.data.sql.lookup_repository(repository_slug)
+    if repository is None:
+        raise app.models.exceptions.RepositoryNotFound(repository_slug)
+
+    # try to find the file in the database
+    package_file = app.data.sql.lookup_package_file(repository, filename)
+
+    if not package_file:
+        # refresh the package data
+        update_package_data(repository, package_name)
+
+        # try again
+        package_file = app.data.sql.lookup_package_file(repository, filename)
+
+        # now fail if still not found
+        if not package_file:
+            raise app.models.exceptions.PackageFileNotFound(
+                repository_slug, package_name, filename
+            )
+
+    # if we haven't cached the file yet, do so now
+    if not package_file.is_cached:
+        cache_file(package_file)
+
+    return package_file

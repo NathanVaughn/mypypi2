@@ -14,7 +14,7 @@ class Repository(Base):
     """
     simple_url: Mapped[str] = mapped_column(String)
     """
-    The repository simple URL. Expects no trailing slash.
+    The repository simple URL. Will have no trailing slash.
     """
     cache_minutes: Mapped[int] = mapped_column(Integer)
     """
