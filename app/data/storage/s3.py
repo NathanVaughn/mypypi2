@@ -67,6 +67,9 @@ class S3Storage(BaseStorage):
         """
         Download a file
         """
-        path = self._get_path(package_file)
+        path = self._download_path(package_file)
         logger.debug(f"Redirecting to {path}")
-        return flask.redirect(path, code=http.HTTPStatus.PERMANENT_REDIRECT)
+        return flask.redirect(
+            self._download_path(package_file),
+            code=http.HTTPStatus.PERMANENT_REDIRECT,
+        )

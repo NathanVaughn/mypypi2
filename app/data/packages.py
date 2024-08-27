@@ -42,6 +42,10 @@ def parse_filename_version(filename: str) -> str:
         # lxml-2.2.win32-py2.4.exe
         # greenlet-0.4.4.win-amd64-py2.6.msi
         version = filename.split("-")[1].split(".win")[0]
+    elif filename.endswith(".rpm"):
+        # example
+        # setuptools-0.6c4-1.src.rpm
+        version = filename.split("-")[1]
     else:
         raise ValueError(f"Unknown file type: {filename}")
 

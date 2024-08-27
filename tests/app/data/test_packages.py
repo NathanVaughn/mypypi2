@@ -13,6 +13,7 @@ import app.data.packages
         ("coverage-4.0a5.tar.bz2", "4.0a5"),
         ("vscode_task_runner-1.2.0-py3-none-any.whl", "1.2.0"),
         ("vscode_task_runner-1.2.0.tar.gz", "1.2.0"),
+        ("setuptools-0.6c4-1.src.rpm", "0.6c4"),
     ),
 )
 def test_parse_filename_version(filename: str, version: str) -> None:
