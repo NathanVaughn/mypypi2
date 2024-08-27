@@ -155,17 +155,17 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
     app.data.sql.upload_new_package_files(new_records)
 
 
-def update_package_data(repository: Repository, package: str) -> None:
+def update_package_data(repository: Repository, package_name: str) -> None:
     """
     Update the package data for a given package in our database
     """
-    logger.info(f"Updating {repository.slug}/{package}")
+    logger.info(f"Updating {repository.slug}/{package_name}")
 
     # parse the simple registry
-    parse_simple_registry(repository, package)
+    parse_simple_registry(repository, package_name)
 
     # record the last time we've updated this package
-    app.data.sql.update_package_last_updated(repository, package)
+    app.data.sql.update_package_last_updated(repository, package_name)
 
 
 def get_package_code_files(
@@ -184,6 +184,8 @@ def get_package_code_files(
     # check if package data is current
     if package_update is None or not package_update.is_current:
         update_package_data(repository, package_name)
+    else:
+        logger.debug(f"Using cached data for {repository.slug}/{package_name}")
 
     # get package filenames
     return app.data.sql.get_package_code_files(repository, package_name)
@@ -193,6 +195,10 @@ def cache_file(package_file: PackageFile) -> None:
     """
     Cache a file
     """
+    # skip if already cached
+    if package_file.is_cached:
+        return
+
     # upload the main file
     app.data.storage.active.ActiveStorage.provider.cache_file(package_file)
 
@@ -214,6 +220,10 @@ def get_package_file(
     package_file = app.data.sql.lookup_package_file(repository, filename)
 
     if not package_file:
+        logger.debug(
+            f"Package file {filename} not found in {
+                repository.slug}/{package_name}, refreshing data",
+        )
         # refresh the package data
         update_package_data(repository, package_name)
 
@@ -227,7 +237,6 @@ def get_package_file(
             )
 
     # if we haven't cached the file yet, do so now
-    if not package_file.is_cached:
-        cache_file(package_file)
+    cache_file(package_file)
 
     return package_file

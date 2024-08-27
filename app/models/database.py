@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flask_sqlalchemy import SQLAlchemy
+from loguru import logger
 from sqlalchemy.orm import DeclarativeBase
 
 if TYPE_CHECKING:
@@ -25,6 +26,7 @@ def init_db(flask_app: Flask) -> None:
     from app.models.repository import Repository  # noqa
 
     with flask_app.app_context():
+        logger.debug("Initializing database")
         db.create_all()
 
         # load configured repositories
@@ -34,6 +36,7 @@ def init_db(flask_app: Flask) -> None:
             repository_obj = app.data.sql.lookup_repository(repository["slug"])
             if repository_obj is None:
                 # create new repository if it doesn't exist
+                logger.debug(f"Add repository {repository['slug']}")
                 db.session.add(
                     Repository(
                         slug=repository["slug"],

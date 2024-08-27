@@ -41,9 +41,8 @@ class S3Storage(BaseStorage):
         """
         Build the path to the file in S3 for upload
         """
-        return (
-            f"{self._bucket_name}/{self._bucket_prefix}/{self._get_path(package_file)}"
-        )
+        return f"{self._bucket_name}/{self._bucket_prefix}/{
+                self._get_path(package_file)}"
 
     def _download_path(self, package_file: PackageFile) -> str:
         """
@@ -68,7 +67,6 @@ class S3Storage(BaseStorage):
         """
         Download a file
         """
-        return flask.redirect(
-            self._download_path(package_file),
-            code=http.HTTPStatus.PERMANENT_REDIRECT,
-        )
+        path = self._get_path(package_file)
+        logger.debug(f"Redirecting to {path}")
+        return flask.redirect(path, code=http.HTTPStatus.PERMANENT_REDIRECT)

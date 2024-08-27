@@ -42,4 +42,6 @@ class LocalStorage(BaseStorage):
         """
         Download a file
         """
-        return flask.send_file(self._path(package_file), as_attachment=True)
+        path = self._path(package_file)
+        logger.debug(f"Sending {path}")
+        return flask.send_file(path, as_attachment=True)
