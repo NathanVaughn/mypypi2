@@ -7,6 +7,8 @@ import flask
 import requests
 from loguru import logger
 
+from app.models.package_file import PackageFile
+
 if TYPE_CHECKING:
     from app.models.package_file import PackageFile
 
@@ -25,7 +27,7 @@ class LocalStorage(BaseStorage):
         """
         return self._local_dir.joinpath(self._get_path(package_file))
 
-    def cache_file(self, package_file: PackageFile) -> None:
+    def upload_file(self, package_file: PackageFile) -> None:
         """
         Take a file from an upstream URL and save it
         """
@@ -37,6 +39,12 @@ class LocalStorage(BaseStorage):
             with requests.get(upstream_url, stream=True) as response:
                 for chunk in response.iter_content(chunk_size=8192):
                     fp.write(chunk)
+
+    def check_file(self, package_file: PackageFile) -> bool:
+        """
+        Check if a file already exists
+        """
+        return self._path(package_file).exists()
 
     def download_file(self, package_file: PackageFile) -> flask.BaseResponse:
         """

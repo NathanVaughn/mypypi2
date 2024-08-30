@@ -2,7 +2,6 @@ import html
 from urllib.parse import urljoin
 
 import lxml.html
-import packaging.utils
 from loguru import logger
 
 import app.data.proxy
@@ -15,45 +14,6 @@ from app.models.package_file import PackageFile
 from app.models.package_metadata_file import PackageMetadataFile
 from app.models.repository import Repository
 from app.utils import log_package_name
-
-
-def parse_filename_version(filename: str) -> str:
-    """
-    Attempt to parse the version from a filename
-    """
-    if filename.endswith(".whl"):
-        _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
-        version = str(version)
-    elif filename.endswith(".tar.gz") or filename.endswith(".zip"):
-        _, version = packaging.utils.parse_sdist_filename(filename)
-        version = str(version)
-    elif filename.endswith(".tar.bz2"):
-        # example
-        # coverage-4.0a5.tar.bz2
-        # lie about file extension
-        _, version = packaging.utils.parse_sdist_filename(
-            filename.replace(".tar.bz2", ".tar.gz")
-        )
-        version = str(version)
-    elif filename.endswith(".egg"):
-        # {distribution_name}-{version}-{python_version}.egg
-        # example
-        # lxml-2.0-py2.4-win32.egg
-        version = filename.split("-")[1]
-    elif filename.endswith(".exe") or filename.endswith(".msi"):
-        # examples
-        # lxml-1.3.4.win32-py2.4.exe
-        # lxml-2.2.win32-py2.4.exe
-        # greenlet-0.4.4.win-amd64-py2.6.msi
-        version = filename.split("-")[1].split(".win")[0]
-    elif filename.endswith(".rpm"):
-        # example
-        # setuptools-0.6c4-1.src.rpm
-        version = filename.split("-")[1]
-    else:
-        raise app.models.exceptions.UnknownFileFormat(filename)
-
-    return version
 
 
 def parse_sha256_hash(given: str) -> str | None:
@@ -86,15 +46,6 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         # inner text is filename
         filename = anchor_tag.text
 
-        # parse filename
-        try:
-            version = parse_filename_version(filename)
-        except app.models.exceptions.UnknownFileFormat:
-            logger.error(
-                f"Skipping {filename} in {
-                    log_package_name(repository, package_name)}"
-            )
-
         # get upstream url and sha256 hash
         href = anchor_tag.attrib["href"]
         absolute_href = urljoin(package_simple_url, href)
@@ -119,7 +70,6 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         package_code_file = PackageCodeFile(
             repository=repository,
             package_name=package_name,
-            version=version,
             filename=filename,
             sha256_hash=upstream_sha256_hash,
             upstream_url=upstream_url,
@@ -133,7 +83,6 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
             package_metadata_file = PackageMetadataFile(
                 repository=repository,
                 package_name=package_name,
-                version=version,
                 filename=metadata_filename,
                 sha256_hash=metadata_sha256_hash,
                 upstream_url=upstream_url + METDATA_EXTENSION,

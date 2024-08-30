@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
@@ -14,6 +14,11 @@ if TYPE_CHECKING:
 
 class PackageUpdate(Base):
     __tablename__ = "package_update"
+    __table_args__ = (
+        UniqueConstraint(
+            "package_name", "repository_id", name="_package_name_repository_id_uc"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """
@@ -24,7 +29,7 @@ class PackageUpdate(Base):
     """
     The parent repository
     """
-    package_name: Mapped[str] = mapped_column(String, unique=True)
+    package_name: Mapped[str] = mapped_column(String)
     """
     Package name
     """

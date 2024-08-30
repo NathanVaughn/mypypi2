@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import BLOB, DateTime, ForeignKey, Integer, String
+from sqlalchemy import BLOB, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 
 class URLCache(Base):
     __tablename__ = "url_cache"
+    __table_args__ = (
+        UniqueConstraint("url", "repository_id", name="_url_repository_id_uc"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     url: Mapped[str] = mapped_column(String)

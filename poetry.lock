@@ -2,24 +2,29 @@
 
 [[package]]
 name = "aiobotocore"
-version = "2.13.3"
+version = "2.14.0"
 description = "Async client for aws services using botocore and aiohttp"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "aiobotocore-2.13.3-py3-none-any.whl", hash = "sha256:1272f765fd9414e1a68f8add71978367db94e17e36c3bf629cf1153eb5141fb9"},
-    {file = "aiobotocore-2.13.3.tar.gz", hash = "sha256:ac5620f93cc3e7c2aef7c67ba2bb74035ff8d49ee2325821daed13b3dd82a473"},
+    {file = "aiobotocore-2.14.0-py3-none-any.whl", hash = "sha256:721c52f5d1221daa4851cfa9ab5db14440477f33d763da9019691c4f67163873"},
+    {file = "aiobotocore-2.14.0.tar.gz", hash = "sha256:680dcbcde9cb0dcefbcddc180d273c2d048940f87f2bdb0eebe0f4c30c1e39b9"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.9.2,<4.0.0"
 aioitertools = ">=0.5.1,<1.0.0"
-botocore = ">=1.34.70,<1.34.163"
+botocore = ">=1.35.0,<1.35.8"
 wrapt = ">=1.10.10,<2.0.0"
 
 [package.extras]
-awscli = ["awscli (>=1.32.70,<1.33.45)"]
-boto3 = ["boto3 (>=1.34.70,<1.34.163)"]
+awscli = ["awscli (>=1.34.0,<1.34.8)"]
+boto3 = ["boto3 (>=1.35.0,<1.35.8)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "aiohappyeyeballs"
@@ -31,6 +36,11 @@ files = [
     {file = "aiohappyeyeballs-2.4.0-py3-none-any.whl", hash = "sha256:7ce92076e249169a13c2f49320d1967425eaf1f407522d707d59cac7628d62bd"},
     {file = "aiohappyeyeballs-2.4.0.tar.gz", hash = "sha256:55a1714f084e63d49639800f95716da97a1f173d46a16dfcfda0016abb93b6b2"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "aiohttp"
@@ -143,6 +153,11 @@ yarl = ">=1.0,<2.0"
 [package.extras]
 speedups = ["Brotli", "aiodns (>=3.2.0)", "brotlicffi"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "aioitertools"
 version = "0.11.0"
@@ -153,6 +168,11 @@ files = [
     {file = "aioitertools-0.11.0-py3-none-any.whl", hash = "sha256:04b95e3dab25b449def24d7df809411c10e62aab0cbe31a50ca4e68748c43394"},
     {file = "aioitertools-0.11.0.tar.gz", hash = "sha256:42c68b8dd3a69c2bf7f2233bf7df4bb58b557bca5252ac02ed5187bbc67d6831"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "aiosignal"
@@ -167,6 +187,11 @@ files = [
 
 [package.dependencies]
 frozenlist = ">=1.1.0"
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "attrs"
@@ -187,6 +212,11 @@ docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphi
 tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
 tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "blinker"
 version = "1.8.2"
@@ -198,15 +228,20 @@ files = [
     {file = "blinker-1.8.2.tar.gz", hash = "sha256:8f77b09d3bf7c795e969e9486f39c2c5e9c39d4ee07424be2bc594ece9642d83"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "botocore"
-version = "1.34.162"
+version = "1.35.7"
 description = "Low-level, data-driven core of boto 3."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">= 3.8"
 files = [
-    {file = "botocore-1.34.162-py3-none-any.whl", hash = "sha256:2d918b02db88d27a75b48275e6fb2506e9adaaddbec1ffa6a8a0898b34e769be"},
-    {file = "botocore-1.34.162.tar.gz", hash = "sha256:adc23be4fb99ad31961236342b7cbf3c0bfc62532cd02852196032e8c0d682f3"},
+    {file = "botocore-1.35.7-py3-none-any.whl", hash = "sha256:324e58518a92f2946bc6653e5e1272bc88d4b6313413f938bdc51cb90d34cbba"},
+    {file = "botocore-1.35.7.tar.gz", hash = "sha256:85e4b58f2c6e54dfbf52eaee72ebc9b70188fd1716d47f626874abadcee45512"},
 ]
 
 [package.dependencies]
@@ -216,6 +251,11 @@ urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >
 
 [package.extras]
 crt = ["awscrt (==0.21.2)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "certifi"
@@ -228,6 +268,11 @@ files = [
     {file = "certifi-2024.7.4.tar.gz", hash = "sha256:5a1e7645bc0ec61a09e26c36f6106dd4cf40c6db3a1fb6352b0244e7fb057c7b"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "cfgv"
 version = "3.4.0"
@@ -238,6 +283,11 @@ files = [
     {file = "cfgv-3.4.0-py2.py3-none-any.whl", hash = "sha256:b7265b1f29fd3316bfcd2b330d63d024f2bfd8bcb8b0272f8e19a504856c48f9"},
     {file = "cfgv-3.4.0.tar.gz", hash = "sha256:e52591d4c5f5dead8e0f673fb16db7949d2cfb3f7da4582893288f0ded8fe560"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "charset-normalizer"
@@ -338,6 +388,11 @@ files = [
     {file = "charset_normalizer-3.3.2-py3-none-any.whl", hash = "sha256:3e4d1f6587322d2788836a99c69062fbb091331ec940e02d12d179c1d53e25fc"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "click"
 version = "8.1.7"
@@ -352,6 +407,11 @@ files = [
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -362,6 +422,11 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "coverage"
@@ -447,6 +512,11 @@ files = [
 [package.extras]
 toml = ["tomli"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "distlib"
 version = "0.3.8"
@@ -457,6 +527,11 @@ files = [
     {file = "distlib-0.3.8-py2.py3-none-any.whl", hash = "sha256:034db59a0b96f8ca18035f36290806a9a6e6bd9d1ff91e45a7f172eb17e51784"},
     {file = "distlib-0.3.8.tar.gz", hash = "sha256:1530ea13e350031b6312d8580ddb6b27a104275a31106523b8f123787f494f64"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "filelock"
@@ -473,6 +548,11 @@ files = [
 docs = ["furo (>=2023.9.10)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.25.2)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8.0.1)", "pytest (>=7.4.3)", "pytest-asyncio (>=0.21)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-timeout (>=2.2)", "virtualenv (>=20.26.2)"]
 typing = ["typing-extensions (>=4.8)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "flask"
@@ -496,6 +576,11 @@ Werkzeug = ">=3.0.0"
 async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "flask-sqlalchemy"
 version = "3.1.1"
@@ -510,6 +595,11 @@ files = [
 [package.dependencies]
 flask = ">=2.2.5"
 sqlalchemy = ">=2.0.16"
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "frozenlist"
@@ -597,6 +687,11 @@ files = [
     {file = "frozenlist-1.4.1.tar.gz", hash = "sha256:c037a86e8513059a2613aaba4d817bb90b9d9b6b69aace3ce9c877e8c8ed402b"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "fsspec"
 version = "2024.6.1"
@@ -635,6 +730,11 @@ test = ["aiohttp (!=4.0.0a0,!=4.0.0a1)", "numpy", "pytest", "pytest-asyncio (!=0
 test-downstream = ["aiobotocore (>=2.5.4,<3.0.0)", "dask-expr", "dask[dataframe,test]", "moto[server] (>4,<5)", "pytest-timeout", "xarray"]
 test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr", "zstandard"]
 tqdm = ["tqdm"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "greenlet"
@@ -707,6 +807,11 @@ files = [
 docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "identify"
 version = "2.6.0"
@@ -721,6 +826,11 @@ files = [
 [package.extras]
 license = ["ukkonen"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "idna"
 version = "3.8"
@@ -731,6 +841,11 @@ files = [
     {file = "idna-3.8-py3-none-any.whl", hash = "sha256:050b4e5baadcd44d760cedbd2b8e639f2ff89bbc7a5730fcc662954303377aac"},
     {file = "idna-3.8.tar.gz", hash = "sha256:d838c2c0ed6fced7693d5e8ab8e734d5f8fda53a039c0164afb0b82e771e3603"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "iniconfig"
@@ -743,6 +858,11 @@ files = [
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "itsdangerous"
 version = "2.2.0"
@@ -753,6 +873,11 @@ files = [
     {file = "itsdangerous-2.2.0-py3-none-any.whl", hash = "sha256:c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef"},
     {file = "itsdangerous-2.2.0.tar.gz", hash = "sha256:e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "jinja2"
@@ -771,6 +896,11 @@ MarkupSafe = ">=2.0"
 [package.extras]
 i18n = ["Babel (>=2.7)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "jmespath"
 version = "1.0.1"
@@ -781,6 +911,11 @@ files = [
     {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
     {file = "jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "loguru"
@@ -799,6 +934,11 @@ win32-setctime = {version = ">=1.0.0", markers = "sys_platform == \"win32\""}
 
 [package.extras]
 dev = ["Sphinx (==7.2.5)", "colorama (==0.4.5)", "colorama (==0.4.6)", "exceptiongroup (==1.1.3)", "freezegun (==1.1.0)", "freezegun (==1.2.2)", "mypy (==v0.910)", "mypy (==v0.971)", "mypy (==v1.4.1)", "mypy (==v1.5.1)", "pre-commit (==3.4.0)", "pytest (==6.1.2)", "pytest (==7.4.0)", "pytest-cov (==2.12.1)", "pytest-cov (==4.1.0)", "pytest-mypy-plugins (==1.9.3)", "pytest-mypy-plugins (==3.0.0)", "sphinx-autobuild (==2021.3.14)", "sphinx-rtd-theme (==1.3.0)", "tox (==3.27.1)", "tox (==4.11.0)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "lxml"
@@ -954,6 +1094,11 @@ html5 = ["html5lib"]
 htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=3.0.11)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "markupsafe"
 version = "2.1.5"
@@ -1022,6 +1167,11 @@ files = [
     {file = "MarkupSafe-2.1.5-cp39-cp39-win_amd64.whl", hash = "sha256:fa173ec60341d6bb97a89f5ea19c85c5643c1e7dedebc22f5181eb73573142c5"},
     {file = "MarkupSafe-2.1.5.tar.gz", hash = "sha256:d283d37a890ba4c1ae73ffadf8046435c76e7bc2247bbb63c00bd1a709c6544b"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "multidict"
@@ -1122,16 +1272,26 @@ files = [
     {file = "multidict-6.0.5.tar.gz", hash = "sha256:f7e301075edaf50500f0b341543c41194d8df3ae5caf4702f2095f3ca73dd8da"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "nodeenv"
 version = "1.9.1"
 description = "Node.js virtual environment builder"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
 files = [
     {file = "nodeenv-1.9.1-py2.py3-none-any.whl", hash = "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9"},
     {file = "nodeenv-1.9.1.tar.gz", hash = "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "packaging"
@@ -1143,6 +1303,11 @@ files = [
     {file = "packaging-24.1-py3-none-any.whl", hash = "sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124"},
     {file = "packaging-24.1.tar.gz", hash = "sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "platformdirs"
@@ -1160,6 +1325,11 @@ docs = ["furo (>=2023.9.10)", "proselint (>=0.13)", "sphinx (>=7.2.6)", "sphinx-
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)"]
 type = ["mypy (>=1.8)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "pluggy"
 version = "1.5.0"
@@ -1174,6 +1344,11 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "pre-commit"
@@ -1192,6 +1367,11 @@ identify = ">=1.0.0"
 nodeenv = ">=0.11.1"
 pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "pyjson5"
@@ -1328,6 +1508,11 @@ files = [
     {file = "pyjson5-1.6.6.tar.gz", hash = "sha256:20df8c5dbbe0d653f403da88b7520be44fc8d74697bbdd1ead688458b5691a02"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "pytest"
 version = "8.3.2"
@@ -1348,6 +1533,11 @@ pluggy = ">=1.5,<2"
 [package.extras]
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "pytest-cov"
 version = "5.0.0"
@@ -1366,6 +1556,11 @@ pytest = ">=4.6"
 [package.extras]
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
@@ -1379,6 +1574,11 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "pyyaml"
@@ -1442,6 +1642,11 @@ files = [
     {file = "pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"},
 ]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "requests"
 version = "2.32.3"
@@ -1463,12 +1668,17 @@ urllib3 = ">=1.21.1,<3"
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "s3fs"
 version = "2024.6.1"
 description = "Convenient Filesystem interface over S3"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">= 3.8"
 files = [
     {file = "s3fs-2024.6.1-py3-none-any.whl", hash = "sha256:ecd20863437409eec1cbfff0b7df5e9772cf7c1926008efab2e17e46f6d52c63"},
     {file = "s3fs-2024.6.1.tar.gz", hash = "sha256:6c2106d6c34fbfbb88e3d20c6f3572896d5ee3d3512896696301c21a3c541bea"},
@@ -1483,6 +1693,11 @@ fsspec = "==2024.6.1.*"
 awscli = ["aiobotocore[awscli] (>=2.5.4,<3.0.0)"]
 boto3 = ["aiobotocore[boto3] (>=2.5.4,<3.0.0)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "six"
 version = "1.16.0"
@@ -1493,6 +1708,11 @@ files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "sqlalchemy"
@@ -1559,7 +1779,7 @@ typing-extensions = ">=4.6.0"
 [package.extras]
 aiomysql = ["aiomysql (>=0.2.0)", "greenlet (!=0.4.17)"]
 aioodbc = ["aioodbc", "greenlet (!=0.4.17)"]
-aiosqlite = ["aiosqlite", "greenlet (!=0.4.17)", "typing_extensions (!=3.10.0.1)"]
+aiosqlite = ["aiosqlite", "greenlet (!=0.4.17)", "typing-extensions (!=3.10.0.1)"]
 asyncio = ["greenlet (!=0.4.17)"]
 asyncmy = ["asyncmy (>=0.2.3,!=0.2.4,!=0.2.6)", "greenlet (!=0.4.17)"]
 mariadb-connector = ["mariadb (>=1.0.1,!=1.1.2,!=1.1.5)"]
@@ -1569,7 +1789,7 @@ mssql-pyodbc = ["pyodbc"]
 mypy = ["mypy (>=0.910)"]
 mysql = ["mysqlclient (>=1.4.0)"]
 mysql-connector = ["mysql-connector-python"]
-oracle = ["cx_oracle (>=8)"]
+oracle = ["cx-oracle (>=8)"]
 oracle-oracledb = ["oracledb (>=1.0.1)"]
 postgresql = ["psycopg2 (>=2.7)"]
 postgresql-asyncpg = ["asyncpg", "greenlet (!=0.4.17)"]
@@ -1579,7 +1799,12 @@ postgresql-psycopg2binary = ["psycopg2-binary"]
 postgresql-psycopg2cffi = ["psycopg2cffi"]
 postgresql-psycopgbinary = ["psycopg[binary] (>=3.0.7)"]
 pymysql = ["pymysql"]
-sqlcipher = ["sqlcipher3_binary"]
+sqlcipher = ["sqlcipher3-binary"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "typing-extensions"
@@ -1591,6 +1816,11 @@ files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "urllib3"
@@ -1608,6 +1838,11 @@ brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "virtualenv"
@@ -1629,6 +1864,11 @@ platformdirs = ">=3.9.1,<5"
 docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2,!=7.3)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
 test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8)", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "werkzeug"
 version = "3.0.4"
@@ -1646,6 +1886,11 @@ MarkupSafe = ">=2.1.1"
 [package.extras]
 watchdog = ["watchdog (>=2.3)"]
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [[package]]
 name = "win32-setctime"
 version = "1.1.0"
@@ -1659,6 +1904,11 @@ files = [
 
 [package.extras]
 dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "wrapt"
@@ -1738,6 +1988,11 @@ files = [
     {file = "wrapt-1.16.0-py3-none-any.whl", hash = "sha256:6906c4100a8fcbf2fa735f6059214bb13b97f75b1a61777fcf6432121ef12ef1"},
     {file = "wrapt-1.16.0.tar.gz", hash = "sha256:5f370f952971e7d17c7d1ead40e49f32345a7f7a5373571ef44d800d06b1899d"},
 ]
+
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
 
 [[package]]
 name = "yarl"
@@ -1842,7 +2097,12 @@ files = [
 idna = ">=2.0"
 multidict = ">=4.0"
 
+[package.source]
+type = "legacy"
+url = "http://localhost:5000/pypi/simple"
+reference = "local"
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "8070fd79129df4207875d27a1cc7d13a3980afd312d4c7b328f3e496c69763b7"
+content-hash = "e2775a82391c89093d0465f5474709e26352975d724eaaac93d67a035584de49"

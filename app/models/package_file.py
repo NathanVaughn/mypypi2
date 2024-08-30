@@ -41,10 +41,13 @@ class PackageFile(Base):
     """
     Package name
     """
-    version: Mapped[str] = mapped_column(String)
-    """
-    Package version
-    """
+    # version: Mapped[str] = mapped_column(String)
+    # get rid of version
+    # near-impossible to consistently parse the version from the filename
+    # as the simple API doesn't give the version
+    # Would need to make a seperate request to the JSON API to get the version
+    # which not all indexes support
+    # Filename is guaranteed to be unique for a repository
     filename: Mapped[str] = mapped_column(String)
     """
     Package filename. Guaranteed to be unique for a repository.
@@ -68,7 +71,6 @@ class PackageFile(Base):
             "file.file_route",
             repository_slug=self.repository.slug,
             package_name=self.package_name,
-            version=self.version,
             filename=self.filename,
             _external=True,
         )

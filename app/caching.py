@@ -9,13 +9,8 @@ import app.data.sql
 
 def repository_cache(func: Callable) -> Callable:
     """
-    Caches the result of a function for a timeout specified by the function itself.
-
-    Args:
-        func (function): The function to be decorated.
-
-    Returns:
-        function: The decorated function.
+    Caches a flask view function based on the repository timeout.
+    Expects the repository_slug to be passed as a keyword argument.
     """
 
     cache = {}
@@ -23,11 +18,15 @@ def repository_cache(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(*args: str, **kwargs: str) -> Any:
-        # Get the timeout value from the function
-        repository_slug = kwargs["repository_slug"]
-        repository_timeout = app.data.sql.lookup_repository_timeout(repository_slug)
+        repository_timeout = app.data.sql.lookup_repository_timeout(
+            kwargs["repository_slug"]
+        )
 
-        key = (func.__name__, *args, *kwargs.items())
+        # flask always passes the view function's arguments as kwargs
+        # the second part of this line flattens the kwargs into a list
+        key = "-".join(
+            (func.__name__, *args, *(i for (k, v) in kwargs.items() for i in (k, v)))
+        )
 
         if key in cache and time.time() - cache_times[key] < repository_timeout:
             logger.debug(f"Cache hit for {key}")

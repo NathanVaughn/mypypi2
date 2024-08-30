@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import http
 from typing import TYPE_CHECKING
 
 import flask
 import requests
 import s3fs
 from loguru import logger
+
+from app.models.package_file import PackageFile
 
 if TYPE_CHECKING:
     from app.models.package_file import PackageFile
@@ -23,12 +24,14 @@ class S3Storage(BaseStorage):
         access_key_id: str,
         secret_access_key: str,
         public_url_prefix: str,
-        region_name: str | None = None,
-        bucket_prefix: str = "",
+        region_name: str | None,
+        bucket_prefix: str,
+        redirect_code: int,
     ) -> None:
         self._bucket_name = bucket_name
         self._bucket_prefix = bucket_prefix.removesuffix("/")
         self._public_url_prefix = public_url_prefix.removesuffix("/")
+        self._redirect_code = redirect_code
 
         self._interface = s3fs.S3FileSystem(
             endpoint_url=endpoint_url,
@@ -50,7 +53,14 @@ class S3Storage(BaseStorage):
         """
         return f"{self._public_url_prefix}/{self._get_path(package_file)}"
 
-    def cache_file(self, package_file: PackageFile) -> None:
+    def check_file(self, package_file: PackageFile) -> bool:
+        """
+        Check if the file already exists in S3
+        """
+        s3_url = self._cache_path(package_file)
+        return self._interface.exists(s3_url)
+
+    def upload_file(self, package_file: PackageFile) -> None:
         """
         Take a file from an upstream URL and save it
         """
@@ -71,5 +81,5 @@ class S3Storage(BaseStorage):
         logger.info(f"Redirecting to {path}")
         return flask.redirect(
             self._download_path(package_file),
-            code=http.HTTPStatus.PERMANENT_REDIRECT,
+            code=self._redirect_code,
         )

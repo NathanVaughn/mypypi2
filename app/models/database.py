@@ -36,7 +36,7 @@ def init_db(flask_app: Flask) -> None:
             repository_obj = app.data.sql.lookup_repository(repository["slug"])
             if repository_obj is None:
                 # create new repository if it doesn't exist
-                logger.debug(f"Add repository {repository['slug']}")
+                logger.debug(f"Adding repository {repository['slug']}")
                 db.session.add(
                     Repository(
                         slug=repository["slug"],

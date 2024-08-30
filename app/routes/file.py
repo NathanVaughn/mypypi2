@@ -8,11 +8,9 @@ from app.caching import repository_cache
 file_bp = Blueprint("file", __name__)
 
 
-@file_bp.route(
-    "/<string:repository_slug>/file/<string:package_name>/<string:version>/<string:filename>"
-)
+@file_bp.route("/<string:repository_slug>/file/<string:package_name>/<string:filename>")
 @repository_cache
-def file_route(repository_slug: str, package_name: str, version: str, filename: str):
+def file_route(repository_slug: str, package_name: str, filename: str):
     """
     This route is used to download a specific file
     """
