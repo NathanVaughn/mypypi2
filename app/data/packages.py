@@ -15,14 +15,30 @@ from app.models.package_metadata_file import PackageMetadataFile
 from app.models.repository import Repository
 from app.utils import log_package_name
 
+# https://github.com/pypa/pip/blob/b989e6ef04810bbd4033a3683020bd4ddcbdb627/src/pip/_internal/models/link.py#L40
+SUPPORTED_HASHES = ("sha512", "sha384", "sha256", "sha224", "sha1", "md5")
 
-def parse_sha256_hash(given: str) -> str | None:
+
+def parse_hash(given: str) -> tuple[str | None, str | None]:
     """
-    Parse the sha256 hash from a string
+    Parses a hash string into a tuple of hash type and hash value.
+    If unsupported hash type is found, returns None.
     """
-    if given.startswith("sha256="):
-        return given.split("=")[1]
-    return None
+
+    # make sure there is a seperator
+    if "=" not in given:
+        return None, None
+
+    # check if the hash type is supported
+    if not any(given.startswith(h) for h in SUPPORTED_HASHES):
+        return None, None
+
+    for hash_type in SUPPORTED_HASHES:
+        if given.startswith(hash_type):
+            return hash_type, given.split("=")[1]
+
+    # this should never happen
+    return None, None
 
 
 def parse_simple_registry(repository: Repository, package_name: str) -> None:
@@ -46,15 +62,18 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         # inner text is filename
         filename = anchor_tag.text
 
-        # get upstream url and sha256 hash
+        # get upstream url and file hash
         href = anchor_tag.attrib["href"]
         absolute_href = urljoin(package_simple_url, href)
         if "#" in absolute_href:
             upstream_url = absolute_href.split("#")[0]
-            upstream_sha256_hash = parse_sha256_hash(absolute_href.split("#")[1])
+            upstream_hash_type, upstream_hash_value = parse_hash(
+                absolute_href.split("#")[1]
+            )
         else:
             upstream_url = absolute_href
-            upstream_sha256_hash = None
+            upstream_hash_type = None
+            upstream_hash_value = None
 
         # get python requires
         requires_python = html.unescape(
@@ -62,29 +81,39 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         )
 
         # grab the sha256 hash from the data-dist-info-metadata attribute
-        metadata_sha256_hash = parse_sha256_hash(
-            anchor_tag.attrib.get("data-dist-info-metadata", "")
+        # PEP 714
+        # data-core-metadata is the preferred value
+        # data-dist-info-metadata is the fallback
+        metadata_value = anchor_tag.attrib.get(
+            "data-core-metadata", anchor_tag.attrib.get("data-dist-info-metadata", "")
         )
+
+        # true is an acceptable value
+        metadata_hash_type, metadata_hash_value = None, None
+        if metadata_value:
+            metadata_hash_type, metadata_hash_value = parse_hash(metadata_value)
 
         # lookup code file
         package_code_file = PackageCodeFile(
             repository=repository,
             package_name=package_name,
             filename=filename,
-            sha256_hash=upstream_sha256_hash,
+            hash_type=upstream_hash_type,
+            hash_value=upstream_hash_value,
             upstream_url=upstream_url,
             requires_python=requires_python,
         )
         new_package_code_files.append(package_code_file)
 
         # lookup metadata file
-        if metadata_sha256_hash:
+        if metadata_value:
             metadata_filename = filename + METDATA_EXTENSION
             package_metadata_file = PackageMetadataFile(
                 repository=repository,
                 package_name=package_name,
                 filename=metadata_filename,
-                sha256_hash=metadata_sha256_hash,
+                hash_type=metadata_hash_type,
+                hash_value=metadata_hash_value,
                 upstream_url=upstream_url + METDATA_EXTENSION,
                 code_file=package_code_file,
             )

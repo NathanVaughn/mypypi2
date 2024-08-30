@@ -52,9 +52,13 @@ class PackageFile(Base):
     """
     Package filename. Guaranteed to be unique for a repository.
     """
-    sha256_hash: Mapped[str] = mapped_column(String)
+    hash_type: Mapped[str] = mapped_column(String, nullable=True)
     """
-    SHA256 hash of the file
+    Type of hash of the file
+    """
+    hash_value: Mapped[str] = mapped_column(String, nullable=True)
+    """
+    Hash of the file
     """
     upstream_url: Mapped[str] = mapped_column(String)
     """
