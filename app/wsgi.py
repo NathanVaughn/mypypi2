@@ -4,6 +4,7 @@ from flask import Flask
 
 def create_app():
     flask_app = Flask(__name__)
+
     with open("config.toml", "rb") as f:
         flask_app.config.update(tomllib.load(f))
 

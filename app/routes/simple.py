@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template
 
 import app.data.packages
+from app.caching import repository_cache
 
 simple_bp = Blueprint("simple", __name__)
 
 
 @simple_bp.route("/<string:repository_slug>/simple/<string:package_name>/")
+@repository_cache
 def simple_route(repository_slug: str, package_name: str):
     """
     This route is used to provide a simple index of a specific package

@@ -1,5 +1,2 @@
-actual error codes (404)
-page-level caching
 handle offline upstream
-better logging
 tests

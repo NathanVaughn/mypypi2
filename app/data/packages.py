@@ -14,9 +14,13 @@ from app.models.package_code_file import PackageCodeFile
 from app.models.package_file import PackageFile
 from app.models.package_metadata_file import PackageMetadataFile
 from app.models.repository import Repository
+from app.utils import log_package_name
 
 
 def parse_filename_version(filename: str) -> str:
+    """
+    Attempt to parse the version from a filename
+    """
     if filename.endswith(".whl"):
         _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
         version = str(version)
@@ -47,7 +51,7 @@ def parse_filename_version(filename: str) -> str:
         # setuptools-0.6c4-1.src.rpm
         version = filename.split("-")[1]
     else:
-        raise ValueError(f"Unknown file type: {filename}")
+        raise app.models.exceptions.UnknownFileFormat(filename)
 
     return version
 
@@ -83,7 +87,13 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         filename = anchor_tag.text
 
         # parse filename
-        version = parse_filename_version(filename)
+        try:
+            version = parse_filename_version(filename)
+        except app.models.exceptions.UnknownFileFormat:
+            logger.error(
+                f"Skipping {filename} in {
+                    log_package_name(repository, package_name)}"
+            )
 
         # get upstream url and sha256 hash
         href = anchor_tag.attrib["href"]
@@ -163,7 +173,7 @@ def update_package_data(repository: Repository, package_name: str) -> None:
     """
     Update the package data for a given package in our database
     """
-    logger.info(f"Updating {repository.slug}/{package_name}")
+    logger.info(f"Updating {log_package_name(repository, package_name)}")
 
     # parse the simple registry
     parse_simple_registry(repository, package_name)
@@ -189,7 +199,8 @@ def get_package_code_files(
     if package_update is None or not package_update.is_current:
         update_package_data(repository, package_name)
     else:
-        logger.debug(f"Using cached data for {repository.slug}/{package_name}")
+        logger.debug(f"Using cached data for {
+                     log_package_name(repository, package_name)}")
 
     # get package filenames
     return app.data.sql.get_package_code_files(repository, package_name)
@@ -226,7 +237,7 @@ def get_package_file(
     if not package_file:
         logger.debug(
             f"Package file {filename} not found in {
-                repository.slug}/{package_name}, refreshing data",
+                log_package_name(repository, package_name)}, refreshing data",
         )
         # refresh the package data
         update_package_data(repository, package_name)
@@ -237,7 +248,7 @@ def get_package_file(
         # now fail if still not found
         if not package_file:
             raise app.models.exceptions.PackageFileNotFound(
-                repository_slug, package_name, filename
+                repository, package_name, filename
             )
 
     # if we haven't cached the file yet, do so now
