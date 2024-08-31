@@ -1,2 +1,3 @@
 handle offline upstream
+handle 404s
 tests

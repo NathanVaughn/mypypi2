@@ -4,10 +4,10 @@ from urllib.parse import urldefrag, urljoin
 import lxml.html
 
 from app.constants import METDATA_EXTENSION
-from app.data.index.simple import SUPPORTED_HASHES
-from app.models.package_code_file import PackageCodeFile
-from app.models.package_metadata_file import PackageMetadataFile
+from app.models.code_file import CodeFile
+from app.models.metadata_file import MetadataFile
 from app.models.repository import Repository
+from app.packages.simple import SUPPORTED_HASHES
 
 
 def parse_hash(given: str) -> tuple[str | None, str | None]:
@@ -39,7 +39,7 @@ def parse_hash(given: str) -> tuple[str | None, str | None]:
 
 def parse_simple_html(
     html_content: str, html_url: str, repository: Repository, package_name: str
-) -> tuple[list[PackageCodeFile], list[PackageMetadataFile]]:
+) -> tuple[list[CodeFile], list[MetadataFile]]:
     """
     Parse the simple registry HTML content.
     Return a tuple which contains a list of code files and a list of metadata files.
@@ -49,8 +49,8 @@ def parse_simple_html(
     upstream_tree = lxml.html.fromstring(html_content).contents
 
     # hold a list of records we parse
-    new_package_code_files: list[PackageCodeFile] = []
-    new_package_metadata_files: list[PackageMetadataFile] = []
+    new_package_code_files: list[CodeFile] = []
+    new_package_metadata_files: list[MetadataFile] = []
 
     # iterate over all anchor tags
     for anchor_tag in upstream_tree.iter("a"):
@@ -79,18 +79,16 @@ def parse_simple_html(
         # data-core-metadata is the preferred value
         # data-dist-info-metadata is the fallback
         metadata_value = anchor_tag.attrib.get(
-            "data-core-metadata", anchor_tag.attrib.get(
-                "data-dist-info-metadata", "")
+            "data-core-metadata", anchor_tag.attrib.get("data-dist-info-metadata", "")
         )
 
         # "true" is an acceptable value
         metadata_hash_type, metadata_hash_value = None, None
         if metadata_value:
-            metadata_hash_type, metadata_hash_value = parse_hash(
-                metadata_value)
+            metadata_hash_type, metadata_hash_value = parse_hash(metadata_value)
 
         # create code file
-        package_code_file = PackageCodeFile(
+        package_code_file = CodeFile(
             repository=repository,
             package_name=package_name,
             filename=filename,
@@ -104,7 +102,7 @@ def parse_simple_html(
         # create metadata file
         if metadata_value:
             metadata_filename = filename + METDATA_EXTENSION
-            package_metadata_file = PackageMetadataFile(
+            package_metadata_file = MetadataFile(
                 repository=repository,
                 package_name=package_name,
                 filename=metadata_filename,

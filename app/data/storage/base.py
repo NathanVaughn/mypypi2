@@ -15,7 +15,7 @@ class BaseStorage(abc.ABC):
         """
         Build the path to the file in storage
         """
-        return f"{package_file.repository.slug}/{package_file.package_name}/{package_file.filename}"
+        return f"{package_file.package.repository.slug}/{package_file.package.name}/{package_file.filename}"
 
     @abc.abstractmethod
     def upload_file(self, package_file: PackageFile) -> None:

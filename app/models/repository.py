@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
+
+if TYPE_CHECKING:
+    from app.models.package import Package
 
 
 class Repository(Base):
@@ -20,3 +27,11 @@ class Repository(Base):
     """
     Number of minutes to cache package data for
     """
+    timeout_seconds: Mapped[int] = mapped_column(Integer)
+    """
+    Number of seconds to wait for a response from the upstream server
+    """
+
+    packages: Mapped[list[Package]] = relationship(
+        "Package", back_populates="repository"
+    )

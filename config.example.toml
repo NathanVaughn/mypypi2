@@ -1,7 +1,8 @@
 [[repositories]]
-    slug          = "pypi"
-    simple_url    = "https://pypi.org/simple/"
-    cache_minutes = 10
+    slug            = "pypi"
+    simple_url      = "https://pypi.org/simple/"
+    cache_minutes   = 10
+    timeout_seconds = 30
 
 [database]
     uri = "sqlite:///data.sqlite"

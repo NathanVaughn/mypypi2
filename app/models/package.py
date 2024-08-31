@@ -3,16 +3,17 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
 
 if TYPE_CHECKING:
+    from app.models.code_file import CodeFile
     from app.models.repository import Repository
 
 
-class PackageUpdate(Base):
+class Package(Base):
     __tablename__ = "package_update"
     __table_args__ = (
         UniqueConstraint(
@@ -25,18 +26,28 @@ class PackageUpdate(Base):
     Unique identifier
     """
     repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
-    repository: Mapped[Repository] = relationship("Repository", lazy="joined")
+    repository: Mapped[Repository] = relationship(
+        "Repository", lazy="joined", back_populates="packages"
+    )
     """
     The parent repository
     """
-    package_name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String)
     """
     Package name
     """
+    versions: Mapped[str] = mapped_column(JSON, nullable=True, default=None)
+    """
+    For packages from a JSON v1.1 API, this will be a list of available versions
+    """
     last_updated: Mapped[datetime.datetime] = mapped_column(DateTime)
     """
-    Last time we checked the available versions and files for this package
+    Last time this package's data was updated
     """
+
+    code_files: Mapped[list[CodeFile]] = relationship(
+        "CodeFile", back_populates="package"
+    )
 
     @property
     def is_current(self) -> bool:

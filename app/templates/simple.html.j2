@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta name="pypi:repository-version" content="1.1">
+        <title>Links for {{ package.name }}</title>
+    </head>
 
-<head>
-    <meta name="pypi:repository-version" content="1.1">
-    <title>Links for {{ package_name }}</title>
-</head>
-
-<body>
-    <h1>Links for {{ package_name }}</h1>
-    {% for pcf in package_code_files -%}
-        <a href="{{ pcf.download_url }}#sha256={{ pcf.sha256_hash }}" data-requires-python="{{ pcf.requires_python | escape }}" {% if pcf.metadata_file %}data-dist-info-metadata="sha256={{ pcf.metadata_file.sha256_hash }}" data-core-metadata="sha256={{ pcf.metadata_file.sha256_hash }}"{% endif %}>{{ pcf.filename }}</a><br />
-    {% endfor %}
-</body>
-
+    <body>
+        <h1>Links for {{ package.name }}</h1>
+        {% for cf in package.code_files -%}
+            <a href="{{ cf.html_download_url }}" {% if cf.requires_python is not None %}data-requires-python="{{ cf.requires_python | escape }}"{% endif %} {% if cf.metadata_file %}data-dist-info-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}" data-core-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}"{% endif %} {% if cf.yanked is not None %}data-yanked="{{ cf.yanked }}"{% endif %}>{{ cf.filename }}</a><br />
+        {% endfor %}
+    </body>
 </html>
+<!--LAST UPDATED {{ package.last_updated.isoformat() }}-->

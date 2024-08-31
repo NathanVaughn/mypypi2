@@ -9,9 +9,9 @@ import app.data.sql
 import app.data.storage.active
 import app.models.exceptions
 from app.constants import METDATA_EXTENSION
-from app.models.package_code_file import PackageCodeFile
+from app.models.code_file import CodeFile
+from app.models.metadata_file import MetadataFile
 from app.models.package_file import PackageFile
-from app.models.package_metadata_file import PackageMetadataFile
 from app.models.repository import Repository
 from app.utils import log_package_name
 
@@ -54,8 +54,8 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
     )
 
     # hold a list of records we parse
-    new_package_code_files: list[PackageCodeFile] = []
-    new_package_metadata_files: list[PackageMetadataFile] = []
+    new_package_code_files: list[CodeFile] = []
+    new_package_metadata_files: list[MetadataFile] = []
 
     # iterate over all anchor tags
     for anchor_tag in upstream_tree.iter("a"):
@@ -94,7 +94,7 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
             metadata_hash_type, metadata_hash_value = parse_hash(metadata_value)
 
         # lookup code file
-        package_code_file = PackageCodeFile(
+        package_code_file = CodeFile(
             repository=repository,
             package_name=package_name,
             filename=filename,
@@ -108,7 +108,7 @@ def parse_simple_registry(repository: Repository, package_name: str) -> None:
         # lookup metadata file
         if metadata_value:
             metadata_filename = filename + METDATA_EXTENSION
-            package_metadata_file = PackageMetadataFile(
+            package_metadata_file = MetadataFile(
                 repository=repository,
                 package_name=package_name,
                 filename=metadata_filename,
@@ -160,9 +160,7 @@ def update_package_data(repository: Repository, package_name: str) -> None:
     app.data.sql.update_package_last_updated(repository, package_name)
 
 
-def get_package_code_files(
-    repository_slug: str, package_name: str
-) -> list[PackageCodeFile]:
+def get_package_code_files(repository_slug: str, package_name: str) -> list[CodeFile]:
     """
     Get a list of PackageCodeFiles objects for a given package
     """
@@ -203,7 +201,7 @@ def get_package_file(
     repository_slug: str, package_name: str, filename: str
 ) -> PackageFile:
     """
-    Get a list of PackageCodeFiles objects for a given package
+    Return a PackageFile object for a given package and filename
     """
     repository = app.data.sql.lookup_repository(repository_slug)
     if repository is None:

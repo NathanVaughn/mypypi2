@@ -24,6 +24,12 @@ class UnknownStorageDriver(Exception):
     """
 
 
+class InvalidQualityValue(Exception):
+    """
+    Exception raised when a quality value is invalid
+    """
+
+
 class RepositoryNotFound(HTTPException):
     """
     Exception raised when a repository is not found
@@ -45,5 +51,5 @@ class PackageFileNotFound(HTTPException):
     def __init__(self, repository: Repository, package_name: str, filename: str):
         super().__init__(
             description=f"Package file {filename} not found in {
-            log_package_name(repository, package_name)}"
+                log_package_name(repository, package_name)}"
         )
