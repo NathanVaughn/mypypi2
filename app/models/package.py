@@ -9,8 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.database import Base
 
 if TYPE_CHECKING:
-    from app.models.code_file import CodeFile
-    from app.models.repository import Repository
+    from app.models.code_file import CodeFile  # pragma: no cover
+    from app.models.repository import Repository  # pragma: no cover
 
 
 class Package(Base):

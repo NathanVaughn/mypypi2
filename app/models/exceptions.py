@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException
 from app.utils import log_package_name
 
 if TYPE_CHECKING:
-    from app.models.repository import Repository
+    from app.models.repository import Repository  # pragma: no cover
 
 
 class UnknownFileFormat(Exception):

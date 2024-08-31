@@ -1,5 +1,6 @@
 import json
 
+from app.constants import METADATA_KEY, METADATA_KEY_LEGACY, METADATA_KEY_LEGACY2
 from app.models.package import Package
 
 
@@ -12,6 +13,9 @@ def render_template(package: Package) -> str:
     data["meta"]["api-version"] = "1.0"
     # we return 1.0 and not 1.1 because we do not support the version list
     # added in 1.1
+    # https://packaging.python.org/en/latest/specifications/simple-repository-api/#additional-fields-for-the-simple-api-for-package-indexes
+    # we only can grab data from the HTML api reliabily, so this does not contain
+    # all the fields needed to return a 1.1 response.
     data["meta"]["_last-updated"] = package.last_updated.isoformat()
 
     # add files
@@ -39,10 +43,13 @@ def render_template(package: Package) -> str:
             if code_file.metadata_file.hashes:
                 value = code_file.metadata_file.hashes_dict
 
-            file_data["core-metadata"] = value
+            file_data[METADATA_KEY] = value
 
             # backwards compatibility
-            file_data["dist-info-metadata"] = value
+            file_data[METADATA_KEY_LEGACY] = value
+
+            # be like pypi
+            file_data[METADATA_KEY_LEGACY2] = value
 
         # append it
         data["files"].append(file_data)

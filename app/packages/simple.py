@@ -2,6 +2,10 @@ import dataclasses
 import functools
 import hashlib
 import re
+from urllib.parse import urljoin
+
+import packaging.utils
+import packaging.version
 
 from app.constants import CONTENT_TYPE_HEADER_HTML
 from app.models.enums import IndexFormat
@@ -95,10 +99,12 @@ def validate_quality(quality: str) -> float:
     try:
         fquality = float(quality)
     except ValueError:
-        raise InvalidQualityValue(f"Quality value {quality} is not a valid float")
+        raise InvalidQualityValue(
+            f"Quality value {quality} is not a valid float")
 
     if not 0 <= fquality <= 1:
-        raise InvalidQualityValue(f"Quality value {quality} is not between 0 and 1")
+        raise InvalidQualityValue(
+            f"Quality value {quality} is not between 0 and 1")
 
     return fquality
 
@@ -165,3 +171,32 @@ def determine_index_format(
 
     # return top pick
     return PYPI_CONTENT_TYPE_INDEX_FORMAT_MAPPING[content_types[0].content_type]
+
+
+def parse_version(filename: str) -> str | None:
+    """
+    Take a filename and attempt to parse the version from it.
+    Returns None if no version could be parsed.
+    """
+    if filename.endswith(".whl"):
+        try:
+            _, version, _, _ = packaging.utils.parse_wheel_filename(filename)
+            return str(version)
+        except packaging.utils.InvalidWheelFilename:
+            return None
+
+    elif filename.endswith(".zip") or filename.endswith(".tar.gz"):
+        try:
+            _, version = packaging.utils.parse_sdist_filename(filename)
+            return str(version)
+        except packaging.utils.InvalidSdistFilename:
+            return None
+
+    return None
+
+
+def absoluify_url(base_url: str, href: str) -> str:
+    """
+    Take a URL and make it absolute based on a base URL.
+    """
+    return urljoin(base_url, href)

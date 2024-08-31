@@ -1,16 +1,23 @@
 import html
-from urllib.parse import urldefrag, urljoin
+from urllib.parse import urldefrag
 
 import lxml.html
 
-from app.constants import METDATA_EXTENSION
+import app.packages.simple
+from app.constants import (
+    DATA_PREFIX,
+    METADATA_EXTENSION,
+    METADATA_KEY,
+    METADATA_KEY_LEGACY,
+)
 from app.models.code_file import CodeFile
 from app.models.metadata_file import MetadataFile
-from app.models.repository import Repository
-from app.packages.simple import SUPPORTED_HASHES
+from app.models.package import Package
+from app.models.package_file import PackageFile
+from app.models.package_file_hash import PackageFileHash
 
 
-def parse_hash(given: str) -> tuple[str | None, str | None]:
+def add_hash(given: str, package_file: PackageFile) -> None:
     """
     Parses a hash string into a tuple of hash type and hash value.
     If unsupported hash type is found, returns None.
@@ -22,95 +29,98 @@ def parse_hash(given: str) -> tuple[str | None, str | None]:
 
     # make sure there is a seperator
     if "=" not in given:
-        return None, None
+        return
 
-    hash_type, sep, hash_value = given.partition("=")
+    kind, sep, value = given.partition("=")
+    kind = kind.lower()
 
     # make sure there is a seperator
     if sep != "=":
-        return None, None
+        return
 
     # check if the hash type is supported
-    if hash_type not in SUPPORTED_HASHES:
-        return None, None
+    if kind not in app.packages.simple.SUPPORTED_HASHES:
+        return
 
-    return hash_type, hash_value
+    package_file.hashes.append(PackageFileHash(
+        package_file=package_file, kind=kind, value=value))
 
 
 def parse_simple_html(
-    html_content: str, html_url: str, repository: Repository, package_name: str
-) -> tuple[list[CodeFile], list[MetadataFile]]:
+    html_content: str, url: str, package: Package
+) -> list[CodeFile]:
     """
     Parse the simple registry HTML content.
-    Return a tuple which contains a list of code files and a list of metadata files.
+    Return a list of code files.
     """
 
     # use lxml for performance
+    # let any exceptions bubble up
     upstream_tree = lxml.html.fromstring(html_content).contents
 
     # hold a list of records we parse
-    new_package_code_files: list[CodeFile] = []
-    new_package_metadata_files: list[MetadataFile] = []
+    code_files: list[CodeFile] = []
 
     # iterate over all anchor tags
-    for anchor_tag in upstream_tree.iter("a"):
+    for anchor in upstream_tree.iter("a"):
+        # required fields
         # inner text is filename
-        filename = anchor_tag.text
+        filename: str = anchor.text
 
         # get upstream url and make it absolute
-        href = anchor_tag.attrib["href"]
-        absolute_href = urljoin(html_url, href)
+        href: str = anchor.attrib["href"]
+        upstream_url = app.packages.simple.absoluify_url(url, href)
 
         # parse out the hash which should be in the fragment
-        upstream_url, fragment = urldefrag(absolute_href)
-        if fragment:
-            upstream_hash_type, upstream_hash_value = parse_hash(fragment)
-        else:
-            upstream_hash_type = None
-            upstream_hash_value = None
+        upstream_url, upstream_fragment = urldefrag(upstream_url)
 
+        # optional fields
         # get python requires
-        requires_python = anchor_tag.attrib.get("data-requires-python", None)
+        requires_python = anchor.attrib.get(
+            f"{DATA_PREFIX}requires-python", None)
         if isinstance(requires_python, str):
             requires_python = html.unescape(requires_python)
 
-        # grab the sha256 hash from the data-dist-info-metadata attribute
-        # PEP 714
-        # data-core-metadata is the preferred value
-        # data-dist-info-metadata is the fallback
-        metadata_value = anchor_tag.attrib.get(
-            "data-core-metadata", anchor_tag.attrib.get("data-dist-info-metadata", "")
-        )
+        # get yanked reason
+        yanked = anchor.attrib.get(f"{DATA_PREFIX}yanked", None)
 
-        # "true" is an acceptable value
-        metadata_hash_type, metadata_hash_value = None, None
-        if metadata_value:
-            metadata_hash_type, metadata_hash_value = parse_hash(metadata_value)
+        # postprocessing
+        version = app.packages.simple.parse_version(filename)
 
         # create code file
-        package_code_file = CodeFile(
-            repository=repository,
-            package_name=package_name,
+        code_file = CodeFile(
+            package=package,
             filename=filename,
-            hash_type=upstream_hash_type,
-            hash_value=upstream_hash_value,
             upstream_url=upstream_url,
             requires_python=requires_python,
+            yanked=yanked,
+            version=version,
         )
-        new_package_code_files.append(package_code_file)
+        code_files.append(code_file)
 
-        # create metadata file
-        if metadata_value:
-            metadata_filename = filename + METDATA_EXTENSION
-            package_metadata_file = MetadataFile(
-                repository=repository,
-                package_name=package_name,
-                filename=metadata_filename,
-                hash_type=metadata_hash_type,
-                hash_value=metadata_hash_value,
-                upstream_url=upstream_url + METDATA_EXTENSION,
-                code_file=package_code_file,
+        # add a hash to the code file
+        if upstream_fragment:
+            add_hash(upstream_fragment, code_file)
+
+        # grab metadata info in order of preference
+        metadata: str | None = anchor.attrib.get(
+            f"{DATA_PREFIX}{METADATA_KEY}", None)
+        if metadata is None:
+            metadata = anchor.attrib.get(
+                f"{DATA_PREFIX}{METADATA_KEY_LEGACY}", None)
+
+        # "true" is an acceptable value
+        # not guaranteed to be a "sha256=value" format
+        if metadata:
+            code_file.metadata_file = MetadataFile(
+                package=package,
+                filename=f"{filename}{METADATA_EXTENSION}",
+                upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
+                code_file=code_file,
             )
-            new_package_metadata_files.append(package_metadata_file)
 
-    return new_package_code_files, new_package_metadata_files
+            # if there was a hash, add it
+            if "=" in metadata:
+                add_hash(metadata, code_file.metadata_file)
+
+    return code_files

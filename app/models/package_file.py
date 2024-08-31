@@ -10,15 +10,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.database import Base
 
 if TYPE_CHECKING:
-    from app.models.package import Package
-    from app.models.package_file_hash import PackageFileHash
+    from app.models.package import Package  # pragma: no cover
+    from app.models.package_file_hash import PackageFileHash  # pragma: no cover
 
 
 class PackageFile(Base):
     __abstract__ = True
     __table_args__ = (
-        UniqueConstraint("filename", "package_id",
-                         name="_filename_package_id_uc"),
+        UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

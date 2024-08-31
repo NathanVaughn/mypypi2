@@ -71,21 +71,24 @@ def simple_route(repository_slug: str, package_name: str):
     if index_format is None:
         return Response("Not Acceptable", status=HTTPStatus.NOT_ACCEPTABLE)
 
+    # get the package information
+    # this function will update the data if needed as well
+    package = app.packages.lookup.get_package(
+        repository_slug,
+        package_name,
+    )
+
+    # if the package is not found, return a 404
+    if package is None:
+        return Response("Not Found", status=HTTPStatus.NOT_FOUND)
+
     # render the appropriate template
     if index_format == app.packages.simple.IndexFormat.json:
-        response_content = app.templates.simple_json.render_template(
-            package=app.packages.lookup.get_package(
-                repository_slug,
-                package_name,
-            )
-        )
+        response_content = app.templates.simple_json.render_template(package)
     elif index_format == app.packages.simple.IndexFormat.html:
         response_content = render_template(
             "simple.html.j2",
-            package=app.packages.lookup.get_package(
-                repository_slug,
-                package_name,
-            ),
+            package=package,
         )
 
     # return the response with the correct content type

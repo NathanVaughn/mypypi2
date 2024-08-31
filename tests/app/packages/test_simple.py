@@ -51,7 +51,7 @@ def test_validate_quality_fail(given: str):
 
 
 @pytest.mark.parametrize(
-    "given_accept_header, given_query_format, expected",
+    "given_accept_header, given_format_query, expected",
     (
         # basic test
         ("text/html", None, IndexFormat.html),
@@ -86,7 +86,7 @@ def test_validate_quality_fail(given: str):
 )
 def test_determine_index_format(
     given_accept_header: str | None,
-    given_query_format: str | None,
+    given_format_query: str | None,
     expected: IndexFormat | None,
 ):
     """
@@ -94,7 +94,25 @@ def test_determine_index_format(
     """
     assert (
         app.packages.simple.determine_index_format(
-            given_accept_header, given_query_format
+            accept_header=given_accept_header, format_query=given_format_query
         )
         == expected
     )
+
+
+@pytest.mark.parametrize(
+    "given, expected",
+    (
+        ("paramiko-1.17.4-py2.py3-none-any.whl", "1.17.4"),
+        ("paramiko-1.17.3.tar.gz", "1.17.3"),
+        ("paramiko-0.9-eevee.zip", None),
+        ("paramiko-0.9-eevee.whl", None),
+        ("lxml-1.3.3-py2.4-win32.egg", None),
+        ("lxml-1.3.2.win32-py2.5.exe", None),
+    ),
+)
+def test_parse_version(given: str, expected: str | None):
+    """
+    Test the version parsing function.
+    """
+    assert app.packages.simple.parse_version(given) == expected

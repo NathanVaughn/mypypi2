@@ -49,8 +49,7 @@ def init_db(flask_app: Flask) -> None:
                 )
             else:
                 # update existing repository
-                repository_obj.simple_url = repository["simple_url"].removesuffix(
-                    "/")
+                repository_obj.simple_url = repository["simple_url"].removesuffix("/")
                 repository_obj.cache_minutes = repository["cache_minutes"]
                 repository_obj.timeout_seconds = repository["timeout_seconds"]
 

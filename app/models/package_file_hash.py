@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.database import Base
 
 if TYPE_CHECKING:
-    from app.models.package_file import PackageFile
+    from app.models.package_file import PackageFile  # pragma: no cover
 
 
 class PackageFileHash(Base):

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.package_file import PackageFile
 
 if TYPE_CHECKING:
-    from app.models.code_file import CodeFile
+    from app.models.code_file import CodeFile  # pragma: no cover
 
 
 class MetadataFile(PackageFile):

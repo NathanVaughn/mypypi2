@@ -15,7 +15,13 @@ class BaseStorage(abc.ABC):
         """
         Build the path to the file in storage
         """
-        return f"{package_file.package.repository.slug}/{package_file.package.name}/{package_file.filename}"
+        version = package_file.version
+        if version is None:
+            version = "UNKNOWN"
+
+        # use forward slashes so it works with URLs
+        # pathlib should handle this for us when working with the local filesystem
+        return f"{package_file.package.repository.slug}/{package_file.package.name}/{version}/{package_file.filename}"
 
     @abc.abstractmethod
     def upload_file(self, package_file: PackageFile) -> None:

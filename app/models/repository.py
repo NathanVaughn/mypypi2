@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.database import Base
 
 if TYPE_CHECKING:
-    from app.models.package import Package
+    from app.models.package import Package  # pragma: no cover
 
 
 class Repository(Base):
