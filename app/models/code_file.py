@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import Boolean, String
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.package_file import PackageFile
 
 if TYPE_CHECKING:
+    from app.models.code_file_hash import CodeFileHash  # pragma: no cover
     from app.models.metadata_file import MetadataFile  # pragma: no cover
 
 
@@ -20,13 +22,12 @@ class CodeFile(PackageFile):
     """
     Python version requirements
     """
-    yanked: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
+    yanked_reason: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None
+    )
     """
     Yanked string. We always show yanked files, but we keep the value here.
-    """
-    version: Mapped[str] = mapped_column(String, nullable=True, default=None)
-    """
-    For some files, record the version
     """
     # setting lazy=joined here will ensure that the data for the
     # metadata file is always returned when this is queried
@@ -36,3 +37,22 @@ class CodeFile(PackageFile):
     metadata_file: Mapped[MetadataFile] = relationship(
         "MetadataFile", back_populates="code_file", lazy="joined"
     )
+
+    @declared_attr
+    def hashes(cls) -> Mapped[list[CodeFileHash]]:
+        """
+        A list of hashes for this file
+        """
+        return relationship("CodeFileHash", back_populates="code_file")
+
+    # utility properties
+    @property
+    def yanked(self) -> bool | str:
+        """
+        Return a boolean if the file is yanked.
+        Return a string if the file is yanked with a reason.
+        """
+        y = self.is_yanked
+        if y and self.yanked_reason:
+            return self.yanked_reason
+        return y

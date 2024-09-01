@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
@@ -14,11 +14,9 @@ if TYPE_CHECKING:
 
 
 class Package(Base):
-    __tablename__ = "package_update"
+    __tablename__ = "package"
     __table_args__ = (
-        UniqueConstraint(
-            "package_name", "repository_id", name="_package_name_repository_id_uc"
-        ),
+        UniqueConstraint("name", "repository_id", name="_name_repository_id_uc"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -36,11 +34,9 @@ class Package(Base):
     """
     Package name
     """
-    versions: Mapped[str] = mapped_column(JSON, nullable=True, default=None)
-    """
-    For packages from a JSON v1.1 API, this will be a list of available versions
-    """
-    last_updated: Mapped[datetime.datetime] = mapped_column(DateTime)
+    last_updated: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.now
+    )
     """
     Last time this package's data was updated
     """

@@ -12,6 +12,7 @@ METADATA_KEY = "core-metadata"
 
 # HTTP headers
 ACCEPT_HEADER = "Accept"
+CONTENT_TYPE_HEADER = "Content-Type"
 CONTENT_TYPE_HEADER_HTML = "text/html"
 CONTENT_TYPE_HEADER_JSON = "application/json"
 

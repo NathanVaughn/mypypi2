@@ -1,5 +1,7 @@
 # basically no indexes other than PyPi support the JSON format
+
 import pyjson5
+from loguru import logger
 
 import app.packages.simple
 from app.constants import (
@@ -9,10 +11,11 @@ from app.constants import (
     METADATA_KEY_LEGACY2,
 )
 from app.models.code_file import CodeFile
+from app.models.code_file_hash import CodeFileHash
 from app.models.metadata_file import MetadataFile
+from app.models.metadata_file_hash import MetadataFileHash
 from app.models.package import Package
 from app.models.package_file import PackageFile
-from app.models.package_file_hash import PackageFileHash
 
 
 def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
@@ -25,10 +28,14 @@ def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
         if kind not in app.packages.simple.SUPPORTED_HASHES:
             continue
 
-        package_file.hashes.append(
-            PackageFileHash(
-                package_file=package_file, kind=kind, value=value)
-        )
+        if isinstance(package_file, CodeFile):
+            package_file.hashes.append(
+                CodeFileHash(code_file=package_file, kind=kind, value=value)
+            )
+        elif isinstance(package_file, MetadataFile):
+            package_file.hashes.append(
+                MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
+            )
 
 
 def parse_simple_json(json_content: str, url: str, package: Package) -> list[CodeFile]:
@@ -36,6 +43,8 @@ def parse_simple_json(json_content: str, url: str, package: Package) -> list[Cod
     Parse the simple registry JSON content.
     Return a list of code files.
     """
+    logger.info(f"Parsing {url} JSON content")
+
     # parse the JSON content
     # let any exceptions bubble up
     # use pyjson5 for performance
@@ -52,7 +61,15 @@ def parse_simple_json(json_content: str, url: str, package: Package) -> list[Cod
 
         # optional fields
         requires_python = record.get("requires-python", None)
-        yanked = record.get("yanked", None)
+
+        # yanked can be a boolean or a string
+        yanked = record.get("yanked", False)
+        if isinstance(yanked, str):
+            is_yanked = True
+            yanked_reason = yanked
+        else:
+            is_yanked = yanked
+            yanked_reason = None
 
         # postprocessing
         version = app.packages.simple.parse_version(filename)
@@ -63,7 +80,8 @@ def parse_simple_json(json_content: str, url: str, package: Package) -> list[Cod
             filename=filename,
             upstream_url=upstream_url,
             requires_python=requires_python,
-            yanked=yanked,
+            is_yanked=is_yanked,
+            yanked_reason=yanked_reason,
             version=version,
         )
         code_files.append(code_file)
@@ -85,6 +103,7 @@ def parse_simple_json(json_content: str, url: str, package: Package) -> list[Cod
                 package=package,
                 filename=f"{filename}{METADATA_EXTENSION}",
                 upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
+                version=version,
                 code_file=code_file,
             )
 

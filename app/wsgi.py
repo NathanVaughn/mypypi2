@@ -17,9 +17,9 @@ def create_app():
     app.models.database.init_db(flask_app)
 
     # setup storage
-    import app.data.storage.active
+    import app.data.storage
 
-    app.data.storage.active.ActiveStorage.init_app(flask_app)
+    app.data.storage.ActiveStorage.init_app(flask_app)
 
     # setup routes
     from app.routes.file import file_bp

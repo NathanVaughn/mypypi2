@@ -30,6 +30,26 @@ class InvalidQualityValue(Exception):
     """
 
 
+class IndexTimeoutError(Exception):
+    """
+    Exception raised when a timeout occurs while fetching an index
+    """
+
+
+class PackageNotFound(HTTPException):
+    """
+    Exception raised when a repository is not found
+    """
+
+    code = HTTPStatus.NOT_FOUND
+
+    def __init__(self, package_name: str, repository_slug: str):
+        super().__init__(
+            description=f"Package {
+                package_name} not found in repository {repository_slug}"
+        )
+
+
 class RepositoryNotFound(HTTPException):
     """
     Exception raised when a repository is not found
@@ -53,3 +73,14 @@ class PackageFileNotFound(HTTPException):
             description=f"Package file {filename} not found in {
                 log_package_name(repository, package_name)}"
         )
+
+
+class IndexParsingError(HTTPException):
+    """
+    Exception raised when upstream index data cannot be parsed
+    """
+
+    code = HTTPStatus.SERVICE_UNAVAILABLE
+
+    def __init__(self, url: str):
+        super().__init__(description=f"Unable to parse {url}")

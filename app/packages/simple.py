@@ -46,7 +46,8 @@ Basically every client can parse the HTML format, so we default to that.
 """
 
 PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING = {
-    IndexFormat.html: PYPI_CONTENT_TYPE_HTML_V1,
+    # this is so it works in a web browser
+    IndexFormat.html: PYPI_CONTENT_TYPE_LEGACY,
     IndexFormat.json: PYPI_CONTENT_TYPE_JSON_V1,
 }
 """
@@ -99,12 +100,10 @@ def validate_quality(quality: str) -> float:
     try:
         fquality = float(quality)
     except ValueError:
-        raise InvalidQualityValue(
-            f"Quality value {quality} is not a valid float")
+        raise InvalidQualityValue(f"Quality value {quality} is not a valid float")
 
     if not 0 <= fquality <= 1:
-        raise InvalidQualityValue(
-            f"Quality value {quality} is not between 0 and 1")
+        raise InvalidQualityValue(f"Quality value {quality} is not between 0 and 1")
 
     return fquality
 

@@ -44,6 +44,10 @@ class PackageFile(Base):
     """
     Upstream URL where we can download this package
     """
+    version: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    """
+    For some files, record the version
+    """
     is_cached: Mapped[bool] = mapped_column(Boolean, default=False)
     """
     Have we already downloaded this package?
@@ -52,11 +56,18 @@ class PackageFile(Base):
     @declared_attr
     def hashes(cls) -> Mapped[list[PackageFileHash]]:
         """
-        A list of hashes for this file
+        This needs to be overridden in the subclasses.
         """
-        return relationship("PackageFileHash", back_populates="package_file")
+        return relationship("PackageFileHash")
 
     # utility properties
+
+    @property
+    def version_text(self) -> str:
+        """
+        Returns the version text for this file.
+        """
+        return self.version or "UKNOWN"
 
     @property
     def hash_value(self) -> str | None:
@@ -89,6 +100,7 @@ class PackageFile(Base):
             repository_slug=self.package.repository.slug,
             package_name=self.package.name,
             filename=self.filename,
+            version=self.version_text,
             _external=True,
         )
 

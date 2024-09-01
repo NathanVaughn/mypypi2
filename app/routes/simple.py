@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from flask import Blueprint, Response, redirect, render_template, request, url_for
+from loguru import logger
 
-import app.packages.lookup
+import app.packages.data
 import app.packages.simple
 import app.templates.simple_json
 from app.caching import repository_cache
@@ -11,7 +12,6 @@ simple_bp = Blueprint("simple", __name__)
 
 
 @simple_bp.route("/")
-@repository_cache
 def simple_route_index():
     """
     Base index route, which we do not support.
@@ -69,23 +69,22 @@ def simple_route(repository_slug: str, package_name: str):
 
     # if we have no acceptable format, return a 406
     if index_format is None:
+        logger.warning(f"No valid format available: {accept_header}")
         return Response("Not Acceptable", status=HTTPStatus.NOT_ACCEPTABLE)
 
     # get the package information
     # this function will update the data if needed as well
-    package = app.packages.lookup.get_package(
+    package = app.packages.data.get_package(
         repository_slug,
         package_name,
     )
 
-    # if the package is not found, return a 404
-    if package is None:
-        return Response("Not Found", status=HTTPStatus.NOT_FOUND)
-
     # render the appropriate template
     if index_format == app.packages.simple.IndexFormat.json:
+        logger.debug("Rendering JSON response")
         response_content = app.templates.simple_json.render_template(package)
     elif index_format == app.packages.simple.IndexFormat.html:
+        logger.debug("Rendering HTML response")
         response_content = render_template(
             "simple.html.j2",
             package=package,

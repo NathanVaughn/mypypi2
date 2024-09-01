@@ -18,7 +18,7 @@ def repository_cache(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(*args: str, **kwargs: str) -> Any:
-        repository_timeout = app.data.sql.lookup_repository_timeout(
+        repository_timeout = app.data.sql.get_repository_timeout(
             kwargs["repository_slug"]
         )
 

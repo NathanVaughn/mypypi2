@@ -9,7 +9,10 @@ def render_template(package: Package) -> str:
     Create JSON content for the simple API.
     """
     data = {}
+    # add name key
     data["name"] = package.name
+    # add meta key
+    data["meta"] = {}
     data["meta"]["api-version"] = "1.0"
     # we return 1.0 and not 1.1 because we do not support the version list
     # added in 1.1
@@ -32,8 +35,8 @@ def render_template(package: Package) -> str:
         if code_file.requires_python:
             file_data["requires-python"] = code_file.requires_python
 
-        if code_file.yanked:
-            file_data["yanked"] = code_file.yanked
+        # yanked can be a boolean or a reason
+        file_data["yanked"] = code_file.yanked
 
         if code_file.metadata_file:
             # default to True
