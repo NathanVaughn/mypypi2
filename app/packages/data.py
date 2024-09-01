@@ -4,7 +4,7 @@ import requests
 from loguru import logger
 
 import app.data.sql
-import app.data.storage
+import app.data.storage.active
 from app.constants import CONTENT_TYPE_HEADER
 from app.models.exceptions import IndexParsingError, IndexTimeoutError, PackageNotFound
 from app.models.package import Package
@@ -137,7 +137,7 @@ def cache_package_file(package_file: PackageFile) -> None:
         return
 
     # actually cache the file
-    app.data.storage.ActiveStorage.provider.cache_file(package_file)
+    app.data.storage.active.ActiveStorage.provider.cache_file(package_file)
 
     # update the database
     package_file.is_cached = True

@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
 from sqlalchemy.orm import DeclarativeBase
 
+from app.config import Config
+
 if TYPE_CHECKING:
     from flask import Flask
 
@@ -18,6 +20,8 @@ db = SQLAlchemy(model_class=Base)
 
 
 def init_db(flask_app: Flask) -> None:
+    db.init_app(flask_app)
+
     # import models so sqlalchemy knows about them
     from app.models.code_file import CodeFile  # noqa
     from app.models.code_file_hash import CodeFileHash  # noqa
@@ -33,29 +37,24 @@ def init_db(flask_app: Flask) -> None:
         # load configured repositories
         import app.data.sql
 
-        for repository in flask_app.config["repositories"]:
-            slug = repository["slug"]
-            simple_url = repository["simple_url"]
-            cache_minutes = repository["cache_minutes"]
-            timeout_seconds = repository["timeout_seconds"]
-
-            repository = app.data.sql.get_repository(slug)
+        for repository_config in Config.repositories:
+            repository = app.data.sql.get_repository(repository_config.slug)
 
             if repository is None:
                 # create new repository if it doesn't exist
-                logger.debug(f"Adding repository {slug}")
+                logger.debug(f"Adding repository {repository_config.slug}")
                 db.session.add(
                     Repository(
-                        slug=slug,
-                        simple_url=simple_url,
-                        cache_minutes=cache_minutes,
-                        timeout_seconds=timeout_seconds,
+                        slug=repository_config.slug,
+                        simple_url=str(repository_config.simple_url),
+                        cache_minutes=repository_config.cache_minutes,
+                        timeout_seconds=repository_config.timeout_seconds,
                     )
                 )
             else:
                 # update existing repository
-                repository.simple_url = simple_url
-                repository.cache_minutes = cache_minutes
-                repository.timeout_seconds = timeout_seconds
+                repository.simple_url = str(repository_config.simple_url)
+                repository.cache_minutes = repository_config.cache_minutes
+                repository.timeout_seconds = repository_config.timeout_seconds
 
         db.session.commit()

@@ -21,3 +21,6 @@
 
 [storage.local]
     directory = "/data/"
+
+[cache]
+    driver = "memory"

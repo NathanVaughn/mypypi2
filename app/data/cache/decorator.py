@@ -4,7 +4,7 @@ from typing import Any, Callable
 from loguru import logger
 
 import app.data.sql
-from app.data.cache import ActiveCache
+from app.data.cache.active import ActiveCache
 
 
 def repository_cache(func: Callable) -> Callable:

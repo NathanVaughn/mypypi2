@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 import app.data.sql
-import app.data.storage
+import app.data.storage.active
 import app.packages.data
 from app.data.cache.decorator import repository_cache
 
@@ -16,4 +16,4 @@ def file_route(repository_slug: str, version: str, package_name: str, filename: 
     """
     package_file = app.packages.data.get_package_file(repository_slug, package_name, filename)
 
-    return app.data.storage.ActiveStorage.provider.download_file(package_file)
+    return app.data.storage.active.ActiveStorage.provider.download_file(package_file)
