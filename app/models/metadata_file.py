@@ -26,4 +26,6 @@ class MetadataFile(PackageFile):
         """
         A list of hashes for this file
         """
-        return relationship("MetadataFileHash", back_populates="metadata_file")
+        return relationship(
+            "MetadataFileHash", back_populates="metadata_file", lazy="joined"
+        )

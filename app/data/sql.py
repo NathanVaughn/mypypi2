@@ -61,7 +61,9 @@ def get_package(repository: Repository, package_name: str) -> Package | None:
     Returns None if not found.
     """
     return db.session.execute(
-        db.select(Package).where(Repository == repository, Package.name == package_name)
+        db.select(Package).where(
+            Package.repository_id == repository.id, Package.name == package_name
+        )
     ).scalar_one_or_none()
 
 
@@ -86,8 +88,8 @@ def get_metadata_file(
     """
     return db.session.execute(
         db.select(MetadataFile).where(
-            Repository == repository,
-            Package == package,
+            MetadataFile.package.repository.id == repository.id,
+            MetadataFile.package.id == package.id,
             MetadataFile.filename == filename,
         )
     ).scalar_one_or_none()
@@ -101,7 +103,9 @@ def get_code_file(
     """
     return db.session.execute(
         db.select(CodeFile).where(
-            Repository == repository, Package == package, CodeFile.filename == filename
+            CodeFile.package.repository.id == repository.id,
+            CodeFile.package.id == package.id,
+            CodeFile.filename == filename,
         )
     ).scalar_one_or_none()
 

@@ -58,7 +58,7 @@ class PackageFile(Base):
         """
         This needs to be overridden in the subclasses.
         """
-        return relationship("PackageFileHash")
+        return relationship("PackageFileHash", lazy="joined")
 
     # utility properties
 

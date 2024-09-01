@@ -43,7 +43,7 @@ class CodeFile(PackageFile):
         """
         A list of hashes for this file
         """
-        return relationship("CodeFileHash", back_populates="code_file")
+        return relationship("CodeFileHash", back_populates="code_file", lazy="joined")
 
     # utility properties
     @property

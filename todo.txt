@@ -1,3 +1,2 @@
-handle offline upstream
-handle 404s
+handle updating instead of replacing
 tests
