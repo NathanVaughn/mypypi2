@@ -113,7 +113,6 @@ def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
     Parse the simple registry JSON content.
     Return a list of code files.
     """
-    logger.info(f"Parsing {package.repository_url} JSON content")
     start_time = time.time()
 
     # parse the JSON content
@@ -125,7 +124,7 @@ def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
     code_files = [_parse_single_record(record, package) for record in data["files"]]
 
     end_time = time.time()
-    logger.info(f"Parsing {package.repository_url} JSON content took {
+    logger.info(f"Parsed {package.repository_url} JSON content in {
                 end_time - start_time:.2f} seconds")
 
     return code_files

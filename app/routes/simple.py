@@ -1,3 +1,4 @@
+import time
 from http import HTTPStatus
 
 from flask import Blueprint, Response, redirect, render_template, request, url_for
@@ -46,6 +47,8 @@ def simple_route(repository_slug: str, package_name: str):
     """
     This route is used to provide a simple index of a specific package
     """
+    start_time = time.time()
+
     # per PEP 503, we can optionally redirect to the normalized name
     # https://peps.python.org/pep-0503/#normalized-names
     normalized_name = app.packages.simple.normalize_name(package_name)
@@ -89,7 +92,13 @@ def simple_route(repository_slug: str, package_name: str):
         )
 
     # return the response with the correct content type
+    content_type = app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format]
+    end_time = time.time()
+
+    # return
+    logger.debug(f"Returning {content_type} for {request.path} took {
+                 end_time - start_time:.2f} seconds")
     return Response(
         response_content,
-        content_type=app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format],
+        content_type=content_type,
     )

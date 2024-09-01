@@ -132,7 +132,6 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     Parse the simple registry HTML content.
     Return a list of code files.
     """
-    logger.info(f"Parsing {package.repository_url} HTML content")
     start_time = time.time()
 
     # use lxml for performance
@@ -147,7 +146,7 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     code_files = [_parse_single_record(record, package) for record in upstream_tree.iter("a")]
 
     end_time = time.time()
-    logger.info(f"Parsing {package.repository_url} JSON content took {
+    logger.info(f"Parsed {package.repository_url} HTML content in {
                 end_time - start_time:.2f} seconds")
 
     return code_files

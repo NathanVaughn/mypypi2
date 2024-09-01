@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import requests
 from loguru import logger
@@ -37,9 +38,12 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     ]
     headers = {"Accept": ",".join(content_types)}
     try:
-        logger.info(f"Fetching {url}")
+        start_time = time.time()
         response = requests.get(url, headers=headers, timeout=package.repository.timeout_seconds)
         response.raise_for_status()
+        end_time = time.time()
+        logger.info(f"Fetched {package.repository_url} in {
+                    end_time - start_time:.2f} seconds")
     except requests.exceptions.Timeout:
         # we need to handle this one specifically to pretend nothing happend
         raise IndexTimeoutError
