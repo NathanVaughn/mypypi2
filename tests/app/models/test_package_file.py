@@ -35,6 +35,26 @@ def test_hash_value() -> None:
     assert code_file.hash_value == "sha256=1234567890abcdef"
 
 
+def test_hash_kinds() -> None:
+    """
+    Test how hash_kinds is generated
+    """
+    # have to use an inherited class here, since the base class
+    # doesn't have a foreign key
+
+    # test no hashes
+    code_file = CodeFile()
+    assert code_file.hash_kinds == []
+
+    # test one hash
+    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    assert code_file.hash_kinds == ["sha256"]
+
+    # test multiple hashes
+    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    assert code_file.hash_kinds == ["sha256", "md5"]
+
+
 def test_hashes_dict() -> None:
     """
     Test how hashes_dict is generated

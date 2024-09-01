@@ -27,3 +27,12 @@ def test_repository_url(package: Package) -> None:
     package.name = "test_package"
     # trailing slash is important
     assert package.repository_url == "https://example.com/simple/test_package/"
+
+
+def test_log_name(package: Package) -> None:
+    """
+    Test log_name attribute
+    """
+    package.repository.slug = "pypi"
+    package.name = "test_package"
+    assert package.log_name == "pypi:test_package"

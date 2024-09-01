@@ -67,7 +67,9 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
 
     # create code file
     code_file = CodeFile(
-        package=package,
+        # we need to create deattached files since we don't know if we will actually
+        # save them or not
+        # package=package,
         filename=filename,
         upstream_url=upstream_url,
         requires_python=requires_python,
@@ -92,7 +94,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     # add metadata file if available
     if metadata:
         code_file.metadata_file = MetadataFile(
-            package=package,
+            # package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,

@@ -92,7 +92,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
 
     # create code file
     code_file = CodeFile(
-        package=package,
+        # package=package,
         filename=filename,
         upstream_url=upstream_url,
         requires_python=requires_python,
@@ -114,7 +114,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
     # not guaranteed to be a "sha256=value" format
     if metadata:
         code_file.metadata_file = MetadataFile(
-            package=package,
+            # package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,

@@ -31,3 +31,24 @@ class MetadataFile(PackageFile):
         A list of hashes for this file
         """
         return relationship("MetadataFileHash", back_populates="metadata_file", lazy="joined")
+
+    def update(self, new: MetadataFile) -> None:
+        """
+        Update this metadata file with new information.
+        """
+
+        # basic attributes
+        # filename is immutable
+        # self.filename = new.filename
+        self.upstream_url = new.upstream_url
+        self.version = new.version
+
+        # hashes
+        if self.hashes_dict != new.hashes_dict:
+            # taking incoming hashes and add new ones
+            for h in new.hashes:
+                # if we don't have this hash, add it
+                if h.kind not in self.hashes:
+                    h.metadata_file = self
+
+                # don't update existing hashes

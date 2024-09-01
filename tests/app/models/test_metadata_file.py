@@ -1,0 +1,25 @@
+from app.models.metadata_file import MetadataFile
+from app.models.metadata_file_hash import MetadataFileHash
+
+
+def test_update() -> None:
+    """
+    Test updates to a metadata file
+    """
+    file1 = MetadataFile(filename="test.metadata", version="1.0.0", upstream_url="https://example.com")
+    MetadataFileHash(metadata_file=file1, kind="sha256", value="1234567890abcdef")
+
+    # update the file
+    file2 = MetadataFile(filename="other.metadata", version="1.0.1", upstream_url="https://nathanv.me")
+    MetadataFileHash(metadata_file=file2, kind="md5", value="abcdef1234567890")
+
+    file1.update(file2)
+    # make sure filename is unchanged
+    assert file1.filename == "test.metadata"
+    # make sure everything else is updated
+    assert file1.version == "1.0.1"
+    assert file1.upstream_url == "https://nathanv.me"
+    assert file1.hashes[0].kind == "sha256"
+    assert file1.hashes[0].value == "1234567890abcdef"
+    assert file1.hashes[1].kind == "md5"
+    assert file1.hashes[1].value == "abcdef1234567890"

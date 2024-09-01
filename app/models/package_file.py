@@ -87,6 +87,13 @@ class PackageFile(Base):
         return f"{self.hashes[0].kind}={self.hashes[0].value}"
 
     @property
+    def hash_kinds(self) -> list[str]:
+        """
+        Returns a list of all hash kinds for this file.
+        """
+        return [h.kind for h in self.hashes]
+
+    @property
     def hashes_dict(self) -> dict[str, str]:
         """
         Returns a dictionary of all hashes for this file.

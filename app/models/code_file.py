@@ -64,3 +64,33 @@ class CodeFile(PackageFile):
         if y and self.yanked_reason:
             return self.yanked_reason
         return y
+
+    def update(self, new: CodeFile) -> None:
+        """
+        Update this code file with new information.
+        """
+
+        # basic attributes
+        # filename is immutable
+        # self.filename = new.filename
+        self.upstream_url = new.upstream_url
+        self.version = new.version
+        self.requires_python = new.requires_python
+        self.is_yanked = new.is_yanked
+        self.yanked_reason = new.yanked_reason
+        self.size = new.size
+        self.upload_time = new.upload_time
+
+        # hashes
+        if self.hashes_dict != new.hashes_dict:
+            # taking incoming hashes and add new ones
+            for h in new.hashes:
+                # if we don't have this hash, add it
+                if h.kind not in self.hashes:
+                    h.code_file = self
+
+                # don't update existing hashes
+
+        # metadata file
+        if self.metadata_file:
+            self.metadata_file.update(new.metadata_file)

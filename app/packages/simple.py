@@ -128,6 +128,8 @@ def determine_index_format(accept_header: str | None, format_query: str | None) 
     if accept_header is None:
         # Default is */*, aka any content type
         accept_header = "*/*"
+
+    if accept_header == "*/*":
         content_types.append(ContentTypeSort(DEFAULT_CONTENT_TYPE, 1))
 
     # parse the accept header

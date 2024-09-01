@@ -76,26 +76,40 @@ def get_metadata_file(repository: Repository, package: Package, filename: str) -
     """
     Lookup a MetadataFile object given the Repository, Package, and filename.
     """
-    return db.session.execute(
-        db.select(MetadataFile).where(
-            MetadataFile.package.repository.id == repository.id,
-            MetadataFile.package.id == package.id,
-            MetadataFile.filename == filename,
+    return (
+        db.session.execute(
+            db.select(MetadataFile)
+            .join(MetadataFile.package)
+            .join(Package.repository)
+            .where(
+                Repository.id == repository.id,
+                Package.id == package.id,
+                MetadataFile.filename == filename,
+            )
         )
-    ).scalar_one_or_none()
+        .unique()
+        .scalar_one_or_none()
+    )
 
 
 def get_code_file(repository: Repository, package: Package, filename: str) -> CodeFile | None:
     """
     Lookup a MetadataFile object given the Repository, Package, and filename.
     """
-    return db.session.execute(
-        db.select(CodeFile).where(
-            CodeFile.package.repository.id == repository.id,
-            CodeFile.package.id == package.id,
-            CodeFile.filename == filename,
+    return (
+        db.session.execute(
+            db.select(CodeFile)
+            .join(CodeFile.package)
+            .join(Package.repository)
+            .where(
+                Repository.id == repository.id,
+                Package.id == package.id,
+                CodeFile.filename == filename,
+            )
         )
-    ).scalar_one_or_none()
+        .unique()
+        .scalar_one_or_none()
+    )
 
 
 def get_package_file_with_exception(repository: Repository, package: Package, filename: str) -> PackageFile:
@@ -104,12 +118,12 @@ def get_package_file_with_exception(repository: Repository, package: Package, fi
     Raises an exception if not found.
     """
     if filename.endswith(METADATA_EXTENSION):
-        package_file = get_metadata_file(repository, package, filename)
+        package_file = get_metadata_file(repository=repository, package=package, filename=filename)
     else:
-        package_file = get_code_file(repository, package, filename)
+        package_file = get_code_file(repository=repository, package=package, filename=filename)
 
     if package_file is None:
-        raise PackageFileNotFound(repository, package.name, filename)
+        raise PackageFileNotFound(package=package, filename=filename)
 
     return package_file
 

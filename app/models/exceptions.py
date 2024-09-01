@@ -5,10 +5,8 @@ from typing import TYPE_CHECKING
 
 from werkzeug.exceptions import HTTPException
 
-from app.utils import log_package_name
-
 if TYPE_CHECKING:
-    from app.models.repository import Repository  # pragma: no cover
+    from app.models.package import Package  # pragma: no cover
 
 
 class UnknownFileFormat(Exception):
@@ -43,7 +41,11 @@ class PackageNotFound(HTTPException):
 
     code = HTTPStatus.NOT_FOUND
 
-    def __init__(self, package_name: str, repository_slug: str):
+    def __init__(
+        self,
+        repository_slug: str,
+        package_name: str,
+    ):
         super().__init__(
             description=f"Package {
                 package_name} not found in repository {repository_slug}"
@@ -68,10 +70,10 @@ class PackageFileNotFound(HTTPException):
 
     code = HTTPStatus.NOT_FOUND
 
-    def __init__(self, repository: Repository, package_name: str, filename: str):
+    def __init__(self, package: Package, filename: str):
         super().__init__(
-            description=f"Package file {filename} not found in {
-                log_package_name(repository, package_name)}"
+            description=f"Package file {
+                filename} not found in {package.log_name}"
         )
 
 

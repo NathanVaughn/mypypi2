@@ -56,3 +56,10 @@ class Package(Base):
         URL for this package in the repository
         """
         return f"{self.repository.simple_url}/{self.name}/"
+
+    @property
+    def log_name(self) -> str:
+        """
+        Package name for logging
+        """
+        return f"{self.repository.slug}:{self.name}"
