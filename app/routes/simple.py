@@ -6,7 +6,7 @@ from loguru import logger
 import app.packages.data
 import app.packages.simple
 import app.templates.simple_json
-from app.caching import repository_cache
+from app.data.cache.decorator import repository_cache
 
 simple_bp = Blueprint("simple", __name__)
 

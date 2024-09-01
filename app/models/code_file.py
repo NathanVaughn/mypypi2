@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, String
+from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,6 +30,14 @@ class CodeFile(PackageFile):
     yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
+    """
+    size: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    """
+    File size in bytes
+    """
+    upload_time: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True, default=None)
+    """
+    Upload time of the file
     """
     # setting lazy=joined here will ensure that the data for the
     # metadata file is always returned when this is queried

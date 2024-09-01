@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import pyjson5
@@ -45,6 +46,12 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
 
     # optional fields
     requires_python = record.get("requires-python", None)
+    size = record.get("size", None)
+
+    # convert upload time to datetime object
+    upload_time = record.get("upload-time", None)
+    if isinstance(upload_time, str):
+        upload_time = datetime.datetime.fromisoformat(upload_time)
 
     # yanked can be a boolean or a string
     yanked = record.get("yanked", False)
@@ -67,6 +74,8 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
         is_yanked=is_yanked,
         yanked_reason=yanked_reason,
         version=version,
+        size=size,
+        upload_time=upload_time,
     )
 
     # add hashes to the code file

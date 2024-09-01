@@ -1,3 +1,5 @@
+import datetime
+
 import app.packages.json
 from app.models.package import Package
 
@@ -25,6 +27,8 @@ def test__parse_single_record1(package: Package) -> None:
     assert result.requires_python == ">=3.10,<4.0"
     assert result.is_yanked is False
     assert result.yanked_reason is None
+    assert result.size == 14920
+    assert result.upload_time == datetime.datetime(2023, 5, 29, 18, 23, 41, 200050, tzinfo=datetime.timezone.utc)
     assert result.version == "0.1.2"
     assert result.hashes[0].kind == "sha256"
     assert result.hashes[0].value == "9f046728d31a5b09b4463b04ba5370650f42874eb0a7446745f3e3477cb3b8f0"

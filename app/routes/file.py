@@ -3,7 +3,7 @@ from flask import Blueprint
 import app.data.sql
 import app.data.storage
 import app.packages.data
-from app.caching import repository_cache
+from app.data.cache.decorator import repository_cache
 
 file_bp = Blueprint("file", __name__)
 
