@@ -1,4 +1,6 @@
 import html
+import time
+from typing import Any
 from urllib.parse import urldefrag
 
 import lxml.html
@@ -38,28 +40,100 @@ def add_hash(given: str, package_file: PackageFile) -> None:
 
     # make sure there is a seperator
     if sep != "=":
-        return
+        # no situation where this should happen
+        return  # pragma: no cover
 
     # check if the hash type is supported
     if kind not in app.packages.simple.SUPPORTED_HASHES:
         return
 
+    # sqlalchemy automatically appends itself
     if isinstance(package_file, CodeFile):
-        package_file.hashes.append(
-            CodeFileHash(code_file=package_file, kind=kind, value=value)
-        )
+        CodeFileHash(code_file=package_file, kind=kind, value=value)
     elif isinstance(package_file, MetadataFile):
-        package_file.hashes.append(
-            MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
+        MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
+
+
+def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
+    # required fields
+    # inner text is filename
+    filename: str = anchor.text
+
+    # get upstream url and make it absolute
+    href: str = anchor.attrib["href"]
+    upstream_url = app.packages.simple.absoluify_url(package.repository_url, href)
+
+    # parse out the hash which should be in the fragment
+    upstream_url, upstream_fragment = urldefrag(upstream_url)
+
+    # optional fields
+    # get python requires
+    requires_python = anchor.attrib.get(f"{DATA_PREFIX}requires-python", None)
+    if isinstance(requires_python, str):
+        requires_python = html.unescape(requires_python)
+
+    # get yanked reason
+    yanked: str | None = anchor.attrib.get(f"{DATA_PREFIX}yanked", None)
+    if yanked is None:
+        # default to not yanked
+        is_yanked = False
+        yanked_reason = None
+    elif isinstance(yanked, str) and yanked.lower() == "true":
+        # yanked with no reason
+        is_yanked = True
+        yanked_reason = None
+    else:
+        # yanked with reason
+        is_yanked = True
+        yanked_reason = yanked
+
+    # postprocessing
+    version = app.packages.simple.parse_version(filename)
+
+    # create code file
+    code_file = CodeFile(
+        package=package,
+        filename=filename,
+        upstream_url=upstream_url,
+        requires_python=requires_python,
+        is_yanked=is_yanked,
+        yanked_reason=yanked_reason,
+        version=version,
+    )
+
+    # add a hash to the code file
+    if upstream_fragment:
+        add_hash(upstream_fragment, code_file)
+
+    # grab metadata info in order of preference
+    metadata: str | None = anchor.attrib.get(f"{DATA_PREFIX}{METADATA_KEY}", None)
+    if metadata is None:
+        metadata = anchor.attrib.get(f"{DATA_PREFIX}{METADATA_KEY_LEGACY}", None)
+
+    # "true" is an acceptable value
+    # not guaranteed to be a "sha256=value" format
+    if metadata:
+        code_file.metadata_file = MetadataFile(
+            package=package,
+            filename=f"{filename}{METADATA_EXTENSION}",
+            upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
+            version=version,
+            code_file=code_file,
         )
 
+        # if there was a hash, add it
+        add_hash(metadata, code_file.metadata_file)
 
-def parse_simple_html(html_content: str, url: str, package: Package) -> list[CodeFile]:
+    return code_file
+
+
+def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     """
     Parse the simple registry HTML content.
     Return a list of code files.
     """
-    logger.info(f"Parsing {url} JSON content")
+    logger.info(f"Parsing {package.repository_url} HTML content")
+    start_time = time.time()
 
     # use lxml for performance
     # let any exceptions bubble up
@@ -69,63 +143,11 @@ def parse_simple_html(html_content: str, url: str, package: Package) -> list[Cod
     code_files: list[CodeFile] = []
 
     # iterate over all anchor tags
-    for anchor in upstream_tree.iter("a"):
-        # required fields
-        # inner text is filename
-        filename: str = anchor.text
+    # tried using threadpoolexecutor, but it was slower
+    code_files = [_parse_single_record(record, package) for record in upstream_tree.iter("a")]
 
-        # get upstream url and make it absolute
-        href: str = anchor.attrib["href"]
-        upstream_url = app.packages.simple.absoluify_url(url, href)
-
-        # parse out the hash which should be in the fragment
-        upstream_url, upstream_fragment = urldefrag(upstream_url)
-
-        # optional fields
-        # get python requires
-        requires_python = anchor.attrib.get(f"{DATA_PREFIX}requires-python", None)
-        if isinstance(requires_python, str):
-            requires_python = html.unescape(requires_python)
-
-        # get yanked reason
-        yanked = anchor.attrib.get(f"{DATA_PREFIX}yanked", None)
-
-        # postprocessing
-        version = app.packages.simple.parse_version(filename)
-
-        # create code file
-        code_file = CodeFile(
-            package=package,
-            filename=filename,
-            upstream_url=upstream_url,
-            requires_python=requires_python,
-            yanked=yanked,
-            version=version,
-        )
-        code_files.append(code_file)
-
-        # add a hash to the code file
-        if upstream_fragment:
-            add_hash(upstream_fragment, code_file)
-
-        # grab metadata info in order of preference
-        metadata: str | None = anchor.attrib.get(f"{DATA_PREFIX}{METADATA_KEY}", None)
-        if metadata is None:
-            metadata = anchor.attrib.get(f"{DATA_PREFIX}{METADATA_KEY_LEGACY}", None)
-
-        # "true" is an acceptable value
-        # not guaranteed to be a "sha256=value" format
-        if metadata:
-            code_file.metadata_file = MetadataFile(
-                package=package,
-                filename=f"{filename}{METADATA_EXTENSION}",
-                upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
-                version=version,
-                code_file=code_file,
-            )
-
-            # if there was a hash, add it
-            if "=" in metadata:
-                add_hash(metadata, code_file.metadata_file)
+    end_time = time.time()
+    logger.info(f"Parsing {package.repository_url} JSON content took {
+                end_time - start_time:.2f} seconds")
 
     return code_files

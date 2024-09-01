@@ -39,9 +39,7 @@ def test_validate_quality_pass(given: str, expected: float):
     assert app.packages.simple.validate_quality(given) == expected
 
 
-@pytest.mark.parametrize(
-    "given", ("a", "0.0000", "1.2.3.4", "1.0001", "123", "1.001", "-1")
-)
+@pytest.mark.parametrize("given", ("a", "0.0000", "1.2.3.4", "1.0001", "123", "1.001", "-1"))
 def test_validate_quality_fail(given: str):
     """
     Test the quality value validation function with an invalid value.
@@ -92,12 +90,7 @@ def test_determine_index_format(
     """
     Test the quality value validation function with an invalid value.
     """
-    assert (
-        app.packages.simple.determine_index_format(
-            accept_header=given_accept_header, format_query=given_format_query
-        )
-        == expected
-    )
+    assert app.packages.simple.determine_index_format(accept_header=given_accept_header, format_query=given_format_query) == expected
 
 
 @pytest.mark.parametrize(

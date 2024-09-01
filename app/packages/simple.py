@@ -93,9 +93,7 @@ def validate_quality(quality: str) -> float:
     """
 
     if "." in quality and len(quality.split(".")[1]) > 3:
-        raise InvalidQualityValue(
-            f"Quality value {quality} has more than 3 decimal places"
-        )
+        raise InvalidQualityValue(f"Quality value {quality} has more than 3 decimal places")
 
     try:
         fquality = float(quality)
@@ -108,9 +106,7 @@ def validate_quality(quality: str) -> float:
     return fquality
 
 
-def determine_index_format(
-    accept_header: str | None, format_query: str | None
-) -> IndexFormat | None:
+def determine_index_format(accept_header: str | None, format_query: str | None) -> IndexFormat | None:
     """
     Determine the content type based on the Accept header and the ?format query parameter.
     The ?format query parameter takes precedence over the Accept header.

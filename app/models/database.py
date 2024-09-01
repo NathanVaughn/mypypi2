@@ -35,7 +35,7 @@ def init_db(flask_app: Flask) -> None:
 
         for repository in flask_app.config["repositories"]:
             slug = repository["slug"]
-            simple_url = repository["simple_url"].removesuffix("/")
+            simple_url = repository["simple_url"]
             cache_minutes = repository["cache_minutes"]
             timeout_seconds = repository["timeout_seconds"]
 

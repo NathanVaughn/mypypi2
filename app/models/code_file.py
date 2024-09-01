@@ -14,18 +14,19 @@ if TYPE_CHECKING:
 
 
 class CodeFile(PackageFile):
+    """
+    This model represents a code file associated with a package.
+    This is what actually appears in the list of files for a package.
+    """
+
     __tablename__ = "code_file"
 
-    requires_python: Mapped[str | None] = mapped_column(
-        String, nullable=True, default=None
-    )
+    requires_python: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     """
     Python version requirements
     """
     is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
-    yanked_reason: Mapped[str | None] = mapped_column(
-        String, nullable=True, default=None
-    )
+    yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
     """
@@ -34,9 +35,7 @@ class CodeFile(PackageFile):
     # This is a huge performance boost when rendering templates
     # with lots of files. Without this, every single record
     # with a metadata file would result in a seperate query.
-    metadata_file: Mapped[MetadataFile] = relationship(
-        "MetadataFile", back_populates="code_file", lazy="joined"
-    )
+    metadata_file: Mapped[MetadataFile] = relationship("MetadataFile", back_populates="code_file", lazy="joined")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[CodeFileHash]]:

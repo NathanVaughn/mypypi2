@@ -2,15 +2,23 @@ import tomllib
 from flask import Flask
 
 
-def create_app():
+def create_app(is_testing: bool = False) -> Flask:
     flask_app = Flask(__name__)
 
-    with open("config.toml", "rb") as f:
-        flask_app.config.update(tomllib.load(f))
+    if is_testing:
+        flask_app.config["TESTING"] = True
+        flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+        flask_app.config["storage"] = {"driver": "local", "local": {"directory": "tmp/storage"}}
+        flask_app.config["repositories"] = []
+
+    else:
+        with open("config.toml", "rb") as f:
+            flask_app.config.update(tomllib.load(f))
+
+        flask_app.config["SQLALCHEMY_DATABASE_URI"] = flask_app.config["database"]["uri"]
 
     # setup database
     # flask_app.config["SQLALCHEMY_ECHO"] = True
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = flask_app.config["database"]["uri"]
     import app.models.database
 
     app.models.database.db.init_app(flask_app)

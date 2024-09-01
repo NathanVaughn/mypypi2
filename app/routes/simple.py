@@ -63,9 +63,7 @@ def simple_route(repository_slug: str, package_name: str):
     # https://peps.python.org/pep-0691/#version-format-selection
     accept_header = request.headers.get("Accept")
     format_query = request.args.get("format")
-    index_format = app.packages.simple.determine_index_format(
-        accept_header, format_query
-    )
+    index_format = app.packages.simple.determine_index_format(accept_header, format_query)
 
     # if we have no acceptable format, return a 406
     if index_format is None:
@@ -93,7 +91,5 @@ def simple_route(repository_slug: str, package_name: str):
     # return the response with the correct content type
     return Response(
         response_content,
-        content_type=app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[
-            index_format
-        ],
+        content_type=app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format],
     )

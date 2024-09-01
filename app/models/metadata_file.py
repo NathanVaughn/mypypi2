@@ -14,18 +14,20 @@ if TYPE_CHECKING:
 
 
 class MetadataFile(PackageFile):
+    """
+    This model represents a metdata file for a code file associated with a package.
+    These do not appear explicitly in the list of files for a package, but
+    are the same as a code file with the extension of `.metadata`.
+    """
+
     __tablename__ = "metadata_file"
 
     code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"))
-    code_file: Mapped[CodeFile] = relationship(
-        "CodeFile", back_populates="metadata_file", lazy="joined"
-    )
+    code_file: Mapped[CodeFile] = relationship("CodeFile", back_populates="metadata_file", lazy="joined")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[MetadataFileHash]]:
         """
         A list of hashes for this file
         """
-        return relationship(
-            "MetadataFileHash", back_populates="metadata_file", lazy="joined"
-        )
+        return relationship("MetadataFileHash", back_populates="metadata_file", lazy="joined")

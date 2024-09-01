@@ -7,6 +7,12 @@ from app.models.database import Base
 
 
 class PackageFileHash(Base):
+    """
+    This model represents a content hash for a file associated with a package.
+    Since the JSON API allows for files to have multiple hashes, we need a seperate
+    table. This is a base model meant to inherited.
+    """
+
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

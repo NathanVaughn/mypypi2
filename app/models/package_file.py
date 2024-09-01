@@ -15,10 +15,13 @@ if TYPE_CHECKING:
 
 
 class PackageFile(Base):
+    """
+    This model represents a file associated with a package.
+    This is a base model meant to inherited.
+    """
+
     __abstract__ = True
-    __table_args__ = (
-        UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),
-    )
+    __table_args__ = (UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """
@@ -57,8 +60,9 @@ class PackageFile(Base):
     def hashes(cls) -> Mapped[list[PackageFileHash]]:
         """
         This needs to be overridden in the subclasses.
+        This is kept here for type checking only.
         """
-        return relationship("PackageFileHash", lazy="joined")
+        return relationship("PackageFileHash", lazy="joined")  # pragma: no cover
 
     # utility properties
 
@@ -67,7 +71,7 @@ class PackageFile(Base):
         """
         Returns the version text for this file.
         """
-        return self.version or "UKNOWN"
+        return self.version or "UNKNOWN"
 
     @property
     def hash_value(self) -> str | None:

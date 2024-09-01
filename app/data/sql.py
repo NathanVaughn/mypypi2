@@ -26,9 +26,7 @@ def get_repository(repository_slug: str) -> Repository | None:
     Lookup a Repository object given the slug.
     Returns None if not found.
     """
-    return db.session.execute(
-        db.select(Repository).where(Repository.slug == repository_slug)
-    ).scalar_one_or_none()
+    return db.session.execute(db.select(Repository).where(Repository.slug == repository_slug)).scalar_one_or_none()
 
 
 def get_repository_with_exception(repository_slug: str) -> Repository:
@@ -60,11 +58,7 @@ def get_package(repository: Repository, package_name: str) -> Package | None:
     Lookup a Package object given the Repository and package name.
     Returns None if not found.
     """
-    return db.session.execute(
-        db.select(Package).where(
-            Package.repository_id == repository.id, Package.name == package_name
-        )
-    ).scalar_one_or_none()
+    return db.session.execute(db.select(Package).where(Package.repository_id == repository.id, Package.name == package_name)).scalar_one_or_none()
 
 
 def get_package_with_exception(repository: Repository, package_name: str) -> Package:
@@ -74,15 +68,11 @@ def get_package_with_exception(repository: Repository, package_name: str) -> Pac
     """
     package = get_package(repository=repository, package_name=package_name)
     if package is None:
-        raise PackageNotFound(
-            repository_slug=repository.slug, package_name=package_name
-        )
+        raise PackageNotFound(repository_slug=repository.slug, package_name=package_name)
     return package
 
 
-def get_metadata_file(
-    repository: Repository, package: Package, filename: str
-) -> MetadataFile | None:
+def get_metadata_file(repository: Repository, package: Package, filename: str) -> MetadataFile | None:
     """
     Lookup a MetadataFile object given the Repository, Package, and filename.
     """
@@ -95,9 +85,7 @@ def get_metadata_file(
     ).scalar_one_or_none()
 
 
-def get_code_file(
-    repository: Repository, package: Package, filename: str
-) -> CodeFile | None:
+def get_code_file(repository: Repository, package: Package, filename: str) -> CodeFile | None:
     """
     Lookup a MetadataFile object given the Repository, Package, and filename.
     """
@@ -110,9 +98,7 @@ def get_code_file(
     ).scalar_one_or_none()
 
 
-def get_package_file_with_exception(
-    repository: Repository, package: Package, filename: str
-) -> PackageFile:
+def get_package_file_with_exception(repository: Repository, package: Package, filename: str) -> PackageFile:
     """
     Lookup a PackageFile object given the Repository, Package, and filename.
     Raises an exception if not found.

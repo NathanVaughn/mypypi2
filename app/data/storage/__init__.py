@@ -23,9 +23,7 @@ class _ActiveStorage:
                     region_name=s3_config.get("region_name"),
                     public_url_prefix=s3_config["public_url_prefix"],
                     bucket_prefix=s3_config.get("bucket_prefix", ""),
-                    redirect_code=int(
-                        s3_config.get("redirect_code", HTTPStatus.PERMANENT_REDIRECT)
-                    ),
+                    redirect_code=int(s3_config.get("redirect_code", HTTPStatus.PERMANENT_REDIRECT)),
                 )
             elif flask_app.config["storage"]["driver"] == "local":
                 import app.data.storage.local

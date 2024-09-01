@@ -31,7 +31,7 @@ def fetch_package_data(repository: Repository, package_name: str) -> Package:
     package = Package(repository=repository, name=package_name)
 
     # make the request upstream
-    url = f"{repository.simple_url}/{package_name}"
+    url = package.repository_url
     content_types = [
         f"{PYPI_CONTENT_TYPE_JSON_V1};q=1",
         f"{PYPI_CONTENT_TYPE_HTML_V1};q=0.2",
@@ -40,9 +40,7 @@ def fetch_package_data(repository: Repository, package_name: str) -> Package:
     headers = {"Accept": ",".join(content_types)}
     try:
         logger.info(f"Fetching {url}")
-        response = requests.get(
-            url, headers=headers, timeout=repository.timeout_seconds
-        )
+        response = requests.get(url, headers=headers, timeout=repository.timeout_seconds)
         response.raise_for_status()
     except requests.exceptions.Timeout:
         # we need to handle this one specifically to pretend nothing happend
@@ -61,9 +59,9 @@ def fetch_package_data(repository: Repository, package_name: str) -> Package:
     # parse the response
     index_format = PYPI_CONTENT_TYPE_INDEX_FORMAT_MAPPING[content_type]
     if index_format == IndexFormat.json:
-        package.code_files = parse_simple_json(response.text, url, package)
+        package.code_files = parse_simple_json(response.text, package)
     elif index_format == IndexFormat.html:
-        package.code_files = parse_simple_html(response.text, url, package)
+        package.code_files = parse_simple_html(response.text, package)
 
     # return our package object
     return package
@@ -96,6 +94,10 @@ def update_package_data(repository: Repository, package: Package) -> Package:
     except IndexTimeoutError:
         # pretend nothing happened
         return package
+
+    # we need to compare a list of code files parsed to the ones we have already seen
+    # We won't delete existing files, but only add new files.
+    # Also need to rectify any changes. This will only include yanked, metadata, and hashes.
 
     # TODO: implement de-duping
     package.last_updated = datetime.datetime.now()
@@ -142,9 +144,7 @@ def cache_package_file(package_file: PackageFile) -> None:
     app.data.sql.save()
 
 
-def get_package_file(
-    repository_slug: str, package_name: str, filename: str
-) -> PackageFile:
+def get_package_file(repository_slug: str, package_name: str, filename: str) -> PackageFile:
     """
     Return a PackageFile object for a given repository, package name, and filename.
     """
@@ -157,9 +157,7 @@ def get_package_file(
     package = app.data.sql.get_package_with_exception(repository, package_name)
 
     # try to find the file in the database
-    package_file = app.data.sql.get_package_file_with_exception(
-        repository, package, filename
-    )
+    package_file = app.data.sql.get_package_file_with_exception(repository, package, filename)
 
     # if we haven't cached the file yet, do so now
     cache_package_file(package_file)
