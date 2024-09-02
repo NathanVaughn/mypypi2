@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy_mixins.serialize import SerializeMixin
 
 from app.config import Config
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase, SerializeMixin):
     pass
 
 

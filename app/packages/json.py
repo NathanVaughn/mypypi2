@@ -1,8 +1,6 @@
 import datetime
-import time
 
 import pyjson5
-from loguru import logger
 
 import app.packages.simple
 from app.constants import (
@@ -17,6 +15,7 @@ from app.models.metadata_file import MetadataFile
 from app.models.metadata_file_hash import MetadataFileHash
 from app.models.package import Package
 from app.models.package_file import PackageFile
+from app.utils import time_this_decorator
 
 
 def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
@@ -108,13 +107,12 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     return code_file
 
 
+@time_this_decorator("Parsed JSON content")
 def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
     """
     Parse the simple registry JSON content.
     Return a list of code files.
     """
-    start_time = time.time()
-
     # parse the JSON content
     # let any exceptions bubble up
     # use pyjson5 for performance
@@ -122,9 +120,5 @@ def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
 
     # tried using threadpoolexecutor, but it was slower
     code_files = [_parse_single_record(record, package) for record in data["files"]]
-
-    end_time = time.time()
-    logger.info(f"Parsed {package.repository_url} JSON content in {
-                end_time - start_time:.2f} seconds")
 
     return code_files

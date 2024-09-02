@@ -1,4 +1,3 @@
-import time
 from http import HTTPStatus
 
 from flask import Blueprint, Response, redirect, render_template, request, url_for
@@ -8,6 +7,7 @@ import app.packages.data
 import app.packages.simple
 import app.templates.simple_json
 from app.data.cache.decorator import repository_cache
+from app.utils import time_this_context, time_this_decorator
 
 simple_bp = Blueprint("simple", __name__)
 
@@ -42,13 +42,12 @@ def simple_route_missing_trailing_slash(repository_slug: str, package_name: str)
 
 
 @simple_bp.route("/<string:repository_slug>/simple/<string:package_name>/")
+@time_this_decorator("Returned response")
 @repository_cache
 def simple_route(repository_slug: str, package_name: str):
     """
     This route is used to provide a simple index of a specific package
     """
-    start_time = time.time()
-
     # per PEP 503, we can optionally redirect to the normalized name
     # https://peps.python.org/pep-0503/#normalized-names
     normalized_name = app.packages.simple.normalize_name(package_name)
@@ -82,22 +81,17 @@ def simple_route(repository_slug: str, package_name: str):
 
     # render the appropriate template
     if index_format == app.packages.simple.IndexFormat.json:
-        logger.debug("Rendering JSON response")
-        response_content = app.templates.simple_json.render_template(package)
+        with time_this_context("Rendered JSON template"):
+            response_content = app.templates.simple_json.render_template(package)
     elif index_format == app.packages.simple.IndexFormat.html:
-        logger.debug("Rendering HTML response")
-        response_content = render_template(
-            "simple.html.j2",
-            package=package,
-        )
+        with time_this_context("Rendered HTML template"):
+            response_content = render_template(
+                "simple.html.j2",
+                package=package,
+            )
 
     # return the response with the correct content type
     content_type = app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format]
-    end_time = time.time()
-
-    # return
-    logger.debug(f"Returning {content_type} for {request.path} took {
-                 end_time - start_time:.2f} seconds")
     return Response(
         response_content,
         content_type=content_type,

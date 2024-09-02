@@ -1,10 +1,8 @@
 import html
-import time
 from typing import Any
 from urllib.parse import urldefrag
 
 import lxml.html
-from loguru import logger
 
 import app.packages.simple
 from app.constants import (
@@ -19,6 +17,7 @@ from app.models.metadata_file import MetadataFile
 from app.models.metadata_file_hash import MetadataFileHash
 from app.models.package import Package
 from app.models.package_file import PackageFile
+from app.utils import time_this_decorator
 
 
 def add_hash(given: str, package_file: PackageFile) -> None:
@@ -127,13 +126,12 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
     return code_file
 
 
+@time_this_decorator("Parsed HTML content")
 def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     """
     Parse the simple registry HTML content.
     Return a list of code files.
     """
-    start_time = time.time()
-
     # use lxml for performance
     # let any exceptions bubble up
     upstream_tree = lxml.html.fromstring(html_content).contents
@@ -144,9 +142,5 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     # iterate over all anchor tags
     # tried using threadpoolexecutor, but it was slower
     code_files = [_parse_single_record(record, package) for record in upstream_tree.iter("a")]
-
-    end_time = time.time()
-    logger.info(f"Parsed {package.repository_url} HTML content in {
-                end_time - start_time:.2f} seconds")
 
     return code_files

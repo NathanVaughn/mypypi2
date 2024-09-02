@@ -1,5 +1,4 @@
 import datetime
-import time
 
 import requests
 from loguru import logger
@@ -21,6 +20,7 @@ from app.packages.simple import (
     PYPI_CONTENT_TYPE_LEGACY,
     IndexFormat,
 )
+from app.utils import time_this_context
 
 
 def fetch_package_data(package: Package) -> list[CodeFile]:
@@ -38,12 +38,9 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     ]
     headers = {"Accept": ",".join(content_types)}
     try:
-        start_time = time.time()
-        response = requests.get(url, headers=headers, timeout=package.repository.timeout_seconds)
-        response.raise_for_status()
-        end_time = time.time()
-        logger.info(f"Fetched {package.repository_url} in {
-                    end_time - start_time:.2f} seconds")
+        with time_this_context(f"Fetched {package.repository_url}"):
+            response = requests.get(url, headers=headers, timeout=package.repository.timeout_seconds)
+            response.raise_for_status()
     except requests.exceptions.Timeout:
         # we need to handle this one specifically to pretend nothing happend
         raise IndexTimeoutError
@@ -88,9 +85,8 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
             code_file.metadata_file.package = package
 
     # save the new package to the database
-    logger.debug(f"Saving {len(package.code_files)
-                           } new code files for package {package.log_name}")
-    app.data.sql.save_package(package)
+    with time_this_context(f"Saved {len(package.code_files)} new code files for package {package.log_name}"):
+        app.data.sql.save_package(package)
     return package
 
 
