@@ -1,0 +1,6 @@
+bulk insert
+
+CodeFile
+CodefileHash
+MetadataFile
+MetadataFileHash

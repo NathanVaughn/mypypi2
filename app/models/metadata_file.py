@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -21,9 +21,16 @@ class MetadataFile(PackageFile):
     """
 
     __tablename__ = "metadata_file"
+    __table_args__ = (ForeignKeyConstraint(["code_file_package_id", "code_file_filename"], [
+                      "code_file.package_id", "code_file.filename"]),)
 
-    code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"))
-    code_file: Mapped[CodeFile] = relationship("CodeFile", back_populates="metadata_file", lazy="joined")
+    code_file_package_id: Mapped[int] = mapped_column(
+        ForeignKey("code_file.package_id"))
+    code_file_filename: Mapped[int] = mapped_column(
+        ForeignKey("code_file.filename"))
+    code_file: Mapped[CodeFile] = relationship(
+        # , foreign_keys=[code_file_package_id, code_file_filename])
+        "CodeFile", back_populates="metadata_file", lazy="joined")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[MetadataFileHash]]:

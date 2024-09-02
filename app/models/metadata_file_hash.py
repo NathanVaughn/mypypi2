@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.package_file_hash import PackageFileHash
@@ -19,7 +19,16 @@ class MetadataFileHash(PackageFileHash):
     """
 
     __tablename__ = "metadata_file_hash"
-    __table_args__ = (UniqueConstraint("kind", "metadata_file_id", name="_kind_metadata_file_id_id_uc"),)
+    __table_args__ = (
+        ForeignKeyConstraint(["metadata_file_package_id", "metadata_file_filename"], [
+                             "metadata_file.package_id", "metadata_file.filename"]),
+        UniqueConstraint("kind", "metadata_file_package_id",
+                         "metadata_file_filename", name="metadata_file_hash_uc"),
+    )
 
-    metadata_file_id: Mapped[int] = mapped_column(ForeignKey("metadata_file.id"), nullable=True)
-    metadata_file: Mapped[MetadataFile] = relationship("MetadataFile", lazy="joined", back_populates="hashes")
+    metadata_file_package_id: Mapped[int] = mapped_column(
+        ForeignKey("metadata_file.package_id"))
+    metadata_file_filename: Mapped[int] = mapped_column(
+        ForeignKey("metadata_file.filename"))
+    metadata_file: Mapped[MetadataFile] = relationship(
+        "MetadataFile", back_populates="metadata_file", lazy="joined")

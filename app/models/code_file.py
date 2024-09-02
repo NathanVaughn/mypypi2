@@ -22,20 +22,24 @@ class CodeFile(PackageFile):
 
     __tablename__ = "code_file"
 
-    requires_python: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    requires_python: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None)
     """
     Python version requirements
     """
     is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
-    yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    yanked_reason: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
     """
-    size: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    size: Mapped[int | None] = mapped_column(
+        Integer, nullable=True, default=None)
     """
     File size in bytes
     """
-    upload_time: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True, default=None)
+    upload_time: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime, nullable=True, default=None)
     """
     Upload time of the file
     """
@@ -44,7 +48,8 @@ class CodeFile(PackageFile):
     # This is a huge performance boost when rendering templates
     # with lots of files. Without this, every single record
     # with a metadata file would result in a seperate query.
-    metadata_file: Mapped[MetadataFile] = relationship("MetadataFile", back_populates="code_file", lazy="joined")
+    metadata_file: Mapped[MetadataFile] = relationship(
+        "MetadataFile", back_populates="code_file", lazy="joined", foreign_keys=[code_file_package_id, code_file_filename])
 
     @declared_attr
     def hashes(cls) -> Mapped[list[CodeFileHash]]:
