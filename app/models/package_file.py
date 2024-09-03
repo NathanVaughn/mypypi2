@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flask import url_for
-from pydantic import Field
 from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+import app.data.sql.main2
 from app.models.database import Base, BaseSQL
+from app.models.package import PackageSQL
 
 if TYPE_CHECKING:
     from app.models.package import Package, PackageSQL  # pragma: no cover
@@ -22,7 +23,8 @@ class PackageFileSQL(BaseSQL):
     """
 
     __abstract__ = True
-    __table_args__ = (UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),)
+    __table_args__ = (UniqueConstraint(
+        "filename", "package_id", name="_filename_package_id_uc"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """
@@ -48,7 +50,8 @@ class PackageFileSQL(BaseSQL):
     """
     Upstream URL where we can download this package
     """
-    version: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    version: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None)
     """
     For some files, record the version
     """
@@ -68,7 +71,6 @@ class PackageFileSQL(BaseSQL):
 
 class PackageFile(Base):
     id: int | None = None  # comes from SQL model
-    package: "Package" = Field(exclude=True)  # forward reference
     package_id: int | None = None  # comes from SQL model
 
     filename: str
@@ -76,6 +78,14 @@ class PackageFile(Base):
     version: str | None
     is_cached: bool = False
     hashes: list[PackageFileHashSQL]
+
+    @property
+    def package(self) -> Package:
+        """
+        Parent package
+        """
+        assert self.package_id is not None
+        return app.data.sql.main2.get_by_id(PackageSQL, self.package_id)
 
     @property
     def version_text(self) -> str:

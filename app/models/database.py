@@ -42,10 +42,11 @@ def init_db(flask_app: Flask) -> None:
         db.create_all()
 
         # load configured repositories
-        import app.data.sql
+        import app.data.sql.main
 
         for repository_config in Config.repositories:
-            repository = app.data.sql.get_repository(repository_config.slug)
+            repository = app.data.sql.main.get_repository(
+                repository_config.slug)
 
             if repository is None:
                 # create new repository if it doesn't exist

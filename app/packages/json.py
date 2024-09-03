@@ -31,7 +31,8 @@ def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
         if isinstance(package_file, CodeFile):
             package_file.hashes.append(CodeFileHash(kind=kind, value=value))
         elif isinstance(package_file, MetadataFile):
-            package_file.hashes.append(MetadataFileHash(kind=kind, value=value))
+            package_file.hashes.append(
+                MetadataFileHash(kind=kind, value=value))
 
 
 def _parse_single_record(record: dict, package: Package) -> CodeFile:
@@ -40,7 +41,8 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     """
     # required fields
     filename = record["filename"]
-    upstream_url = app.packages.simple.urljoin(package.repository_url, record["url"])
+    upstream_url = app.packages.simple.urljoin(
+        package.repository_url, record["url"])
 
     # optional fields
     requires_python = record.get("requires-python", None)
@@ -65,7 +67,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
 
     # create code file
     code_file = CodeFile(
-        package=package,
+        package_id=package.id,
         filename=filename,
         upstream_url=upstream_url,
         requires_python=requires_python,
@@ -91,7 +93,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     # add metadata file if available
     if metadata:
         code_file.metadata_file = MetadataFile(
-            package=package,
+            package_id=package.id,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,
@@ -118,6 +120,7 @@ def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
     data = pyjson5.loads(json_content)
 
     # tried using threadpoolexecutor, but it was slower
-    code_files = [_parse_single_record(record, package) for record in data["files"]]
+    code_files = [_parse_single_record(record, package)
+                  for record in data["files"]]
 
     return code_files

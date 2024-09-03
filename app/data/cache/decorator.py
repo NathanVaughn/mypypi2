@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from loguru import logger
 
-import app.data.sql
+import app.data.sql.main
 from app.data.cache.active import ActiveCache
 
 
@@ -15,11 +15,13 @@ def repository_cache(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(*args: str, **kwargs: str) -> Any:
-        repository_timeout = app.data.sql.get_repository_timeout(kwargs["repository_slug"])
+        repository_timeout = app.data.sql.main.get_repository_timeout(
+            kwargs["repository_slug"])
 
         # flask always passes the view function's arguments as kwargs
         # the second part of this line flattens the kwargs into a list
-        key = "-".join((func.__name__, *args, *(i for (k, v) in kwargs.items() for i in (k, v))))
+        key = "-".join((func.__name__, *args, *(i for (k, v)
+                       in kwargs.items() for i in (k, v))))
 
         response = ActiveCache.provider.get(key)
         if response is not None:

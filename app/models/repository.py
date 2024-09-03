@@ -40,7 +40,8 @@ class RepositorySQL(BaseSQL):
     Number of seconds to wait for a response from the upstream server
     """
 
-    packages: Mapped[list[PackageSQL]] = relationship("PackageSQL", back_populates="repository")
+    packages: Mapped[list[PackageSQL]] = relationship(
+        "PackageSQL", back_populates="repository")
 
 
 class Repository(Base):
@@ -55,6 +56,10 @@ class Repository(Base):
     timeout_seconds: int
 
     # this is a liability
+    # since converting the model from SQL to Pydantic
+    # will pull in ALL subpackages, and then their child models,
+    # etc.
+    # Basically querying for one repository will pull in the entire database
     # packages: list[Package] = Field(exclude=True)
 
     @field_validator("simple_url")

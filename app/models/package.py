@@ -7,15 +7,14 @@ from pydantic import Field
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.code_file import CodeFile
+import app.data.sql.main2
 from app.models.database import Base, BaseSQL
-from app.models.repository import Repository
+from app.models.repository import Repository, RepositorySQL
 
 if TYPE_CHECKING:
-    from app.models.code_file import CodeFileSQL  # pragma: no cover
-    from app.models.repository import (
-        Repository,  # pragma: no cover
-        RepositorySQL,  # pragma: no cover
+    from app.models.code_file import (
+        CodeFile,
+        CodeFileSQL,  # pragma: no cover
     )
 
 
@@ -27,7 +26,8 @@ class PackageSQL(BaseSQL):
     """
 
     __tablename__ = "package"
-    __table_args__ = (UniqueConstraint("name", "repository_id", name="_name_repository_id_uc"),)
+    __table_args__ = (UniqueConstraint(
+        "name", "repository_id", name="_name_repository_id_uc"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """
@@ -47,7 +47,8 @@ class PackageSQL(BaseSQL):
     Last time this package's data was updated
     """
 
-    code_files: Mapped[list[CodeFileSQL]] = relationship("CodeFileSQL", back_populates="package")
+    code_files: Mapped[list[CodeFileSQL]] = relationship(
+        "CodeFileSQL", back_populates="package")
 
 
 class Package(Base):
@@ -56,13 +57,21 @@ class Package(Base):
     """
 
     id: int | None = None  # comes from SQL model
-    repository: "Repository" = Field(exclude=True)  # forward reference
     repository_id: int | None = None  # comes from SQL model
 
     name: str
-    last_updated: datetime.datetime = Field(default_factory=datetime.datetime.now)
+    last_updated: datetime.datetime = Field(
+        default_factory=datetime.datetime.now)
 
     code_files: list[CodeFile] = Field(exclude=True)
+
+    @property
+    def repository(self) -> Repository:
+        """
+        Parent repository
+        """
+        assert self.repository_id is not None
+        return app.data.sql.main2.get_by_id(RepositorySQL, self.repository_id)
 
     @property
     def is_current(self) -> bool:

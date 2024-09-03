@@ -3,7 +3,7 @@ import datetime
 import requests
 from loguru import logger
 
-import app.data.sql
+import app.data.sql.main
 import app.data.storage.active
 from app.constants import CONTENT_TYPE_HEADER
 from app.models.code_file import CodeFile
@@ -39,14 +39,16 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     headers = {"Accept": ",".join(content_types)}
     try:
         with time_this_context(f"Fetched {package.repository_url}"):
-            response = requests.get(url, headers=headers, timeout=package.repository.timeout_seconds)
+            response = requests.get(
+                url, headers=headers, timeout=package.repository.timeout_seconds)
             response.raise_for_status()
     except requests.exceptions.Timeout:
         # we need to handle this one specifically to pretend nothing happend
         raise IndexTimeoutError
     except Exception:
         # if we have any error, we need to raise a PackageNotFound
-        raise PackageNotFound(package_name=package.name, repository_slug=package.repository.slug)
+        raise PackageNotFound(package_name=package.name,
+                              repository_slug=package.repository.slug)
 
     # now, figure out how to parse the response.
     content_type = response.headers.get(CONTENT_TYPE_HEADER)
@@ -69,24 +71,26 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
     """
     Fetch package data for the first time.
     """
-    package = Package(repository=repository, repository_id=repository.id, name=package_name, code_files=[])
+    package = Package(repository_id=repository.id,
+                      name=package_name, code_files=[])
     logger.debug(f"Creating package {package.log_name}")
 
     try:
         package.code_files = fetch_package_data(package)
     except IndexTimeoutError:
         # since we have nothing to work with, raise a not found error
-        raise PackageNotFound(package_name=package.name, repository_slug=repository.slug)
+        raise PackageNotFound(package_name=package.name,
+                              repository_slug=repository.slug)
 
     # set the package for each code file
     for code_file in package.code_files:
-        code_file.package = package
+        code_file.package_id = package.id
         if code_file.metadata_file:
-            code_file.metadata_file.package = package
+            code_file.metadata_file.package_id = package.id
 
     # save the new package to the database
     with time_this_context(f"Saved {len(package.code_files)} new code files for package {package.log_name}"):
-        app.data.sql.save_package(package)
+        app.data.sql.main.save_package(package)
     return package
 
 
@@ -95,7 +99,8 @@ def update_package_data(repository: Repository, package: Package) -> Package:
     Update the package data for a given package in our database
     """
     # first, we need to get the existing code files
-    old_code_files_dict = {code_file.filename: code_file for code_file in package.code_files}
+    old_code_files_dict = {
+        code_file.filename: code_file for code_file in package.code_files}
     old_code_files_filenames_set = set(old_code_files_dict.keys())
 
     try:
@@ -107,7 +112,8 @@ def update_package_data(repository: Repository, package: Package) -> Package:
     # we need to compare a list of code files parsed to the ones we have already seen
     # We won't delete existing files, but only add new files.
     # Also need to rectify any changes. This will only include yanked, metadata, and hashes.
-    new_code_files_dict = {code_file.filename: code_file for code_file in new_code_files}
+    new_code_files_dict = {
+        code_file.filename: code_file for code_file in new_code_files}
 
     to_save_code_files: list[CodeFile] = []
     # add new code files
@@ -120,14 +126,14 @@ def update_package_data(repository: Repository, package: Package) -> Package:
 
     # set the package for each code file
     for code_file in to_save_code_files:
-        code_file.package = package
+        code_file.package_id = package.id
         if code_file.metadata_file:
-            code_file.metadata_file.package = package
+            code_file.metadata_file.package_id = package.id
 
     logger.debug(f"Saving {len(to_save_code_files)
                            } new code files for package {package.log_name}")
     package.last_updated = datetime.datetime.now()
-    app.data.sql.save()
+    app.data.sql.main.save()
 
     return package
 
@@ -137,10 +143,11 @@ def get_package(repository_slug: str, package_name: str) -> Package:
     Return a Package object for a given repository and package name.
     """
     # first try to find the repository
-    repository = app.data.sql.get_repository_with_exception(repository_slug)
+    repository = app.data.sql.main.get_repository_with_exception(
+        repository_slug)
 
     # try to find the package in the database
-    package = app.data.sql.get_package(repository, package_name)
+    package = app.data.sql.main.get_package(repository, package_name)
 
     # if package is not in the database, we need to fetch it
     if package is None:
@@ -166,7 +173,7 @@ def cache_package_file(package_file: PackageFile) -> None:
 
     # update the database
     package_file.is_cached = True
-    app.data.sql.save()
+    app.data.sql.main.save()
 
 
 def get_package_file(repository_slug: str, package_name: str, filename: str) -> PackageFile:
@@ -174,15 +181,18 @@ def get_package_file(repository_slug: str, package_name: str, filename: str) -> 
     Return a PackageFile object for a given repository, package name, and filename.
     """
     # first try to find the repository
-    repository = app.data.sql.get_repository_with_exception(repository_slug)
+    repository = app.data.sql.main.get_repository_with_exception(
+        repository_slug)
 
     # try to find the package in the database
     # this shouldn't be the first time we're hearing of this package name
     # so if it is, we can raise an exception
-    package = app.data.sql.get_package_with_exception(repository, package_name)
+    package = app.data.sql.main.get_package_with_exception(
+        repository, package_name)
 
     # try to find the file in the database
-    package_file = app.data.sql.get_package_file_with_exception(repository, package, filename)
+    package_file = app.data.sql.main.get_package_file_with_exception(
+        repository, package, filename)
 
     # if we haven't cached the file yet, do so now
     cache_package_file(package_file)

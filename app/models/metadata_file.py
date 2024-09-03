@@ -7,6 +7,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+import app.data.sql.main2
+from app.models.code_file import CodeFile
 from app.models.metadata_file_hash import MetadataFileHash
 from app.models.package_file import PackageFile, PackageFileSQL
 
@@ -27,7 +29,8 @@ class MetadataFileSQL(PackageFileSQL):
     __tablename__ = "metadata_file"
 
     code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"))
-    code_file: Mapped[CodeFileSQL] = relationship("CodeFileSQL", back_populates="metadata_file", lazy="joined")
+    code_file: Mapped[CodeFileSQL] = relationship(
+        "CodeFileSQL", back_populates="metadata_file", lazy="joined")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[MetadataFileHashSQL]]:
@@ -67,3 +70,11 @@ class MetadataFile(PackageFile):
     code_file_id: int | None = None  # comes from SQL model
 
     hashes: list[MetadataFileHash] = Field(exclude=True)
+
+    @property
+    def code_file(self) -> CodeFile:
+        """
+        Parent code file
+        """
+        assert self.code_file_id is not None
+        return app.data.sql.main2.get_by_id(CodeFileSQL, self.code_file_id)

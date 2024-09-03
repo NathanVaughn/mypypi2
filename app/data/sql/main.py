@@ -1,7 +1,7 @@
 import functools
-from typing import overload
 
 from app.constants import METADATA_EXTENSION, MINUTES_TO_SECONDS
+from app.data.sql.main2 import convert_sql_to_pydantic
 from app.models.code_file import CodeFile, CodeFileSQL
 from app.models.code_file_hash import CodeFileHash, CodeFileHashSQL
 from app.models.database import db
@@ -17,36 +17,6 @@ from app.models.package_file import PackageFile
 from app.models.repository import Repository, RepositorySQL
 
 
-@overload
-def convert_sql_to_pydantic(sql_object: RepositorySQL) -> Repository: ...
-
-
-@overload
-def convert_sql_to_pydantic(sql_object: PackageSQL) -> Package: ...
-
-
-@overload
-def convert_sql_to_pydantic(sql_object: CodeFileSQL) -> CodeFile: ...
-
-
-@overload
-def convert_sql_to_pydantic(sql_object: MetadataFileSQL) -> MetadataFile: ...
-
-
-def convert_sql_to_pydantic(sql_object: RepositorySQL | PackageSQL | CodeFileSQL | MetadataFileSQL) -> Repository | Package | CodeFile | MetadataFile:
-    """
-    Convert a SQLAlchemy object to a Pydantic object.
-    """
-    if isinstance(sql_object, RepositorySQL):
-        return Repository.model_validate(sql_object, from_attributes=True)
-    elif isinstance(sql_object, PackageSQL):
-        return Package.model_validate(sql_object, from_attributes=True)
-    elif isinstance(sql_object, CodeFileSQL):
-        return CodeFile.model_validate(sql_object, from_attributes=True)
-    elif isinstance(sql_object, MetadataFileSQL):
-        return MetadataFile.model_validate(sql_object, from_attributes=True)
-
-
 def save() -> None:
     """
     Save changes made to existing objects.
@@ -59,7 +29,8 @@ def get_repository(repository_slug: str) -> Repository | None:
     Lookup a Repository object given the slug.
     Returns None if not found.
     """
-    repository: RepositorySQL | None = db.session.execute(db.select(RepositorySQL).where(RepositorySQL.slug == repository_slug)).scalar_one_or_none()
+    repository: RepositorySQL | None = db.session.execute(db.select(
+        RepositorySQL).where(RepositorySQL.slug == repository_slug)).scalar_one_or_none()
     if repository is not None:
         return convert_sql_to_pydantic(repository)
 
@@ -93,7 +64,8 @@ def get_package(repository: Repository, package_name: str) -> Package | None:
     Lookup a Package object given the Repository and package name.
     Returns None if not found.
     """
-    package: PackageSQL | None = db.session.execute(db.select(PackageSQL).where(PackageSQL.repository_id == repository.id, PackageSQL.name == package_name)).scalar_one_or_none()
+    package: PackageSQL | None = db.session.execute(db.select(PackageSQL).where(
+        PackageSQL.repository_id == repository.id, PackageSQL.name == package_name)).scalar_one_or_none()
     if package is not None:
         return convert_sql_to_pydantic(package)
 
@@ -105,7 +77,8 @@ def get_package_with_exception(repository: Repository, package_name: str) -> Pac
     """
     package = get_package(repository=repository, package_name=package_name)
     if package is None:
-        raise PackageNotFound(repository_slug=repository.slug, package_name=package_name)
+        raise PackageNotFound(
+            repository_slug=repository.slug, package_name=package_name)
     return package
 
 
@@ -159,9 +132,11 @@ def get_package_file_with_exception(repository: Repository, package: Package, fi
     Raises an exception if not found.
     """
     if filename.endswith(METADATA_EXTENSION):
-        package_file = get_metadata_file(repository=repository, package=package, filename=filename)
+        package_file = get_metadata_file(
+            repository=repository, package=package, filename=filename)
     else:
-        package_file = get_code_file(repository=repository, package=package, filename=filename)
+        package_file = get_code_file(
+            repository=repository, package=package, filename=filename)
 
     if package_file is None:
         raise PackageFileNotFound(package=package, filename=filename)
@@ -170,14 +145,16 @@ def get_package_file_with_exception(repository: Repository, package: Package, fi
 
 
 def save_package(package: Package) -> None:
-    package_id = db.session.scalars(db.insert(PackageSQL).returning(PackageSQL.id), [package.model_dump()]).first()
+    package_id = db.session.scalars(db.insert(PackageSQL).returning(
+        PackageSQL.id), [package.model_dump()]).first()
 
     code_files = package.code_files
     for code_file in code_files:
         code_file.package_id = package_id
 
     # now bulk insert the code files
-    code_file_ids = db.session.scalars(db.insert(CodeFileSQL).returning(CodeFileSQL.id), [code_file.model_dump() for code_file in code_files]).all()
+    code_file_ids = db.session.scalars(db.insert(CodeFileSQL).returning(
+        CodeFileSQL.id), [code_file.model_dump() for code_file in code_files]).all()
 
     code_file_hashes: list[CodeFileHash] = []
     metadata_files: list[MetadataFile] = []
@@ -196,10 +173,12 @@ def save_package(package: Package) -> None:
             metadata_files.append(code_file.metadata_file)
 
     # bulk insert code file hashes
-    db.session.execute(db.insert(CodeFileHashSQL).values([hash.model_dump() for hash in code_file_hashes]))
+    db.session.execute(db.insert(CodeFileHashSQL).values(
+        [hash.model_dump() for hash in code_file_hashes]))
 
     # bulk insert metadata files
-    metadata_file_ids = db.session.scalars(db.insert(MetadataFileSQL).returning(MetadataFileSQL.id), [metadata_file.model_dump() for metadata_file in metadata_files]).all()
+    metadata_file_ids = db.session.scalars(db.insert(MetadataFileSQL).returning(
+        MetadataFileSQL.id), [metadata_file.model_dump() for metadata_file in metadata_files]).all()
 
     # reattach the metadata file ids
     metadata_file_hashes: list[MetadataFileHash] = []
@@ -210,6 +189,7 @@ def save_package(package: Package) -> None:
             metadata_file_hashes.append(hash)
 
     # bulk insert metadata file hashes
-    db.session.execute(db.insert(MetadataFileHashSQL).values([hash.model_dump() for hash in metadata_file_hashes]))
+    db.session.execute(db.insert(MetadataFileHashSQL).values(
+        [hash.model_dump() for hash in metadata_file_hashes]))
 
     save()

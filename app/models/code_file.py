@@ -8,13 +8,17 @@ from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.code_file_hash import CodeFileHash
-from app.models.metadata_file import MetadataFile
 from app.models.package_file import PackageFile, PackageFileSQL
 
 if TYPE_CHECKING:
-    from app.models.code_file_hash import CodeFileHashSQL  # pragma: no cover
-    from app.models.metadata_file import MetadataFileSQL  # pragma: no cover
+    from app.models.code_file_hash import (
+        CodeFileHash,  # pragma: no cover
+        CodeFileHashSQL,  # pragma: no cover
+    )
+    from app.models.metadata_file import (
+        MetadataFile,  # pragma: no cover
+        MetadataFileSQL,  # pragma: no cover
+    )
 
 
 class CodeFileSQL(PackageFileSQL):
@@ -25,20 +29,24 @@ class CodeFileSQL(PackageFileSQL):
 
     __tablename__ = "code_file"
 
-    requires_python: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    requires_python: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None)
     """
     Python version requirements
     """
     is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
-    yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    yanked_reason: Mapped[str | None] = mapped_column(
+        String, nullable=True, default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
     """
-    size: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    size: Mapped[int | None] = mapped_column(
+        Integer, nullable=True, default=None)
     """
     File size in bytes
     """
-    upload_time: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True, default=None)
+    upload_time: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime, nullable=True, default=None)
     """
     Upload time of the file
     """
@@ -47,7 +55,8 @@ class CodeFileSQL(PackageFileSQL):
     # This is a huge performance boost when rendering templates
     # with lots of files. Without this, every single record
     # with a metadata file would result in a seperate query.
-    metadata_file: Mapped[MetadataFileSQL | None] = relationship("MetadataFileSQL", back_populates="code_file", lazy="joined")
+    metadata_file: Mapped[MetadataFileSQL | None] = relationship(
+        "MetadataFileSQL", back_populates="code_file", lazy="joined")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[CodeFileHashSQL]]:

@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+import app.data.sql.main2
+from app.models.code_file import CodeFile
 from app.models.package_file_hash import PackageFileHash, PackageFileHashSQL
 
 if TYPE_CHECKING:
@@ -19,10 +21,13 @@ class CodeFileHashSQL(PackageFileHashSQL):
     """
 
     __tablename__ = "code_file_hash"
-    __table_args__ = (UniqueConstraint("kind", "code_file_id", name="_kind_code_file_id_id_uc"),)
+    __table_args__ = (UniqueConstraint(
+        "kind", "code_file_id", name="_kind_code_file_id_id_uc"),)
 
-    code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"), nullable=True)
-    code_file: Mapped[CodeFileSQL] = relationship("CodeFileSQL", lazy="joined", back_populates="hashes")
+    code_file_id: Mapped[int] = mapped_column(
+        ForeignKey("code_file.id"), nullable=True)
+    code_file: Mapped[CodeFileSQL] = relationship(
+        "CodeFileSQL", lazy="joined", back_populates="hashes")
 
 
 class CodeFileHash(PackageFileHash):
@@ -32,3 +37,11 @@ class CodeFileHash(PackageFileHash):
 
     # code_file: "CodeFile" = Field(exclude=True)  # forward reference
     code_file_id: int | None = None  # comes from SQL model
+
+    @property
+    def code_file(self) -> CodeFile:
+        """
+        Parent code file
+        """
+        assert self.code_file_id is not None
+        return app.data.sql.main2.get_by_id(CodeFileSQL, self.code_file_id)
