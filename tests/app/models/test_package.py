@@ -2,11 +2,11 @@ import datetime
 
 from freezegun import freeze_time
 
-from app.models.package import Package
+from app.models.package import PackageSQL
 
 
 @freeze_time("2020-01-01 12:00:00")
-def test_is_current(package: Package) -> None:
+def test_is_current(package: PackageSQL) -> None:
     """
     Test is_current attribute
     """
@@ -19,7 +19,7 @@ def test_is_current(package: Package) -> None:
     assert package.is_current is False
 
 
-def test_repository_url(package: Package) -> None:
+def test_repository_url(package: PackageSQL) -> None:
     """
     Test repository_url attribute
     """
@@ -29,7 +29,7 @@ def test_repository_url(package: Package) -> None:
     assert package.repository_url == "https://example.com/simple/test_package/"
 
 
-def test_log_name(package: Package) -> None:
+def test_log_name(package: PackageSQL) -> None:
     """
     Test log_name attribute
     """

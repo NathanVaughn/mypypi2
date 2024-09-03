@@ -3,14 +3,14 @@ from typing import Generator
 import pytest
 from flask import Flask
 
-from app.models.package import Package
-from app.models.repository import Repository
+from app.models.package import PackageSQL
+from app.models.repository import RepositorySQL
 from app.wsgi import create_app
 
 
 @pytest.fixture
-def repository() -> Repository:
-    return Repository(
+def repository() -> RepositorySQL:
+    return RepositorySQL(
         slug="pypi",
         simple_url="https://pypi.org/simple",
         cache_minutes=10,
@@ -19,8 +19,8 @@ def repository() -> Repository:
 
 
 @pytest.fixture
-def package(repository: Repository) -> Package:
-    return Package(repository=repository, name="vscode-task-runner")
+def package(repository: RepositorySQL) -> PackageSQL:
+    return PackageSQL(repository=repository, name="vscode-task-runner")
 
 
 @pytest.fixture

@@ -1,10 +1,10 @@
 import lxml.html
 
 import app.packages.html
-from app.models.package import Package
+from app.models.package import PackageSQL
 
 
-def test__parse_single_record1(package: Package) -> None:
+def test__parse_single_record1(package: PackageSQL) -> None:
     """
     Test the parsing of a single record. Main test on a real example.
     """
@@ -32,7 +32,7 @@ def test__parse_single_record1(package: Package) -> None:
     assert len(result.metadata_file.hashes) == 1
 
 
-def test__parse_single_record2(package: Package) -> None:
+def test__parse_single_record2(package: PackageSQL) -> None:
     """
     Test the parsing of a single record.
     Tests: Having a yanked reason, missing python requires, and legacy metadata key only.
@@ -61,7 +61,7 @@ def test__parse_single_record2(package: Package) -> None:
     assert len(result.metadata_file.hashes) == 1
 
 
-def test__parse_single_record3(package: Package) -> None:
+def test__parse_single_record3(package: PackageSQL) -> None:
     """
     Test the parsing of a single record.
     Tests: Yanked with no reason, pypi-only metadata key, and unsupported hash types
@@ -86,7 +86,7 @@ def test__parse_single_record3(package: Package) -> None:
     assert len(result.metadata_file.hashes) == 0
 
 
-def test__parse_single_record4(package: Package) -> None:
+def test__parse_single_record4(package: PackageSQL) -> None:
     """
     Test the parsing of a single record, bare minimum.
     Tests: No metadata or hashes
@@ -107,7 +107,7 @@ def test__parse_single_record4(package: Package) -> None:
     assert len(result.hashes) == 0
 
 
-def test__parse_single_record5(package: Package) -> None:
+def test__parse_single_record5(package: PackageSQL) -> None:
     """
     Test the parsing of a single record.
     Tests: Bad hash formats

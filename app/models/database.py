@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
+from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy_mixins.serialize import SerializeMixin
 
@@ -13,23 +14,28 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-class Base(DeclarativeBase, SerializeMixin):
+class BaseSQL(DeclarativeBase, SerializeMixin):
     pass
 
 
-db = SQLAlchemy(model_class=Base)
+class Base(BaseModel):
+    class Config:
+        from_attributes = True
+
+
+db = SQLAlchemy(model_class=BaseSQL)
 
 
 def init_db(flask_app: Flask) -> None:
     db.init_app(flask_app)
 
     # import models so sqlalchemy knows about them
-    from app.models.code_file import CodeFile  # noqa
-    from app.models.code_file_hash import CodeFileHash  # noqa
-    from app.models.metadata_file import MetadataFile  # noqa
-    from app.models.metadata_file_hash import MetadataFileHash  # noqa
-    from app.models.package import Package  # noqa
-    from app.models.repository import Repository  # noqa
+    from app.models.code_file import CodeFileSQL  # noqa
+    from app.models.code_file_hash import CodeFileHashSQL  # noqa
+    from app.models.metadata_file import MetadataFileSQL  # noqa
+    from app.models.metadata_file_hash import MetadataFileHashSQL  # noqa
+    from app.models.package import PackageSQL  # noqa
+    from app.models.repository import RepositorySQL, Repository  # noqa
 
     with flask_app.app_context():
         logger.debug("Initializing database")
@@ -45,7 +51,7 @@ def init_db(flask_app: Flask) -> None:
                 # create new repository if it doesn't exist
                 logger.debug(f"Adding repository {repository_config.slug}")
                 db.session.add(
-                    Repository(
+                    RepositorySQL(
                         slug=repository_config.slug,
                         simple_url=str(repository_config.simple_url),
                         cache_minutes=repository_config.cache_minutes,

@@ -3,10 +3,10 @@ from __future__ import annotations
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.database import Base
+from app.models.database import Base, BaseSQL
 
 
-class PackageFileHash(Base):
+class PackageFileHashSQL(BaseSQL):
     """
     This model represents a content hash for a file associated with a package.
     Since the JSON API allows for files to have multiple hashes, we need a seperate
@@ -27,3 +27,13 @@ class PackageFileHash(Base):
     """
     Hash of the file
     """
+
+
+class PackageFileHash(Base):
+    """
+    Pydantic model for PackageFileHashSQL
+    """
+
+    id: int | None = None  # comes from SQL model
+    kind: str
+    value: str

@@ -46,7 +46,7 @@ def add_hash(given: str, package_file: PackageFile) -> None:
     if kind not in app.packages.simple.SUPPORTED_HASHES:
         return
 
-    # sqlalchemy automatically appends itself
+    # alchemy automatically appends itself
     if isinstance(package_file, CodeFile):
         CodeFileHash(code_file=package_file, kind=kind, value=value)
     elif isinstance(package_file, MetadataFile):
@@ -91,7 +91,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
 
     # create code file
     code_file = CodeFile(
-        # package=package,
+        package=package,
         filename=filename,
         upstream_url=upstream_url,
         requires_python=requires_python,
@@ -113,7 +113,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
     # not guaranteed to be a "sha256=value" format
     if metadata:
         code_file.metadata_file = MetadataFile(
-            # package=package,
+            package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,

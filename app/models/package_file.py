@@ -3,18 +3,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flask import url_for
+from pydantic import Field
 from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.database import Base
+from app.models.database import Base, BaseSQL
 
 if TYPE_CHECKING:
-    from app.models.package import Package  # pragma: no cover
-    from app.models.package_file_hash import PackageFileHash  # pragma: no cover
+    from app.models.package import Package, PackageSQL  # pragma: no cover
+    from app.models.package_file_hash import PackageFileHashSQL  # pragma: no cover
 
 
-class PackageFile(Base):
+class PackageFileSQL(BaseSQL):
     """
     This model represents a file associated with a package.
     This is a base model meant to inherited.
@@ -33,11 +34,11 @@ class PackageFile(Base):
         return mapped_column(ForeignKey("package.id"))
 
     @declared_attr
-    def package(cls) -> Mapped[Package]:
+    def package(cls) -> Mapped[PackageSQL]:
         """
         The parent package
         """
-        return relationship("Package", lazy="joined")
+        return relationship("PackageSQL", lazy="joined")
 
     filename: Mapped[str] = mapped_column(String)
     """
@@ -47,7 +48,7 @@ class PackageFile(Base):
     """
     Upstream URL where we can download this package
     """
-    version: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    version: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
     """
     For some files, record the version
     """
@@ -57,14 +58,24 @@ class PackageFile(Base):
     """
 
     @declared_attr
-    def hashes(cls) -> Mapped[list[PackageFileHash]]:
+    def hashes(cls) -> Mapped[list[PackageFileHashSQL]]:
         """
         This needs to be overridden in the subclasses.
         This is kept here for type checking only.
         """
         return relationship("PackageFileHash", lazy="joined")  # pragma: no cover
 
-    # utility properties
+
+class PackageFile(Base):
+    id: int | None = None  # comes from SQL model
+    package: "Package" = Field(exclude=True)  # forward reference
+    package_id: int | None = None  # comes from SQL model
+
+    filename: str
+    upstream_url: str
+    version: str | None
+    is_cached: bool = False
+    hashes: list[PackageFileHashSQL]
 
     @property
     def version_text(self) -> str:

@@ -1802,21 +1802,6 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
-name = "sqlalchemy-mixins"
-version = "2.0.5"
-description = "Active Record, Django-like queries, nested eager load and beauty __repr__ for SQLAlchemy"
-optional = false
-python-versions = "*"
-files = [
-    {file = "sqlalchemy_mixins-2.0.5-py3-none-any.whl", hash = "sha256:9067b630744741b472aa91d92494cc5612ed2d29c66729a5a4a1d3fbbeccd448"},
-    {file = "sqlalchemy_mixins-2.0.5.tar.gz", hash = "sha256:85197fc3682c4bf9c35671fb3d10282a0973b19cd2ff2b6791d601cbfb0fb89e"},
-]
-
-[package.dependencies]
-six = "*"
-SQLAlchemy = ">=2.0"
-
-[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2082,4 +2067,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "290b8ed7377ad213adbf0641dd0024beb49d96f152b9b597d28260ef1cc9b3e1"
+content-hash = "0e8b2971146f0f7cc4d35e38f42c27901d7d8de5227d7f1435014efc69cc91b0"

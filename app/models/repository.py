@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from pydantic import field_validator
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.database import Base
+from app.models.database import Base, BaseSQL
 
 if TYPE_CHECKING:
-    from app.models.package import Package  # pragma: no cover
+    from app.models.package import PackageSQL  # pragma: no cover
 
 
-class Repository(Base):
+class RepositorySQL(BaseSQL):
     """
     This model represents a repository (index) of packages.
     This records the URL of the repository, the cache time, and the timeout,
@@ -39,10 +40,26 @@ class Repository(Base):
     Number of seconds to wait for a response from the upstream server
     """
 
-    packages: Mapped[list[Package]] = relationship("Package", back_populates="repository")
+    packages: Mapped[list[PackageSQL]] = relationship("PackageSQL", back_populates="repository")
 
-    @validates("simple_url")
-    def validate_simple_url(self, key: str, simple_url: str) -> str:
+
+class Repository(Base):
+    """
+    Pydantic model for RepositorySQL
+    """
+
+    id: int | None = None  # comes from SQL model
+    slug: str
+    simple_url: str
+    cache_minutes: int
+    timeout_seconds: int
+
+    # this is a liability
+    # packages: list[Package] = Field(exclude=True)
+
+    @field_validator("simple_url")
+    @classmethod
+    def validate_simple_url(cls, simple_url: str) -> str:
         """
         Remove any trailing slashes from the simple URL and strip precedding/trailing whitespace
         """

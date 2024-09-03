@@ -69,7 +69,7 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
     """
     Fetch package data for the first time.
     """
-    package = Package(repository=repository, name=package_name)
+    package = Package(repository=repository, repository_id=repository.id, name=package_name, code_files=[])
     logger.debug(f"Creating package {package.log_name}")
 
     try:
@@ -114,9 +114,9 @@ def update_package_data(repository: Repository, package: Package) -> Package:
     for new_code_file_filename, new_code_file in new_code_files_dict.items():
         if new_code_file_filename not in old_code_files_filenames_set:
             to_save_code_files.append(new_code_file)
-        else:
-            # rectify any changes
-            old_code_files_dict[new_code_file_filename].update(new_code_file)
+        # else:
+        #     # rectify any changes
+        #     old_code_files_dict[new_code_file_filename].update(new_code_file)
 
     # set the package for each code file
     for code_file in to_save_code_files:

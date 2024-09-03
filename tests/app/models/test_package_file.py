@@ -1,17 +1,17 @@
-from app.models.code_file import CodeFile
-from app.models.code_file_hash import CodeFileHash
-from app.models.package import Package
-from app.models.package_file import PackageFile
+from app.models.code_file import CodeFileSQL
+from app.models.code_file_hash import CodeFileHashSQL
+from app.models.package import PackageSQL
+from app.models.package_file import PackageFileSQL
 
 
 def test_version_text() -> None:
     """
     Test how version_text is generated
     """
-    package_file = PackageFile(version=None)
+    package_file = PackageFileSQL(version=None)
     assert package_file.version_text == "UNKNOWN"
 
-    package_file = PackageFile(version="1.2.3")
+    package_file = PackageFileSQL(version="1.2.3")
     assert package_file.version_text == "1.2.3"
 
 
@@ -23,15 +23,15 @@ def test_hash_value() -> None:
     # doesn't have a foreign key
 
     # test no hashes
-    code_file = CodeFile()
+    code_file = CodeFileSQL()
     assert code_file.hash_value is None
 
     # test one hash
-    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    CodeFileHashSQL(code_file=code_file, kind="sha256", value="1234567890abcdef")
     assert code_file.hash_value == "sha256=1234567890abcdef"
 
     # test multiple hashes
-    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    CodeFileHashSQL(code_file=code_file, kind="md5", value="abcdef1234567890")
     assert code_file.hash_value == "sha256=1234567890abcdef"
 
 
@@ -43,15 +43,15 @@ def test_hash_kinds() -> None:
     # doesn't have a foreign key
 
     # test no hashes
-    code_file = CodeFile()
+    code_file = CodeFileSQL()
     assert code_file.hash_kinds == []
 
     # test one hash
-    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    CodeFileHashSQL(code_file=code_file, kind="sha256", value="1234567890abcdef")
     assert code_file.hash_kinds == ["sha256"]
 
     # test multiple hashes
-    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    CodeFileHashSQL(code_file=code_file, kind="md5", value="abcdef1234567890")
     assert code_file.hash_kinds == ["sha256", "md5"]
 
 
@@ -63,19 +63,19 @@ def test_hashes_dict() -> None:
     # doesn't have a foreign key
 
     # test no hashes
-    code_file = CodeFile()
+    code_file = CodeFileSQL()
     assert code_file.hashes_dict == {}
 
     # test one hash
-    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    CodeFileHashSQL(code_file=code_file, kind="sha256", value="1234567890abcdef")
     assert code_file.hashes_dict == {"sha256": "1234567890abcdef"}
 
     # test multiple hashes
-    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    CodeFileHashSQL(code_file=code_file, kind="md5", value="abcdef1234567890")
     assert code_file.hashes_dict == {"sha256": "1234567890abcdef", "md5": "abcdef1234567890"}
 
 
-def test_download_url(package: Package, app_request_context: None) -> None:
+def test_download_url(package: PackageSQL, app_request_context: None) -> None:
     """
     Test download_url
     """
@@ -85,14 +85,14 @@ def test_download_url(package: Package, app_request_context: None) -> None:
     filename = "vscode_task_runner-0.1.2-py3-none-any.whl"
     version = "0.1.2"
 
-    package_file = CodeFile(package=package, filename=filename, version=version)
+    package_file = CodeFileSQL(package=package, filename=filename, version=version)
 
     assert package.repository.slug in package_file.download_url
     assert package.name in package_file.download_url
     assert filename in package_file.download_url
 
 
-def test_html_download_url(package: Package, app_request_context: None) -> None:
+def test_html_download_url(package: PackageSQL, app_request_context: None) -> None:
     """
     Test how html_download_url is generated
     """
@@ -103,21 +103,21 @@ def test_html_download_url(package: Package, app_request_context: None) -> None:
     version = "0.1.2"
 
     # test no hashes
-    code_file = CodeFile(package=package, filename=filename, version=version)
+    code_file = CodeFileSQL(package=package, filename=filename, version=version)
     assert package.repository.slug in code_file.html_download_url
     assert package.name in code_file.html_download_url
     assert filename in code_file.html_download_url
     assert "#" not in code_file.html_download_url
 
     # test one hash
-    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    CodeFileHashSQL(code_file=code_file, kind="sha256", value="1234567890abcdef")
     assert package.repository.slug in code_file.html_download_url
     assert package.name in code_file.html_download_url
     assert filename in code_file.html_download_url
     assert "#sha256=1234567890abcdef" in code_file.html_download_url
 
     # test multiple hashes
-    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    CodeFileHashSQL(code_file=code_file, kind="md5", value="abcdef1234567890")
     assert package.repository.slug in code_file.html_download_url
     assert package.name in code_file.html_download_url
     assert filename in code_file.html_download_url

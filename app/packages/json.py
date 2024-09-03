@@ -28,11 +28,10 @@ def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
         if kind not in app.packages.simple.SUPPORTED_HASHES:
             continue
 
-        # sqlalchemy automatically appends itself
         if isinstance(package_file, CodeFile):
-            CodeFileHash(code_file=package_file, kind=kind, value=value)
+            package_file.hashes.append(CodeFileHash(kind=kind, value=value))
         elif isinstance(package_file, MetadataFile):
-            MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
+            package_file.hashes.append(MetadataFileHash(kind=kind, value=value))
 
 
 def _parse_single_record(record: dict, package: Package) -> CodeFile:
@@ -66,9 +65,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
 
     # create code file
     code_file = CodeFile(
-        # we need to create deattached files since we don't know if we will actually
-        # save them or not
-        # package=package,
+        package=package,
         filename=filename,
         upstream_url=upstream_url,
         requires_python=requires_python,
@@ -77,6 +74,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
         version=version,
         size=size,
         upload_time=upload_time,
+        hashes=[],
     )
 
     # add hashes to the code file
@@ -93,11 +91,12 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     # add metadata file if available
     if metadata:
         code_file.metadata_file = MetadataFile(
-            # package=package,
+            package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,
-            code_file=code_file,
+            # code_file=code_file,
+            hashes=[],
         )
 
         # if there were hashes, add them
