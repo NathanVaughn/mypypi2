@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Base(DeclarativeBase):
-    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid)
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid, sort_order=-1)
     """
     Unique identifier. Uses a ULID to ensure no collisions.
     """
