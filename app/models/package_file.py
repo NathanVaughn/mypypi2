@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import TYPE_CHECKING
 
 from flask import url_for
@@ -24,7 +25,7 @@ class PackageFile(Base):
     __table_args__ = (UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),)
 
     @declared_attr
-    def package_id(cls) -> Mapped[int]:
+    def package_id(cls) -> Mapped[uuid.UUID]:
         return mapped_column(ForeignKey("package.id"))
 
     @declared_attr

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey
@@ -22,7 +23,7 @@ class MetadataFile(PackageFile):
 
     __tablename__ = "metadata_file"
 
-    code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"))
+    code_file_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("code_file.id"))
     code_file: Mapped[CodeFile] = relationship("CodeFile", back_populates="metadata_file", lazy="joined")
 
     @declared_attr

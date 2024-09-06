@@ -42,6 +42,11 @@
     # i have an ultra-wide monitor and makes things easier to read
     line-length = 256
 
+# [[tool.poetry.source]]
+#     name = "local"
+#     url  = "http://localhost:5000/pypi/simple/"
+#     priority = "primary"
+
 [build-system]
     requires      = ["poetry-core"]
     build-backend = "poetry.core.masonry.api"

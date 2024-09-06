@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import TYPE_CHECKING
 
 import ulid
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class Base(DeclarativeBase):
-    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid, sort_order=-1)
+    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid, sort_order=-1)
     """
     Unique identifier. Uses a ULID to ensure no collisions.
     """
