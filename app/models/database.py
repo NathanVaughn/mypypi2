@@ -19,6 +19,11 @@ class Base(DeclarativeBase):
     """
     Unique identifier. Uses a ULID to ensure no collisions.
     """
+    # using a value that is not auto-incrementing is a huge performance gain.
+    # Otherwise, the SQL database wants to insert one record at a time to be
+    # able to generate the next ID. By generating the ID client-side,
+    # we can use that ID pre-emptively in child foreign keys and not
+    # have to wait for the parents to be inserted first.
 
 
 db = SQLAlchemy(model_class=Base)
