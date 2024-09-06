@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import uuid
 from typing import TYPE_CHECKING
 
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy_mixins.serialize import SerializeMixin
+from sqlmodel import Field, SQLModel
 
 from app.config import Config
 
@@ -13,8 +13,12 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-class Base(DeclarativeBase, SerializeMixin):
-    pass
+class Base(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    """
+    Unique identifier
+    Use a factory function so we can pre-generate these for speed
+    """
 
 
 db = SQLAlchemy(model_class=Base)

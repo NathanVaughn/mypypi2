@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlmodel import Field, Relationship
 
 from app.models.package_file import PackageFile
 
@@ -13,24 +12,19 @@ if TYPE_CHECKING:
     from app.models.metadata_file_hash import MetadataFileHash  # pragma: no cover
 
 
-class MetadataFile(PackageFile):
+class MetadataFile(PackageFile, table=True):
     """
     This model represents a metdata file for a code file associated with a package.
     These do not appear explicitly in the list of files for a package, but
     are the same as a code file with the extension of `.metadata`.
     """
 
-    __tablename__ = "metadata_file"
+    code_file_id: str = Field(foreign_key="code_file.id")
+    code_file: "CodeFile" = Relationship(
+        back_populates="metadata_file",  sa_relationship_kwargs={"lazy": "joined"})
 
-    code_file_id: Mapped[int] = mapped_column(ForeignKey("code_file.id"))
-    code_file: Mapped[CodeFile] = relationship("CodeFile", back_populates="metadata_file", lazy="joined")
-
-    @declared_attr
-    def hashes(cls) -> Mapped[list[MetadataFileHash]]:
-        """
-        A list of hashes for this file
-        """
-        return relationship("MetadataFileHash", back_populates="metadata_file", lazy="joined")
+    hashes: Mapped[list["MetadataFileHash"]] = Relationship(
+        back_populates="metadata_file", sa_relationship_kwargs={"lazy": "joined"})
 
     def update(self, new: MetadataFile) -> None:
         """

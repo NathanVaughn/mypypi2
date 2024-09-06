@@ -3,9 +3,8 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, Integer, String
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped
+from sqlmodel import Field, Relationship
 
 from app.models.package_file import PackageFile
 
@@ -14,28 +13,26 @@ if TYPE_CHECKING:
     from app.models.metadata_file import MetadataFile  # pragma: no cover
 
 
-class CodeFile(PackageFile):
+class CodeFile(PackageFile, table=True):
     """
     This model represents a code file associated with a package.
     This is what actually appears in the list of files for a package.
     """
 
-    __tablename__ = "code_file"
-
-    requires_python: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    requires_python: str | None = Field(default=None)
     """
     Python version requirements
     """
-    is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
-    yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    is_yanked: bool = Field(default=False)
+    yanked_reason: str | None = Field(default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
     """
-    size: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)
+    size: int | None = Field(default=None)
     """
     File size in bytes
     """
-    upload_time: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True, default=None)
+    upload_time: datetime.datetime | None = Field(default=None)
     """
     Upload time of the file
     """
@@ -44,14 +41,11 @@ class CodeFile(PackageFile):
     # This is a huge performance boost when rendering templates
     # with lots of files. Without this, every single record
     # with a metadata file would result in a seperate query.
-    metadata_file: Mapped[MetadataFile | None] = relationship("MetadataFile", back_populates="code_file", lazy="joined")
+    metadata_file: MetadataFile | None = Relationship(
+        back_populates="code_file", sa_relationship_kwargs={"lazy": "joined"})
 
-    @declared_attr
-    def hashes(cls) -> Mapped[list[CodeFileHash]]:
-        """
-        A list of hashes for this file
-        """
-        return relationship("CodeFileHash", back_populates="code_file", lazy="joined")
+    hashes: Mapped[list["CodeFileHash"]] = Relationship(
+        back_populates="code_file", sa_relationship_kwargs={"lazy": "joined"})
 
     # utility properties
     @property

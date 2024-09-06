@@ -3,9 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flask import url_for
-from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlmodel import Field, Relationship
 
 from app.models.database import Base
 
@@ -20,49 +18,31 @@ class PackageFile(Base):
     This is a base model meant to inherited.
     """
 
-    __abstract__ = True
-    __table_args__ = (UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),)
+    package_id: str = Field(foreign_key="package.id")
+    package: "Package" = Relationship()
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    """
-    Unique identifier
-    """
-
-    @declared_attr
-    def package_id(cls) -> Mapped[int]:
-        return mapped_column(ForeignKey("package.id"))
-
-    @declared_attr
-    def package(cls) -> Mapped[Package]:
-        """
-        The parent package
-        """
-        return relationship("Package", lazy="joined")
-
-    filename: Mapped[str] = mapped_column(String)
+    filename: str
     """
     Package filename. Guaranteed to be unique for a repository.
     """
-    upstream_url: Mapped[str] = mapped_column(String)
+    upstream_url: str
     """
     Upstream URL where we can download this package
     """
-    version: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    version: str | None = Field(default=None)
     """
     For some files, record the version
     """
-    is_cached: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_cached: bool = Field(default=False)
     """
     Have we already downloaded this package?
     """
-
-    @declared_attr
-    def hashes(cls) -> Mapped[list[PackageFileHash]]:
-        """
-        This needs to be overridden in the subclasses.
-        This is kept here for type checking only.
-        """
-        return relationship("PackageFileHash", lazy="joined")  # pragma: no cover
+    hashes: list["PackageFileHash"] = Relationship(
+        sa_relationship_kwargs={"lazy": "joined"})
+    """
+    This needs to be overridden in the subclasses.
+    This is kept here for type checking only.
+    """
 
     # utility properties
 

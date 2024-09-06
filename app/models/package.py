@@ -3,8 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlmodel import Field, Relationship
 
 from app.models.database import Base
 
@@ -13,35 +12,28 @@ if TYPE_CHECKING:
     from app.models.repository import Repository  # pragma: no cover
 
 
-class Package(Base):
+class Package(Base, table=True):
     """
     This model represents a package in a repository.
     This records the name of the package, the last time the package data was updated,
     and is tied to a list of child files.
     """
 
-    __tablename__ = "package"
-    __table_args__ = (UniqueConstraint("name", "repository_id", name="_name_repository_id_uc"),)
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    """
-    Unique identifier
-    """
-    repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
-    repository: Mapped[Repository] = relationship("Repository", lazy="joined", back_populates="packages")
+    repository_id: str = Field(foreign_key="repository.id")
+    repository: "Repository" = Relationship(back_populates="packages")
     """
     The parent repository
     """
-    name: Mapped[str] = mapped_column(String)
+    name: str
     """
     Package name
     """
-    last_updated: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.now)
+    last_updated: datetime.datetime = Field(default=datetime.datetime.now)
     """
     Last time this package's data was updated
     """
 
-    code_files: Mapped[list[CodeFile]] = relationship("CodeFile", back_populates="package")
+    code_files: list["CodeFile"] = Relationship(back_populates="package")
 
     @property
     def is_current(self) -> bool:
