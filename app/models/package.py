@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
@@ -23,10 +23,6 @@ class Package(Base):
     __tablename__ = "package"
     __table_args__ = (UniqueConstraint("name", "repository_id", name="_name_repository_id_uc"),)
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    """
-    Unique identifier
-    """
     repository_id: Mapped[int] = mapped_column(ForeignKey("repository.id"))
     repository: Mapped[Repository] = relationship("Repository", lazy="joined", back_populates="packages")
     """
@@ -63,3 +59,17 @@ class Package(Base):
         Package name for logging
         """
         return f"{self.repository.slug}:{self.name}"
+
+    @property
+    def child_count(self) -> int:
+        """
+        Total number of objects
+        """
+        count = 0
+        for code_file in self.code_files:
+            count += 1
+            count += len(code_file.hashes)
+            if code_file.metadata_file:
+                count += 1
+                count += len(code_file.metadata_file.hashes)
+        return count

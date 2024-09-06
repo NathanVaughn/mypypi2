@@ -20,7 +20,6 @@ class Repository(Base):
 
     __tablename__ = "repository"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     slug: Mapped[str] = mapped_column(String, unique=True)
     """
     The repository slug

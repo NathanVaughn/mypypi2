@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import ulid
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy_mixins.serialize import SerializeMixin
+from sqlalchemy import UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.config import Config
 
@@ -13,8 +14,11 @@ if TYPE_CHECKING:
     from flask import Flask
 
 
-class Base(DeclarativeBase, SerializeMixin):
-    pass
+class Base(DeclarativeBase):
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid)
+    """
+    Unique identifier. Uses a ULID to ensure no collisions.
+    """
 
 
 db = SQLAlchemy(model_class=Base)

@@ -85,7 +85,7 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
             code_file.metadata_file.package = package
 
     # save the new package to the database
-    with time_this_context(f"Saved {len(package.code_files)} new code files for package {package.log_name}"):
+    with time_this_context(f"Saved {package.child_count} new rows for package {package.log_name}"):
         app.data.sql.save_package(package)
     return package
 

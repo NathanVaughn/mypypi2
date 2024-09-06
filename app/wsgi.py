@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 
 from app.config import Config, StorageLocalConfig
@@ -11,7 +13,7 @@ def create_app(is_testing: bool = False) -> Flask:
         flask_app.config["TESTING"] = True
         Config.database.uri = "sqlite:///:memory:"
         Config.storage.driver = "local"
-        Config.storage.local = StorageLocalConfig(directory="tmp/storage")
+        Config.storage.local = StorageLocalConfig(directory=os.path.join("tmp", "storage"))
         Config.repositories = []
 
     # setup database
