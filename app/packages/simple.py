@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 import packaging.utils
 import packaging.version
 
-from app.constants import CONTENT_TYPE_HEADER_HTML
+from app.constants import CONTENT_TYPE_HEADER_HTML, CONTENT_TYPE_HEADER_JSON
 from app.models.enums import IndexFormat
 from app.models.exceptions import InvalidQualityValue
 
@@ -30,6 +30,7 @@ PYPI_CONTENT_TYPE_JSON_LATEST = f"{PYPI_CONTENT_TYPE_PREFIX}.latest+json"
 
 
 PYPI_CONTENT_TYPES = {
+    CONTENT_TYPE_HEADER_JSON,
     PYPI_CONTENT_TYPE_LEGACY,
     PYPI_CONTENT_TYPE_HTML_V1,
     PYPI_CONTENT_TYPE_JSON_V1,
@@ -55,6 +56,7 @@ Mapping of index formats to the return contenty-type they should be served as.
 """
 
 PYPI_CONTENT_TYPE_INDEX_FORMAT_MAPPING = {
+    CONTENT_TYPE_HEADER_JSON: IndexFormat.json,
     PYPI_CONTENT_TYPE_LEGACY: IndexFormat.html,
     PYPI_CONTENT_TYPE_HTML_V1: IndexFormat.html,
     PYPI_CONTENT_TYPE_JSON_V1: IndexFormat.json,

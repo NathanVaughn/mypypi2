@@ -21,6 +21,8 @@
     packaging         = "^24.1"     # PEP 440 version parsing
     pydantic-settings = "^2.4.0"    # config file parsing
     ulid-py           = "^1.1.0"    # ULID generation
+    psycopg2          = "^2.9.9"    # PostgreSQL client
+    mysqlclient       = "^2.2.4"    # MySQL client
 
 [tool.poetry.group.dev.dependencies]
     pytest                  = "8.3.2"
@@ -42,10 +44,10 @@
     # i have an ultra-wide monitor and makes things easier to read
     line-length = 256
 
-# [[tool.poetry.source]]
-#     name = "local"
-#     url  = "http://localhost:5000/pypi/simple/"
-#     priority = "primary"
+    # [[tool.poetry.source]]
+    #     name = "local"
+    #     url  = "http://localhost:5000/pypi/simple/"
+    #     priority = "primary"
 
 [build-system]
     requires      = ["poetry-core"]
