@@ -18,7 +18,8 @@ For that, I recommend more advanced solutions like Artifactory, Azure Artifacts,
 
 - Pull-through caching of Python packages
 - Supports multiple upstream indexes
-- S3 or local storage
+- S3 or local storage for package files
+- SQLite, PostgreSQL, or MySQL for metadata storage
 - Implements both the HTML and JSON APIs
 - Content Negotiation via [`Accept` header](https://packaging.python.org/en/latest/specifications/simple-repository-api/#content-types)
 - Content Negotiation via [URL parameter](https://packaging.python.org/en/latest/specifications/simple-repository-api/#url-parameter)

@@ -23,6 +23,7 @@
     ulid-py           = "^1.1.0"    # ULID generation
     psycopg2          = "^2.9.9"    # PostgreSQL client
     mysqlclient       = "^2.2.4"    # MySQL client
+    gunicorn          = "^23.0.0"   # deployment web server
 
 [tool.poetry.group.dev.dependencies]
     pytest                  = "8.3.2"
