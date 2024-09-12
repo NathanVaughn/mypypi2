@@ -62,9 +62,16 @@ class CacheFilesystemConfig(BaseModel):
     directory: str
 
 
+class CacheRedisConfig(BaseModel):
+    host: str
+    port: int = 6379
+    db: int = 0
+
+
 class CacheConfig(BaseModel):
-    driver: Literal["memory", "filesystem"]
+    driver: Literal["memory", "filesystem", "redis"]
     filesystem: CacheFilesystemConfig | None = None
+    redis: CacheRedisConfig | None = None
 
     @model_validator(mode="after")
     def must_contain_driver_config(self) -> Self:
@@ -74,7 +81,13 @@ class CacheConfig(BaseModel):
 
 
 class _Config(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="MYPYPI_", env_nested_delimiter="__", toml_file="config.toml", json_file="config.json", yaml_file="config.yaml")
+    model_config = SettingsConfigDict(
+        env_prefix="MYPYPI_",
+        env_nested_delimiter="__",
+        toml_file="config.toml",
+        json_file="config.json",
+        yaml_file="config.yaml",
+    )
 
     repositories: list[RepositoryConfig]
     database: DatabaseConfig
@@ -90,7 +103,15 @@ class _Config(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        return (TomlConfigSettingsSource(settings_cls), JsonConfigSettingsSource(settings_cls), YamlConfigSettingsSource(settings_cls), YamlConfigSettingsSource(settings_cls), env_settings, dotenv_settings, file_secret_settings)
+        return (
+            TomlConfigSettingsSource(settings_cls),
+            JsonConfigSettingsSource(settings_cls),
+            YamlConfigSettingsSource(settings_cls),
+            YamlConfigSettingsSource(settings_cls),
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+        )
 
 
 Config = _Config()  # type: ignore

@@ -13,6 +13,7 @@
     python            = "^3.12"
     flask             = "^3.0.3"    # web framework
     flask-sqlalchemy  = "^3.1.1"    # ORM
+    sqlalchemy-utils  = "^0.41.2"   # SQLAlchemy utilities
     pyjson5           = "^1.6.6"    # fast json parser
     requests          = "^2.32.3"   # HTTP requests
     loguru            = "^0.7.2"    # logging
@@ -23,7 +24,9 @@
     ulid-py           = "^1.1.0"    # ULID generation
     psycopg2          = "^2.9.9"    # PostgreSQL client
     mysqlclient       = "^2.2.4"    # MySQL client
+    redis             = "^5.0.8"    # Redis client
     gunicorn          = "^23.0.0"   # deployment web server
+
 
 [tool.poetry.group.dev.dependencies]
     pytest                  = "8.3.2"
@@ -43,12 +46,12 @@
 
 [tool.ruff]
     # i have an ultra-wide monitor and makes things easier to read
-    line-length = 256
+    line-length = 120
 
-    # [[tool.poetry.source]]
-    #     name = "local"
-    #     url  = "http://localhost:5000/pypi/simple/"
-    #     priority = "primary"
+# [[tool.poetry.source]]
+#     name     = "local"
+#     url      = "http://localhost:5000/pypi/simple/"
+#     priority = "primary"
 
 [build-system]
     requires      = ["poetry-core"]

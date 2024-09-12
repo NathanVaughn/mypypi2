@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import time
 import uuid
 from typing import TYPE_CHECKING
 
+import sqlalchemy_utils
 import ulid
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
@@ -42,6 +44,10 @@ def init_db(flask_app: Flask) -> None:
     from app.models.repository import Repository  # noqa
 
     with flask_app.app_context():
+        while not sqlalchemy_utils.database_exists(str(Config.database.uri)):
+            logger.debug("Waiting for database to be available")
+            time.sleep(1)
+
         logger.debug("Initializing database")
         db.create_all()
 

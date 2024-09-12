@@ -22,7 +22,7 @@ class Package(Base):
     """
 
     __tablename__ = "package"
-    __table_args__ = (UniqueConstraint("name", "repository_id", name="_name_repository_id_uc"),)
+    __table_args__ = (UniqueConstraint("name", "repository_id"),)
 
     repository_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("repository.id"))
     repository: Mapped[Repository] = relationship("Repository", lazy="joined", back_populates="packages")

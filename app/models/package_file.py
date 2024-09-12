@@ -22,7 +22,7 @@ class PackageFile(Base):
     """
 
     __abstract__ = True
-    __table_args__ = (UniqueConstraint("filename", "package_id", name="_filename_package_id_uc"),)
+    __table_args__ = (UniqueConstraint("filename", "package_id"),)
 
     @declared_attr
     def package_id(cls) -> Mapped[uuid.UUID]:

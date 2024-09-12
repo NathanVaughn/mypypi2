@@ -1,3 +1,6 @@
+# ========================================
+# Export the poetry lock file to a requirements.txt file
+
 FROM docker.io/library/python:3.12 AS poetry-exporter
 
 WORKDIR /work
@@ -9,6 +12,9 @@ COPY poetry.lock poetry.lock
 
 RUN poetry export -o requirements.txt
 
+# ========================================
+# Build the final image
+
 FROM docker.io/library/python:3.12
 
 WORKDIR /app
@@ -19,4 +25,4 @@ RUN python -m pip install pip wheel --upgrade \
 
 COPY app app
 
-CMD ["gunicorn", "--bind=0.0.0.0:80", "app.wsgi:create_app"]
+CMD ["gunicorn", "--bind=0.0.0.0:80", "app.wsgi:create_app()"]

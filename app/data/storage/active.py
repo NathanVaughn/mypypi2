@@ -29,8 +29,6 @@ class _ActiveStorage:
             self.provider = app.data.storage.local.LocalStorage(
                 directory=Config.storage.local.directory,
             )
-        else:
-            raise ValueError("Unknown storage driver")
 
 
 ActiveStorage = _ActiveStorage()
