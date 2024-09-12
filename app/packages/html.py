@@ -134,7 +134,7 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     """
     # use lxml for performance
     # let any exceptions bubble up
-    upstream_tree = lxml.html.fromstring(html_content).contents
+    upstream_tree = lxml.html.fromstring(html_content)
 
     # hold a list of records we parse
     code_files: list[CodeFile] = []

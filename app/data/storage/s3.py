@@ -70,7 +70,8 @@ class S3Storage(BaseStorage):
         logger.info(f"Uploading {upstream_url} to {s3_url}")
         with self._interface.open(s3_url, "wb") as fp:
             with requests.get(upstream_url, stream=True) as response:
-                for chunk in response.iter_content(chunk_size=8192):
+                # 1MB chunks
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
                     fp.write(chunk)
 
     def download_file(self, package_file: PackageFile) -> flask.BaseResponse:

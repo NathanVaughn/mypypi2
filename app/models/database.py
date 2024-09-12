@@ -44,16 +44,21 @@ def init_db(flask_app: Flask) -> None:
     from app.models.repository import Repository  # noqa
 
     with flask_app.app_context():
-        while not sqlalchemy_utils.database_exists(str(Config.database.uri)):
-            logger.debug("Waiting for database to be available")
-            time.sleep(1)
+        if not Config.database.uri.startswith("sqlite"):
+            # Wait for database to be available
+            # for some reason, this will return false for sqlite if the file doesn't exist
+            # This is fine, because the database will be created when the first table is created
+            while not sqlalchemy_utils.database_exists(Config.database.uri):
+                logger.debug("Waiting for database to be available")
+                time.sleep(1)
 
         logger.debug("Initializing database")
+        # this will not create tables if they already exist
         db.create_all()
 
-        # load configured repositories
         import app.data.sql
 
+        # load configured repositories
         for repository_config in Config.repositories:
             repository = app.data.sql.get_repository(repository_config.slug)
 

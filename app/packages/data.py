@@ -58,11 +58,28 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     # parse the response
     index_format = PYPI_CONTENT_TYPE_INDEX_FORMAT_MAPPING[content_type]
     if index_format == IndexFormat.json:
-        return parse_simple_json(response.text, package)
+        code_files = parse_simple_json(response.text, package)
     elif index_format == IndexFormat.html:
-        return parse_simple_html(response.text, package)
+        code_files = parse_simple_html(response.text, package)
     else:
         raise IndexParsingError(url)
+
+    # in some weird situations, (looking at you pytorch), we can have code files
+    # with different URLs but the same filename.
+    # In that situation, we discard any duplicates, preferring ones that occur first.
+    unique_code_filenames = set()
+    out_code_files: list[CodeFile] = []
+    for code_file in code_files:
+        # if we have already seen this filename, skip it
+        if code_file.filename in unique_code_filenames:
+            logger.warning(f"Discarding duplicate code file {
+                           code_file.filename}. This should not happen. The upstream registry is not configured properly.")
+            continue
+
+        unique_code_filenames.add(code_file.filename)
+        out_code_files.append(code_file)
+
+    return out_code_files
 
 
 def create_package_data(repository: Repository, package_name: str) -> Package:
