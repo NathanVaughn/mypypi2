@@ -37,7 +37,12 @@
     directory = "/data/" # If using the local storage driver, this is the directory to store files in. Should be an absolute path.
 
 [cache]
-    driver = "memory" # The cache driver to use. Valid options are "memory" and "filesystem"
+    driver = "memory" # The cache driver to use. Valid options are "memory", "filesystem", and "redis"
 
 [cache.filesystem]
     directory = "/tmp/" # If using the filesystem cache driver, this is the directory to store files in. Should be an absolute path.
+
+[cache.redis]
+    host = "redis.service" # If using the redis cache driver, this is the hostname of the redis server. Can be a hostname or IP address.
+    port = 6379            # The port of the redis server. Defaults to 6379.
+    db   = 0               # The database number to use. Defaults to 0.
