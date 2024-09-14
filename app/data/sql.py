@@ -58,7 +58,9 @@ def get_package(repository: Repository, package_name: str) -> Package | None:
     Lookup a Package object given the Repository and package name.
     Returns None if not found.
     """
-    return db.session.execute(db.select(Package).where(Package.repository_id == repository.id, Package.name == package_name)).scalar_one_or_none()
+    return db.session.execute(
+        db.select(Package).where(Package.repository_id == repository.id, Package.name == package_name)
+    ).scalar_one_or_none()
 
 
 def get_package_with_exception(repository: Repository, package_name: str) -> Package:

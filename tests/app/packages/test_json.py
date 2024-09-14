@@ -23,7 +23,10 @@ def test__parse_single_record1(package: Package) -> None:
     result = app.packages.json._parse_single_record(record=record, package=package)
 
     assert result.filename == "vscode_task_runner-0.1.2-py3-none-any.whl"
-    assert result.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    assert (
+        result.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    )
     assert result.requires_python == ">=3.10,<4.0"
     assert result.is_yanked is False
     assert result.yanked_reason is None
@@ -34,7 +37,10 @@ def test__parse_single_record1(package: Package) -> None:
     assert result.hashes[0].value == "9f046728d31a5b09b4463b04ba5370650f42874eb0a7446745f3e3477cb3b8f0"
     assert result.metadata_file is not None
     assert result.metadata_file.filename == "vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
-    assert result.metadata_file.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    assert (
+        result.metadata_file.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    )
     assert result.metadata_file.version == "0.1.2"
     assert result.metadata_file.hashes[0].kind == "sha256"
     assert result.metadata_file.hashes[0].value == "4a7687e223ae9c52899b004c8ce445bb8e5e7a749adfb1355da94fd32ff46527"
@@ -65,7 +71,10 @@ def test__parse_single_record2(package: Package) -> None:
     result = app.packages.json._parse_single_record(record=record, package=package)
 
     assert result.filename == "vscode_task_runner-0.1.2-py3-none-any.whl"
-    assert result.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    assert (
+        result.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    )
     assert result.requires_python is None
     assert result.is_yanked is True
     assert result.yanked_reason == "This was yanked because of reasons"
@@ -76,7 +85,10 @@ def test__parse_single_record2(package: Package) -> None:
     assert result.hashes[1].value == "0e0499d13614de61617d94f23410da6c"
     assert result.metadata_file is not None
     assert result.metadata_file.filename == "vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
-    assert result.metadata_file.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    assert (
+        result.metadata_file.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    )
     assert result.metadata_file.version == "0.1.2"
     assert result.metadata_file.hashes[0].kind == "sha256"
     assert result.metadata_file.hashes[0].value == "4a7687e223ae9c52899b004c8ce445bb8e5e7a749adfb1355da94fd32ff46527"
@@ -103,14 +115,20 @@ def test__parse_single_record3(package: Package) -> None:
     result = app.packages.json._parse_single_record(record=record, package=package)
 
     assert result.filename == "vscode_task_runner-0.1.2-py3-none-any.whl"
-    assert result.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    assert (
+        result.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    )
     assert result.requires_python is None
     assert result.is_yanked is True
     assert result.yanked_reason is None
     assert result.version == "0.1.2"
     assert result.metadata_file is not None
     assert result.metadata_file.filename == "vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
-    assert result.metadata_file.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    assert (
+        result.metadata_file.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl.metadata"
+    )
     assert result.metadata_file.version == "0.1.2"
 
     assert len(result.hashes) == 0
@@ -131,7 +149,10 @@ def test__parse_single_record4(package: Package) -> None:
     result = app.packages.json._parse_single_record(record=record, package=package)
 
     assert result.filename == "vscode_task_runner-0.1.2-py3-none-any.whl"
-    assert result.upstream_url == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    assert (
+        result.upstream_url
+        == "https://files.pythonhosted.org/packages/9f/cd/a21a34074a00154b61d981218bb767a8bd130e76d08f65d64b2a3a18547a/vscode_task_runner-0.1.2-py3-none-any.whl"
+    )
     assert result.requires_python is None
     assert result.is_yanked is False
     assert result.yanked_reason is None

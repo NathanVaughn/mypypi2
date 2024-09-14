@@ -3,7 +3,6 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-from flask import url_for
 from sqlalchemy import Boolean, ForeignKey, String, UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -76,4 +75,3 @@ class PackageFile(Base):
         Used in the JSON API.
         """
         return {hash.kind: hash.value for hash in self.hashes}
-

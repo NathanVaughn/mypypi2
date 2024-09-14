@@ -90,7 +90,10 @@ def test_determine_index_format(
     """
     Test the quality value validation function with an invalid value.
     """
-    assert app.packages.simple.determine_index_format(accept_header=given_accept_header, format_query=given_format_query) == expected
+    assert (
+        app.packages.simple.determine_index_format(accept_header=given_accept_header, format_query=given_format_query)
+        == expected
+    )
 
 
 @pytest.mark.parametrize(

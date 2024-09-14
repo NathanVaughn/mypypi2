@@ -1,6 +1,5 @@
 from app.models.code_file import CodeFile
 from app.models.code_file_hash import CodeFileHash
-from app.models.package import Package
 from app.models.package_file import PackageFile
 
 

@@ -94,7 +94,6 @@ class CodeFile(PackageFile):
             _external=True,
         )
 
-
     @property
     def html_download_url(self) -> str:
         """

@@ -28,6 +28,7 @@ def test_yanked(package: Package, is_yanked: bool, yanked_reason: str | None, ex
 
     assert code_file.yanked == expected
 
+
 def test_hash_value() -> None:
     """
     Test how hash_value is generated
@@ -101,11 +102,29 @@ def test_update() -> None:
     """
     Test updates to a code file
     """
-    file1 = CodeFile(filename="test.whl", version="1.0.0", upstream_url="https://example.com", requires_python=">=3.6", is_yanked=False, yanked_reason=None, size=12345, upload_time=datetime.datetime.now())
+    file1 = CodeFile(
+        filename="test.whl",
+        version="1.0.0",
+        upstream_url="https://example.com",
+        requires_python=">=3.6",
+        is_yanked=False,
+        yanked_reason=None,
+        size=12345,
+        upload_time=datetime.datetime.now(),
+    )
     CodeFileHash(code_file=file1, kind="sha256", value="1234567890abcdef")
 
     # update the file
-    file2 = CodeFile(filename="other.whl", version="1.0.1", upstream_url="https://nathanv.me", requires_python=">=3.8", is_yanked=True, yanked_reason="reason", size=6789, upload_time=datetime.datetime(2021, 1, 1))
+    file2 = CodeFile(
+        filename="other.whl",
+        version="1.0.1",
+        upstream_url="https://nathanv.me",
+        requires_python=">=3.8",
+        is_yanked=True,
+        yanked_reason="reason",
+        size=6789,
+        upload_time=datetime.datetime(2021, 1, 1),
+    )
     CodeFileHash(code_file=file2, kind="md5", value="abcdef1234567890")
 
     file1.update(file2)
