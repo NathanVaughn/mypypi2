@@ -42,6 +42,7 @@ def init_db(flask_app: Flask) -> None:
     from app.models.metadata_file_hash import MetadataFileHash  # noqa
     from app.models.package import Package  # noqa
     from app.models.repository import Repository  # noqa
+    from app.models.cache import Cache  # noqa
 
     with flask_app.app_context():
         if not Config.database.uri.startswith("sqlite"):

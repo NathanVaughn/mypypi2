@@ -41,7 +41,9 @@ class StorageS3Config(BaseModel):
     public_url_prefix: str
     region_name: str | None = None
     bucket_prefix: str = ""
-    redirect_code: int = HTTPStatus.PERMANENT_REDIRECT
+    redirect_code: Literal[
+        HTTPStatus.MOVED_PERMANENTLY, HTTPStatus.FOUND, HTTPStatus.TEMPORARY_REDIRECT, HTTPStatus.PERMANENT_REDIRECT
+    ] = HTTPStatus.PERMANENT_REDIRECT
 
 
 class StorageConfig(BaseModel):
@@ -68,15 +70,25 @@ class CacheRedisConfig(BaseModel):
     db: int = 0
 
 
+class CacheMemcachedConfig(BaseModel):
+    host: str
+    port: int = 11211
+
+
 class CacheConfig(BaseModel):
-    driver: Literal["memory", "filesystem", "redis"]
+    driver: Literal["memory", "filesystem", "redis", "memcached", "database"]
     filesystem: CacheFilesystemConfig | None = None
     redis: CacheRedisConfig | None = None
+    memcached: CacheMemcachedConfig | None = None
 
     @model_validator(mode="after")
     def must_contain_driver_config(self) -> Self:
         if self.driver == "filesystem" and self.filesystem is None:
             raise ValueError("filesystem config must be provided when using filesystem driver")
+        if self.driver == "redis" and self.redis is None:
+            raise ValueError("redis config must be provided when using redis driver")
+        if self.driver == "memcached" and self.memcached is None:
+            raise ValueError("memcached config must be provided when using memcached driver")
         return self
 
 

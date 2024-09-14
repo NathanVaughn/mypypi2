@@ -10,7 +10,11 @@ class FileSystemCache(BaseCache):
         self._local_dir = pathlib.Path(directory)
         self._local_dir.mkdir(parents=True, exist_ok=True)
 
-    def _set(self, key: str, value: Any) -> None:
+    @property
+    def _supports_ttl(self) -> bool:
+        return False
+
+    def _set(self, key: str, value: Any, ttl: None = None) -> None:
         """
         Set a cache value
         """

@@ -75,3 +75,16 @@ class PackageFile(Base):
         Used in the JSON API.
         """
         return {hash.kind: hash.value for hash in self.hashes}
+
+    @property
+    def hash_value(self) -> str | None:
+        """
+        Returns the first hash value for this file.
+        Use for the HTML API since files can have more than one hash,
+        while the HTML API only supports one.
+
+        Returns None if no hashes are available.
+        """
+        if not self.hashes:
+            return None
+        return f"{self.hashes[0].kind}={self.hashes[0].value}"

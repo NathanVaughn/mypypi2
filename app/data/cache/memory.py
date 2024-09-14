@@ -1,5 +1,3 @@
-from typing import Any
-
 from app.data.cache.base import BaseCache
 
 
@@ -7,13 +5,17 @@ class MemoryCache(BaseCache):
     def __init__(self):
         self._cache = {}
 
-    def _set(self, key: str, value: Any) -> None:
+    @property
+    def _supports_ttl(self) -> bool:
+        return False
+
+    def _set(self, key: str, value: str, ttl: None = None) -> None:
         """
         Set a cache value
         """
         self._cache[key] = value
 
-    def _get(self, key: str) -> Any | None:
+    def _get(self, key: str) -> str | None:
         """
         Get a cache value. Returnm None if the key does not exist
         """

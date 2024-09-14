@@ -19,5 +19,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  cache:
+    image: redis:alpine
+    restart: always
+
 volumes:
   postgres-data:

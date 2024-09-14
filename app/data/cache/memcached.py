@@ -1,14 +1,14 @@
-import pickle
 from typing import Any
 
-import redis
+from pymemcache import serde
+from pymemcache.client.base import Client
 
 from app.data.cache.base import BaseCache
 
 
-class RedisCache(BaseCache):
-    def __init__(self, host: str, port: int, db: int) -> None:
-        self._connection = redis.Redis(host=host, port=port, db=db)
+class MemcachedCache(BaseCache):
+    def __init__(self, host: str, port: int) -> None:
+        self._connection = Client(server=(host, port), serde=serde.pickle_serde)
 
     @property
     def _supports_ttl(self) -> bool:
@@ -18,17 +18,13 @@ class RedisCache(BaseCache):
         """
         Set a cache value
         """
-        self._connection.set(key, pickle.dumps(value), ex=ttl)
+        self._connection.set(key, value, expire=ttl)
 
     def _get(self, key: str) -> Any | None:
         """
         Get a cache value. Returnm None if the key does not exist
         """
-        value = self._connection.get(key)
-        if value is not None:
-            return pickle.loads(value)  # type: ignore
-
-        return None
+        return self._connection.get(key)
 
     def _delete(self, key: str) -> None:
         """

@@ -103,7 +103,7 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
 
     # save the new package to the database
     with time_this_context(f"Saved {package.child_count} new rows for package {package.log_name}"):
-        app.data.sql.save_package(package)
+        app.data.sql.session_save(package)
     return package
 
 

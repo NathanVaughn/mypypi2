@@ -1,8 +1,11 @@
 import functools
 
+from sqlalchemy import select
+
 from app.constants import METADATA_EXTENSION, MINUTES_TO_SECONDS
+from app.models.cache import Cache
 from app.models.code_file import CodeFile
-from app.models.database import db
+from app.models.database import Base, db
 from app.models.exceptions import (
     PackageFileNotFound,
     PackageNotFound,
@@ -26,7 +29,7 @@ def get_repository(repository_slug: str) -> Repository | None:
     Lookup a Repository object given the slug.
     Returns None if not found.
     """
-    return db.session.execute(db.select(Repository).where(Repository.slug == repository_slug)).scalar_one_or_none()
+    return db.session.execute(select(Repository).where(Repository.slug == repository_slug)).scalar_one_or_none()
 
 
 def get_repository_with_exception(repository_slug: str) -> Repository:
@@ -59,7 +62,7 @@ def get_package(repository: Repository, package_name: str) -> Package | None:
     Returns None if not found.
     """
     return db.session.execute(
-        db.select(Package).where(Package.repository_id == repository.id, Package.name == package_name)
+        select(Package).where(Package.repository_id == repository.id, Package.name == package_name)
     ).scalar_one_or_none()
 
 
@@ -80,7 +83,7 @@ def get_metadata_file(repository: Repository, package: Package, filename: str) -
     """
     return (
         db.session.execute(
-            db.select(MetadataFile)
+            select(MetadataFile)
             .join(MetadataFile.package)
             .join(Package.repository)
             .where(
@@ -100,7 +103,7 @@ def get_code_file(repository: Repository, package: Package, filename: str) -> Co
     """
     return (
         db.session.execute(
-            db.select(CodeFile)
+            select(CodeFile)
             .join(CodeFile.package)
             .join(Package.repository)
             .where(
@@ -130,9 +133,24 @@ def get_package_file_with_exception(repository: Repository, package: Package, fi
     return package_file
 
 
-def save_package(package: Package) -> None:
+def get_cache(key: str) -> Cache | None:
     """
-    Save the package and child models to the database
+    Get a cache value. Return None if the key does not exist
     """
-    db.session.add(package)
+    return db.session.execute(select(Cache).where(Cache.key == key)).scalar_one_or_none()
+
+
+def session_save(obj: Base) -> None:
+    """
+    Save an object to the current session
+    """
+    db.session.add(obj)
+    save()
+
+
+def session_delete(obj: Base) -> None:
+    """
+    Delete an object to the current session
+    """
+    db.session.delete(obj)
     save()

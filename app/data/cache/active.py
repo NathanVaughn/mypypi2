@@ -24,5 +24,18 @@ class _ActiveCache:
                 host=Config.cache.redis.host, port=Config.cache.redis.port, db=Config.cache.redis.db
             )
 
+        elif Config.cache.driver == "memcached":
+            import app.data.cache.memcached
+
+            assert Config.cache.memcached is not None
+            self.provider = app.data.cache.memcached.MemcachedCache(
+                host=Config.cache.memcached.host, port=Config.cache.memcached.port
+            )
+
+        elif Config.cache.driver == "database":
+            import app.data.cache.database
+
+            self.provider = app.data.cache.database.DatabaseCache()
+
 
 ActiveCache = _ActiveCache()

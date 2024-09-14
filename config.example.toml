@@ -1,24 +1,24 @@
 [[repositories]]
     slug            = "pypi"                     # The slug is a unique identifier for the repository and will appear in URLs
     simple_url      = "https://pypi.org/simple/" # The URL to the simple repository index
-    cache_minutes   = 10                         # The number of minutes to cache data for from the upstream index
-    timeout_seconds = 30                         # The number of seconds to wait for a response from the upstream index before returning cached data
+    cache_minutes   = 30                         # [Optional] The number of minutes to cache data for from the upstream index. Defaults to 10
+    timeout_seconds = 30                         # [Optional] The number of seconds to wait for a response from the upstream index before returning cached data. Defaults to 10
 
 [[repositories]]
     slug            = "pytorch"                           # More than one repoistory can be defined
     simple_url      = "https://download.pytorch.org/whl/"
-    cache_minutes   = 10
+    cache_minutes   = 30
     timeout_seconds = 30
 
 [[repositories]]
     slug            = "piwheels"
     simple_url      = "https://www.piwheels.org/simple/"
-    cache_minutes   = 10
+    cache_minutes   = 30
     timeout_seconds = 30
 
 [database]
-    uri = "sqlite:///data.sqlite" # The URI to the database. This must be a valid SQLAlchemy URI. See https://docs.sqlalchemy.org/en/20/core/engines.html#backend-specific-urls
-    # SQLite is not recommended and can be easily overwhelmed by a high volume of requests. Use a more robust database like PostgreSQL or MySQL in production.
+    uri = "postgresql://mypypiuser:mypypipass@db:5432/mypypi" # The URI to the database. This must be a valid SQLAlchemy URI. See https://docs.sqlalchemy.org/en/20/core/engines.html#backend-specific-urls
+    # SQLite is not recommended and can be easily overwhelmed by a high volume of simulataneous requests. Use a more robust database like PostgreSQL or MySQL in production.
 
 [storage]
     driver = "s3" # The storage driver to use. Valid options are "local" and "s3"
@@ -30,19 +30,25 @@
     region_name       = "us-east-1"                          # [Optional] The region name for the S3-compatible storage service. Cloudflare R2 uses "auto"
     bucket_name       = "mypypi-files"                       # The name of the bucket to store files in
     bucket_prefix     = ""                                   # [Optional] A prefix to add to all keys in the bucket
-    public_url_prefix = "https://mycdn.example.com/pip/"     # Prefix to add to URLs for files stored in the S3-compatible storage service. This allows you to use a CDN to serve files or a seperate domain from the storage provider. If using S3 without Cloudfront, this will be something like "https://s3.us-east-1.amazonaws.com/mypypi-files/"
-    redirect_code     = 302                                  # [Optional] The HTTP status code to use for redirects to files stored in the S3-compatible storage service. Valid options are 301, 302, 307, 308. Defaults to 308.
+    public_url_prefix = "https://mycdn.example.com/pip/"     # Prefix to add to URLs for files stored in the S3-compatible storage service. This allows you to use a CDN to serve files or a seperate domain from the storage provider. If using S3 without Cloudfront, this will be something like "https://mypypi-files.s3.us-east-1.amazonaws.com/"
+    redirect_code     = 308                                  # [Optional] The HTTP status code to use for redirects to files stored in the S3-compatible storage service. Valid options are 301, 302, 307, 308. Defaults to 308.
 
 [storage.local]
     directory = "/data/" # If using the local storage driver, this is the directory to store files in. Should be an absolute path.
 
 [cache]
-    driver = "memory" # The cache driver to use. Valid options are "memory", "filesystem", and "redis"
+    driver = "memory" # The cache driver to use. Valid options are "memory", "filesystem", "redis", "memcached", and "database"
+    # The database cache driver will use the same database URI as the main database configuration
 
 [cache.filesystem]
     directory = "/tmp/" # If using the filesystem cache driver, this is the directory to store files in. Should be an absolute path.
 
 [cache.redis]
-    host = "redis.service" # If using the redis cache driver, this is the hostname of the redis server. Can be a hostname or IP address.
+    # This driver will also work with Valkey
+    host = "redis.service" # If using the redis cache driver, this is the host of the redis server. Can be a hostname or IP address.
     port = 6379            # The port of the redis server. Defaults to 6379.
     db   = 0               # The database number to use. Defaults to 0.
+
+[cache.memcached]
+    host = "redis.service" # If using the memcached cache driver, this is the host of the memcached server. Can be a hostname or IP address.
+    port = 11211           # The port of the memcached server. Defaults to 11211.

@@ -8,8 +8,17 @@ from typing import Any
 class BaseCache(abc.ABC):
     EXPIRATION_SUFFIX = "_expiration"
 
+    @property
     @abc.abstractmethod
-    def _set(self, key: str, value: Any) -> None:
+    def _supports_ttl(self) -> bool:
+        """
+        Return whether or not the cache implementation supports TTL.
+        If not, the TTL will be stored as a seperate cache key.
+        """
+        ...
+
+    @abc.abstractmethod
+    def _set(self, key: str, value: Any, ttl: int | None = None) -> None:
         """
         Set a cache value
         """
@@ -33,21 +42,24 @@ class BaseCache(abc.ABC):
         """
         Set a cache value, with a TTL in seconds
         """
-        expiration = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
-        self._set(f"{key}{self.EXPIRATION_SUFFIX}", expiration.isoformat())
-        self._set(key, value)
+        self._set(key, value, ttl=ttl)
+
+        if not self._supports_ttl:
+            expiration = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
+            self._set(f"{key}{self.EXPIRATION_SUFFIX}", expiration.isoformat())
 
     def get(self, key: str) -> Any | None:
         """
         Get a cache value, or None if it does not exist or is expired
         """
-        expiration = self._get(f"{key}{self.EXPIRATION_SUFFIX}")
-        if expiration is None:
-            return None
+        if not self._supports_ttl:
+            expiration = self._get(f"{key}{self.EXPIRATION_SUFFIX}")
+            if expiration is None:
+                return None
 
-        if datetime.datetime.fromisoformat(expiration) < datetime.datetime.now():
-            self._delete(key)
-            self._delete(f"{key}{self.EXPIRATION_SUFFIX}")
-            return None
+            if datetime.datetime.fromisoformat(expiration) < datetime.datetime.now():
+                self._delete(key)
+                self._delete(f"{key}{self.EXPIRATION_SUFFIX}")
+                return None
 
         return self._get(key)
