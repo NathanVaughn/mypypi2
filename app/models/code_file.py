@@ -3,6 +3,8 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
+from flask import url_for
+
 from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -64,6 +66,44 @@ class CodeFile(PackageFile):
         if y and self.yanked_reason:
             return self.yanked_reason
         return y
+
+    @property
+    def hash_value(self) -> str | None:
+        """
+        Returns the first hash value for this file.
+        Use for the HTML API since files can have more than one hash,
+        while the HTML API only supports one.
+
+        Returns None if no hashes are available.
+        """
+        if not self.hashes:
+            return None
+        return f"{self.hashes[0].kind}={self.hashes[0].value}"
+
+    @property
+    def download_url(self) -> str:
+        """
+        Return the download URL for this file through our proxy.
+        """
+        return url_for(
+            "file.file_route",
+            repository_slug=self.package.repository.slug,
+            package_name=self.package.name,
+            filename=self.filename,
+            version=self.version_text,
+            _external=True,
+        )
+
+
+    @property
+    def html_download_url(self) -> str:
+        """
+        Returns the download URL for use with the HTML API.
+        """
+        url = self.download_url
+        if self.hash_value:
+            url += f"#{self.hash_value}"
+        return url
 
     def update(self, new: CodeFile) -> None:
         """

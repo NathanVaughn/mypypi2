@@ -28,6 +28,74 @@ def test_yanked(package: Package, is_yanked: bool, yanked_reason: str | None, ex
 
     assert code_file.yanked == expected
 
+def test_hash_value() -> None:
+    """
+    Test how hash_value is generated
+    """
+    # have to use an inherited class here, since the base class
+    # doesn't have a foreign key
+
+    # test no hashes
+    code_file = CodeFile()
+    assert code_file.hash_value is None
+
+    # test one hash
+    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    assert code_file.hash_value == "sha256=1234567890abcdef"
+
+    # test multiple hashes
+    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    assert code_file.hash_value == "sha256=1234567890abcdef"
+
+
+def test_download_url(package: Package, app_request_context: None) -> None:
+    """
+    Test download_url
+    """
+    # actually testing the exact value would be unfair,
+    # so just making sure no error is raised and it looks reasonably correct
+
+    filename = "vscode_task_runner-0.1.2-py3-none-any.whl"
+    version = "0.1.2"
+
+    package_file = CodeFile(package=package, filename=filename, version=version)
+
+    assert package.repository.slug in package_file.download_url
+    assert package.name in package_file.download_url
+    assert filename in package_file.download_url
+
+
+def test_html_download_url(package: Package, app_request_context: None) -> None:
+    """
+    Test how html_download_url is generated
+    """
+    # have to use an inherited class here, since the base class
+    # doesn't have a foreign key
+
+    filename = "vscode_task_runner-0.1.2-py3-none-any.whl"
+    version = "0.1.2"
+
+    # test no hashes
+    code_file = CodeFile(package=package, filename=filename, version=version)
+    assert package.repository.slug in code_file.html_download_url
+    assert package.name in code_file.html_download_url
+    assert filename in code_file.html_download_url
+    assert "#" not in code_file.html_download_url
+
+    # test one hash
+    CodeFileHash(code_file=code_file, kind="sha256", value="1234567890abcdef")
+    assert package.repository.slug in code_file.html_download_url
+    assert package.name in code_file.html_download_url
+    assert filename in code_file.html_download_url
+    assert "#sha256=1234567890abcdef" in code_file.html_download_url
+
+    # test multiple hashes
+    CodeFileHash(code_file=code_file, kind="md5", value="abcdef1234567890")
+    assert package.repository.slug in code_file.html_download_url
+    assert package.name in code_file.html_download_url
+    assert filename in code_file.html_download_url
+    assert "#sha256=1234567890abcdef" in code_file.html_download_url
+
 
 def test_update() -> None:
     """
