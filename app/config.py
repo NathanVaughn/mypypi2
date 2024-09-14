@@ -1,3 +1,4 @@
+from enum import Enum
 from http import HTTPStatus
 from typing import Literal, Self, Type
 
@@ -10,6 +11,19 @@ from pydantic_settings import (
     TomlConfigSettingsSource,
     YamlConfigSettingsSource,
 )
+
+
+class StorageDrivers(Enum):
+    LOCAL = "local"
+    S3 = "s3"
+
+
+class CacheDrivers(Enum):
+    MEMORY = "memory"
+    FILESYSTEM = "filesystem"
+    REDIS = "redis"
+    MEMCACHED = "memcached"
+    DATABASE = "database"
 
 
 class RepositoryConfig(BaseModel):
@@ -47,15 +61,15 @@ class StorageS3Config(BaseModel):
 
 
 class StorageConfig(BaseModel):
-    driver: Literal["s3", "local"]
+    driver: StorageDrivers
     s3: StorageS3Config | None = None
     local: StorageLocalConfig | None = None
 
     @model_validator(mode="after")
     def must_contain_driver_config(self) -> Self:
-        if self.driver == "s3" and self.s3 is None:
-            raise ValueError("s3 config must be provided when using s3 driver")
-        if self.driver == "local" and self.local is None:
+        if self.driver == StorageDrivers.S3 and self.s3 is None:
+            raise ValueError("S3 config must be provided when using S3 driver")
+        if self.driver == StorageDrivers.LOCAL and self.local is None:
             raise ValueError("local config must be provided when using local driver")
         return self
 
@@ -76,18 +90,18 @@ class CacheMemcachedConfig(BaseModel):
 
 
 class CacheConfig(BaseModel):
-    driver: Literal["memory", "filesystem", "redis", "memcached", "database"]
+    driver: CacheDrivers
     filesystem: CacheFilesystemConfig | None = None
     redis: CacheRedisConfig | None = None
     memcached: CacheMemcachedConfig | None = None
 
     @model_validator(mode="after")
     def must_contain_driver_config(self) -> Self:
-        if self.driver == "filesystem" and self.filesystem is None:
+        if self.driver == CacheDrivers.FILESYSTEM and self.filesystem is None:
             raise ValueError("filesystem config must be provided when using filesystem driver")
-        if self.driver == "redis" and self.redis is None:
-            raise ValueError("redis config must be provided when using redis driver")
-        if self.driver == "memcached" and self.memcached is None:
+        if self.driver == CacheDrivers.REDIS and self.redis is None:
+            raise ValueError("Redis config must be provided when using Redis driver")
+        if self.driver == CacheDrivers.MEMCACHED and self.memcached is None:
             raise ValueError("memcached config must be provided when using memcached driver")
         return self
 

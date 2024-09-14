@@ -4,7 +4,7 @@ from typing import Any, Callable
 from loguru import logger
 
 import app.data.sql
-from app.data.cache.active import ActiveCache
+from app.data.cache.active import CacheDriver
 
 
 def repository_cache(func: Callable) -> Callable:
@@ -21,7 +21,7 @@ def repository_cache(func: Callable) -> Callable:
         # the second part of this line flattens the kwargs into a list
         key = "-".join((func.__name__, *args, *(i for (k, v) in kwargs.items() for i in (k, v))))
 
-        response = ActiveCache.provider.get(key)
+        response = CacheDriver.get(key)
         if response is not None:
             logger.debug(f"Cache hit for {key}")
             return response
@@ -30,7 +30,7 @@ def repository_cache(func: Callable) -> Callable:
         # and cache the result
         logger.debug(f"Cache miss for {key}")
         result = func(*args, **kwargs)
-        ActiveCache.provider.set(key, result, repository_timeout)
+        CacheDriver.set(key, result, repository_timeout)
         return result
 
     return wrapper

@@ -179,7 +179,7 @@ def cache_package_file(package_file: PackageFile) -> None:
         return
 
     # actually cache the file
-    app.data.storage.active.ActiveStorage.provider.cache_file(package_file)
+    app.data.storage.active.StorageDriver.cache_file(package_file)
 
     # update the database
     package_file.is_cached = True
