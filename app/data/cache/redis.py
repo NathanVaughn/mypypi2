@@ -24,9 +24,9 @@ class RedisCache(BaseCache):
         """
         Get a cache value. Returnm None if the key does not exist
         """
-        value = self._connection.get(key)
+        value: Any | None = self._connection.get(key)
         if value is not None:
-            return pickle.loads(value)  # type: ignore
+            return pickle.loads(value)
 
         return None
 
