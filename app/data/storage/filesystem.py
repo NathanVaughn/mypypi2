@@ -34,7 +34,7 @@ class FilesystemStorage(BaseStorage):
         local_path = self._path(package_file)
         upstream_url = package_file.upstream_url
 
-        logger.info(f"Downloading {upstream_url} to {local_path.absolute()}")
+        logger.debug(f"Downloading {upstream_url} to {local_path.absolute()}")
         with open(local_path, "wb") as fp:
             with requests.get(upstream_url, stream=True) as response:
                 for chunk in response.iter_content(chunk_size=8192):

@@ -2,6 +2,7 @@ from enum import Enum
 from http import HTTPStatus
 from typing import Literal, Self, Type
 
+from loguru import logger
 from pydantic import BaseModel, HttpUrl, field_validator, model_validator
 from pydantic_settings import (
     BaseSettings,
@@ -41,6 +42,18 @@ class RepositoryConfig(BaseModel):
 
 class DatabaseConfig(BaseModel):
     url: str
+
+    @field_validator("url")
+    def url_prefix(cls, v: str) -> str:
+        """
+        Database must be sqlite or postgres
+        """
+        if v.startswith("sqlite://"):
+            logger.warning("SQLite is not recommended for production")
+        elif not v.startswith("postgresql://"):
+            raise ValueError("Database must be PostgreSQL or SQLite")
+
+        return v
 
 
 class StorageFilesystemConfig(BaseModel):

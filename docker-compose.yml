@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     ports:
       - "5000:80"
     depends_on:
@@ -37,10 +39,7 @@ services:
       POSTGRES_PASSWORD: mypypipass
       POSTGRES_DB: mypypi
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./data/db/:/var/lib/postgresql/data
 
   cache:
     image: redis:alpine
-
-volumes:
-  postgres-data:

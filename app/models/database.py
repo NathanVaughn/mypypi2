@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from typing import TYPE_CHECKING
 
-import sqlalchemy_utils
+import psycogreen.eventlet
+import sqlalchemy.exc
 import ulid
 from flask_sqlalchemy import SQLAlchemy
 from loguru import logger
-from sqlalchemy import UUID
+from sqlalchemy import Uuid, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.config import Config
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class Base(DeclarativeBase):
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=lambda: ulid.new().uuid, sort_order=-1)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=lambda: ulid.new().uuid, sort_order=-1)
     """
     Unique identifier. Uses a ULID to ensure no collisions.
     """
@@ -33,6 +35,16 @@ db = SQLAlchemy(model_class=Base)
 
 
 def init_db(flask_app: Flask) -> None:
+    psycogreen.eventlet.patch_psycopg()
+
+    # with multiple workers, make sure 10 aren't trying to
+    # create tables all at the same time
+    # easiest fix is to sleep based on their ID, so they are hopefully sequential
+    # Docker always seems to start at PID 8
+    worker_id = int(os.getenv("GUNICORN_WORKER_ID", 8)) - 7
+    # make sure there are no negative values
+    time.sleep(max(0, worker_id))
+
     db.init_app(flask_app)
 
     # import models so sqlalchemy knows about them
@@ -45,12 +57,13 @@ def init_db(flask_app: Flask) -> None:
     from app.models.cache import Cache  # noqa
 
     with flask_app.app_context():
-        if not Config.database.url.startswith("sqlite"):
-            # Wait for database to be available
-            # for some reason, this will return false for sqlite if the file doesn't exist
-            # This is fine, because the database will be created when the first table is created
-            while not sqlalchemy_utils.database_exists(Config.database.url):
-                logger.debug("Waiting for database to be available")
+        ready = False
+        while not ready:
+            try:
+                db.session.execute(text("SELECT 1"))
+                ready = True
+            except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError):
+                logger.info("Waiting for database to be ready")
                 time.sleep(1)
 
         logger.debug("Initializing database")
@@ -81,3 +94,4 @@ def init_db(flask_app: Flask) -> None:
                 repository.timeout_seconds = repository_config.timeout_seconds
 
         db.session.commit()
+        logger.success("Database ready")

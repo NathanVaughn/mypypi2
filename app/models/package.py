@@ -4,7 +4,7 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.database import Base
@@ -29,7 +29,7 @@ class Package(Base):
     """
     The parent repository
     """
-    name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(Text)
     """
     Package name
     """

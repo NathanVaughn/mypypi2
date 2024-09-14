@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from app.models.database import Base
@@ -20,11 +20,11 @@ class Repository(Base):
 
     __tablename__ = "repository"
 
-    slug: Mapped[str] = mapped_column(String, unique=True)
+    slug: Mapped[str] = mapped_column(Text, unique=True)
     """
     The repository slug
     """
-    simple_url: Mapped[str] = mapped_column(String)
+    simple_url: Mapped[str] = mapped_column(Text)
     """
     The repository simple URL. Will have no trailing slash.
     Any value with a trailing slash provided will have it removed.

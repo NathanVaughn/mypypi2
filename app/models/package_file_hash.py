@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.database import Base
@@ -15,11 +15,11 @@ class PackageFileHash(Base):
 
     __abstract__ = True
 
-    kind: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(Text)
     """
     Type of hash of the file
     """
-    value: Mapped[str] = mapped_column(String)
+    value: Mapped[str] = mapped_column(Text)
     """
     Hash of the file
     """

@@ -67,7 +67,7 @@ class S3Storage(BaseStorage):
         s3_url = self._cache_path(package_file)
         upstream_url = package_file.upstream_url
 
-        logger.info(f"Uploading {upstream_url} to {s3_url}")
+        logger.debug(f"Uploading {upstream_url} to {s3_url}")
         with self._interface.open(s3_url, "wb") as fp:
             with requests.get(upstream_url, stream=True) as response:
                 # 1MB chunks
@@ -79,7 +79,7 @@ class S3Storage(BaseStorage):
         Download a file
         """
         path = self._download_path(package_file)
-        logger.info(f"Redirecting to {path}")
+        logger.debug(f"Redirecting to {path}")
         return flask.redirect(
             self._download_path(package_file),
             code=self._redirect_code,

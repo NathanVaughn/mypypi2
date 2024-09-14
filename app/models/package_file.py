@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, ForeignKey, String, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, Text, UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -34,15 +34,15 @@ class PackageFile(Base):
         """
         return relationship("Package", lazy="joined")
 
-    filename: Mapped[str] = mapped_column(String)
+    filename: Mapped[str] = mapped_column(Text)
     """
     Package filename. Guaranteed to be unique for a repository.
     """
-    upstream_url: Mapped[str] = mapped_column(String)
+    upstream_url: Mapped[str] = mapped_column(Text)
     """
     Upstream URL where we can download this package
     """
-    version: Mapped[str] = mapped_column(String, nullable=True, default=None)
+    version: Mapped[str] = mapped_column(Text, nullable=True, default=None)
     """
     For some files, record the version
     """

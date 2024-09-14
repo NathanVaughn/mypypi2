@@ -4,7 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from flask import url_for
-from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy import Boolean, DateTime, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,12 +23,12 @@ class CodeFile(PackageFile):
 
     __tablename__ = "code_file"
 
-    requires_python: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    requires_python: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
     """
     Python version requirements
     """
     is_yanked: Mapped[bool] = mapped_column(Boolean, default=False)
-    yanked_reason: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    yanked_reason: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
     """
     Yanked string. We always show yanked files, but we keep the value here.
     """

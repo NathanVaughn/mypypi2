@@ -1,12 +1,27 @@
 import os
 
-from flask import Flask
+from flask import Flask, Response, request
+from loguru import logger
 
 from app.config import Config, StorageDrivers, StorageFilesystemConfig
 
 
 def create_app(is_testing: bool = False) -> Flask:
     flask_app = Flask(__name__)
+
+    @flask_app.before_request
+    def log_before_request() -> None:
+        logger.info(f"{request.method} {request.full_path}")
+
+    @flask_app.after_request
+    def log_after_request(response: Response) -> Response:
+        text = f"{response.status_code} {request.full_path}"
+        if response.location:
+            # show redirect
+            text = f"{text} {response.location}"
+
+        logger.info(text)
+        return response
 
     # load configuration
     if is_testing:
@@ -25,9 +40,11 @@ def create_app(is_testing: bool = False) -> Flask:
 
     # setup routes
     from app.routes.file import file_bp
+    from app.routes.healthcheck import healthcheck_bp
     from app.routes.simple import simple_bp
 
-    flask_app.register_blueprint(simple_bp)
     flask_app.register_blueprint(file_bp)
+    flask_app.register_blueprint(healthcheck_bp)
+    flask_app.register_blueprint(simple_bp)
 
     return flask_app

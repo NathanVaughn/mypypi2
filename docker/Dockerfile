@@ -31,6 +31,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Copy the application code
 COPY app app
+COPY docker/docker-entrypoint.py docker-entrypoint.py
+COPY docker/gunicorn-config.py gunicorn-config.py
 
 EXPOSE 80
-CMD ["gunicorn", "--bind=0.0.0.0:80", "app.wsgi:create_app()"]
+CMD ["python", "docker-entrypoint.py"]

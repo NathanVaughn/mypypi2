@@ -17,8 +17,13 @@
     timeout_seconds = 10
 
 [database]
-    url = "postgresql://mypypiuser:mypypipass@db:5432/mypypi" # The URL to the database. This must be a valid SQLAlchemy URL. See https://docs.sqlalchemy.org/en/20/core/engines.html#backend-specific-urls
-    # SQLite is not recommended and can be easily overwhelmed by a high volume of simulataneous requests. Use a more robust database like PostgreSQL or MariaDB in production.
+    url = "postgresql://mypypiuser:mypypipass@db:5432/mypypi" # The URL to the database. This must be a valid SQLAlchemy URL for SQLite or PostgreSQL.
+    # SQLite is not recommended and can be easily overwhelmed by a high volume of simulataneous requests.
+    # Examples:
+    # SQLite: "sqlite:///mypypi.db"
+    # SQLite (in-memory): "sqlite:///:memory:"
+    # PostgreSQL: "postgresql://username:password@localhost:5432/database"
+    # PostgreSQL uses the psycopg2 driver. See this page for information on additional arguments: https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#psycopg2-connect-arguments
 
 [storage]
     driver = "filesystem" # The storage driver to use. Valid options are "filesystem" and "s3"

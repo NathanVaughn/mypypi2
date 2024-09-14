@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 
-from sqlalchemy import DateTime, LargeBinary, String
+from sqlalchemy import DateTime, LargeBinary, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.database import Base
@@ -15,7 +15,7 @@ class Cache(Base):
 
     __tablename__ = "cache"
 
-    key: Mapped[str] = mapped_column(String, unique=True)
+    key: Mapped[str] = mapped_column(Text, unique=True)
     """
     Cache key
     """

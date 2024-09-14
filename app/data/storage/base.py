@@ -40,7 +40,7 @@ class BaseStorage(abc.ABC):
         if not self.check_file(package_file):
             self.upload_file(package_file)
         else:
-            logger.info(f"File {package_file.filename} already exists")
+            logger.debug(f"File {package_file.filename} already exists")
 
     @abc.abstractmethod
     def download_file(self, package_file: PackageFile) -> flask.Response:
