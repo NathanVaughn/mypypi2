@@ -14,7 +14,7 @@ from pydantic_settings import (
 
 
 class StorageDrivers(Enum):
-    LOCAL = "local"
+    FILESYSTEM = "filesystem"
     S3 = "s3"
 
 
@@ -40,10 +40,10 @@ class RepositoryConfig(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
-    uri: str
+    url: str
 
 
-class StorageLocalConfig(BaseModel):
+class StorageFilesystemConfig(BaseModel):
     directory: str
 
 
@@ -59,18 +59,27 @@ class StorageS3Config(BaseModel):
         HTTPStatus.MOVED_PERMANENTLY, HTTPStatus.FOUND, HTTPStatus.TEMPORARY_REDIRECT, HTTPStatus.PERMANENT_REDIRECT
     ] = HTTPStatus.PERMANENT_REDIRECT
 
+    @field_validator("redirect_code", mode="before")
+    @classmethod
+    def coerce_redirect_code(cls, v: str | int | HTTPStatus) -> HTTPStatus:
+        """
+        When coming from an environment variable, the value will be a string.
+        We need to convert it to an HTTPStatus enum.
+        """
+        return HTTPStatus(int(v))
+
 
 class StorageConfig(BaseModel):
     driver: StorageDrivers
     s3: StorageS3Config | None = None
-    local: StorageLocalConfig | None = None
+    filesystem: StorageFilesystemConfig | None = None
 
     @model_validator(mode="after")
     def must_contain_driver_config(self) -> Self:
         if self.driver == StorageDrivers.S3 and self.s3 is None:
             raise ValueError("S3 config must be provided when using S3 driver")
-        if self.driver == StorageDrivers.LOCAL and self.local is None:
-            raise ValueError("local config must be provided when using local driver")
+        if self.driver == StorageDrivers.FILESYSTEM and self.filesystem is None:
+            raise ValueError("filesystem config must be provided when using filesystem driver")
         return self
 
 
@@ -90,7 +99,7 @@ class CacheMemcachedConfig(BaseModel):
 
 
 class CacheConfig(BaseModel):
-    driver: CacheDrivers
+    driver: CacheDrivers = CacheDrivers.MEMORY
     filesystem: CacheFilesystemConfig | None = None
     redis: CacheRedisConfig | None = None
     memcached: CacheMemcachedConfig | None = None

@@ -19,7 +19,7 @@ def repository_cache(func: Callable) -> Callable:
 
         # flask always passes the view function's arguments as kwargs
         # the second part of this line flattens the kwargs into a list
-        key = "-".join((func.__name__, *args, *(i for (k, v) in kwargs.items() for i in (k, v))))
+        key = "-".join((func.__qualname__, *args, *(i for (k, v) in kwargs.items() for i in (k, v))))
 
         response = CacheDriver.get(key)
         if response is not None:

@@ -6,8 +6,30 @@ services:
       - "5000:80"
     depends_on:
       - db
+      - cache
     volumes:
       - ./config.toml:/app/config.toml
+    # Alternatively, you can use environment variables to configure MyPyPI, though the config file is probably easier.
+    # environment:
+    #   MYPYPI_REPOSITORIES: '[{"slug": "pypi", "simple_url": "https://pypi.org/simple/", "cache_minutes": 10, "timeout_seconds": 10}, {"slug": "pytorch", "simple_url": "https://download.pytorch.org/whl/", "cache_minutes": 10, "timeout_seconds": 10}, {"slug": "piwheels", "simple_url": "https://www.piwheels.org/simple/", "cache_minutes": 10, "timeout_seconds": 10}]'
+    #   MYPYPI_DATABASE__URL: postgresql://mypypiuser:mypypipass@db/mypypi
+    #   MYPYPI_STORAGE__DRIVER: filesystem
+    #   MYPYPI_STORAGE__S3__ENDPOINT_URL: https://s3.us-east-1.amazonaws.com
+    #   MYPYPI_STORAGE__S3__ACCESS_KEY_ID: '{access_key_id}'
+    #   MYPYPI_STORAGE__S3__SECRET_ACCESS_KEY: '{secret_access_key}'
+    #   MYPYPI_STORAGE__S3__REGION_NAME: us-east-1
+    #   MYPYPI_STORAGE__S3__BUCKET_NAME: mypypi-files
+    #   MYPYPI_STORAGE__S3__BUCKET_PREFIX: ''
+    #   MYPYPI_STORAGE__S3__PUBLIC_URL_PREFIX: https://mycdn.example.com/pip/
+    #   MYPYPI_STORAGE__S3__REDIRECT_CODE: 308
+    #   MYPYPI_STORAGE__FILESYSTEM__DIRECTORY: /data/
+    #   MYPYPI_CACHE__DRIVER: redis
+    #   MYPYPI_CACHE__FILESYSTEM__DIRECTORY: /tmp/mypypi-cache/
+    #   MYPYPI_CACHE__REDIS__HOST: cache
+    #   MYPYPI_CACHE__REDIS__PORT: 6379
+    #   MYPYPI_CACHE__REDIS__DB: 0
+    #   MYPYPI_CACHE__MEMCACHED_HOST: cache
+    #   MYPYPI_CACHE__MEMCACHED_PORT: 11211
 
   db:
     image: postgres:13

@@ -45,11 +45,11 @@ def init_db(flask_app: Flask) -> None:
     from app.models.cache import Cache  # noqa
 
     with flask_app.app_context():
-        if not Config.database.uri.startswith("sqlite"):
+        if not Config.database.url.startswith("sqlite"):
             # Wait for database to be available
             # for some reason, this will return false for sqlite if the file doesn't exist
             # This is fine, because the database will be created when the first table is created
-            while not sqlalchemy_utils.database_exists(Config.database.uri):
+            while not sqlalchemy_utils.database_exists(Config.database.url):
                 logger.debug("Waiting for database to be available")
                 time.sleep(1)
 

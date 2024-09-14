@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 
-from sqlalchemy import BLOB, DateTime, String
+from sqlalchemy import DateTime, LargeBinary, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.database import Base
@@ -19,7 +19,7 @@ class Cache(Base):
     """
     Cache key
     """
-    value: Mapped[bytes] = mapped_column(BLOB)
+    value: Mapped[bytes] = mapped_column(LargeBinary)
     """
     Cache value
     """

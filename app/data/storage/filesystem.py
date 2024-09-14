@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 from app.data.storage.base import BaseStorage
 
 
-class LocalStorage(BaseStorage):
+class FilesystemStorage(BaseStorage):
     def __init__(self, directory: str) -> None:
         self._local_dir = pathlib.Path(directory)
         self._local_dir.mkdir(parents=True, exist_ok=True)

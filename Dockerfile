@@ -2,7 +2,7 @@
 # ========================================
 # Export the poetry lock file to a requirements.txt file
 
-FROM docker.io/library/python:3.12 AS poetry-exporter
+FROM docker.io/library/python:3.12-alpine AS poetry-exporter
 
 WORKDIR /work
 
@@ -17,7 +17,7 @@ RUN poetry export -o requirements.txt
 # ========================================
 # Build the final image
 
-FROM docker.io/library/python:3.12
+FROM docker.io/library/python:3.12-alpine
 
 WORKDIR /app
 

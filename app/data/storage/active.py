@@ -18,11 +18,11 @@ if Config.storage.driver == StorageDrivers.S3:
         redirect_code=Config.storage.s3.redirect_code,
     )
 
-elif Config.storage.driver == StorageDrivers.LOCAL:
-    import app.data.storage.local
+elif Config.storage.driver == StorageDrivers.FILESYSTEM:
+    import app.data.storage.filesystem
 
-    assert Config.storage.local is not None
+    assert Config.storage.filesystem is not None
 
-    StorageDriver = app.data.storage.local.LocalStorage(
-        directory=Config.storage.local.directory,
+    StorageDriver = app.data.storage.filesystem.FilesystemStorage(
+        directory=Config.storage.filesystem.directory,
     )
