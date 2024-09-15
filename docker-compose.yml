@@ -10,7 +10,7 @@ services:
       - cache
     volumes:
       - ./config.toml:/app/config.toml
-    # Alternatively, you can use environment variables to configure MyPyPI, though the config file is probably easier.
+    # Alternatively, you can use environment variables to configure MyPyPi, though the config file is probably easier.
     # environment:
     #   MYPYPI_REPOSITORIES: '[{"slug": "pypi", "simple_url": "https://pypi.org/simple/", "cache_minutes": 10, "timeout_seconds": 10}, {"slug": "pytorch", "simple_url": "https://download.pytorch.org/whl/", "cache_minutes": 10, "timeout_seconds": 10}, {"slug": "piwheels", "simple_url": "https://www.piwheels.org/simple/", "cache_minutes": 10, "timeout_seconds": 10}]'
     #   MYPYPI_DATABASE__URL: postgresql://mypypiuser:mypypipass@db/mypypi
