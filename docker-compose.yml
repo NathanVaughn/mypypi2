@@ -33,7 +33,7 @@ services:
     #   MYPYPI_CACHE__MEMCACHED_PORT: 11211
 
   db:
-    image: postgres:13
+    image: postgres:16
     environment:
       POSTGRES_USER: mypypiuser
       POSTGRES_PASSWORD: mypypipass
