@@ -5,7 +5,6 @@ import time
 import uuid
 from typing import TYPE_CHECKING
 
-import psycogreen.eventlet
 import sqlalchemy.exc
 import ulid
 from flask_sqlalchemy import SQLAlchemy
@@ -35,7 +34,10 @@ db = SQLAlchemy(model_class=Base)
 
 
 def init_db(flask_app: Flask) -> None:
-    psycogreen.eventlet.patch_psycopg()
+    if not flask_app.config.get("TESTING"):
+        import psycogreen.eventlet
+
+        psycogreen.eventlet.patch_psycopg()
 
     # with multiple workers, make sure 10 aren't trying to
     # create tables all at the same time

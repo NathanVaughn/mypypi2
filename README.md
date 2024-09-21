@@ -12,7 +12,8 @@ performance improvements, and better adherence to the
 [Python Simple Repository API Specification](https://packaging.python.org/en/latest/specifications/simple-repository-api).
 
 This is NOT a way to distribute custom packages internally.
-For that, I recommend more advanced solutions like Artifactory, Azure Artifacts, etc.
+For that, I recommend more advanced solutions like Artifactory,
+Azure Artifacts, Sonatype Nexus, etc.
 
 ### Features
 

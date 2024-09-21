@@ -1,42 +1,39 @@
-[tool.poetry]
-    name         = "mypypi2"
-    version      = "0.1.0"
-    description  = "Simple pull-through PyPi cache"
-    license      = "MIT"
-    readme       = "README.md"
-    authors      = ["Nathan Vaughn <nath@nvaughn.email>"]
-    homepage     = "https://github.com/NathanVaughn/mypypi2"
-    repository   = "https://github.com/NathanVaughn/mypypi2.git"
-    package-mode = false
+[project]
+    name = "mypypi2"
+    version = "0.1.0"
+    description = "Simple pull-through PyPi cache"
+    license = { text = "MIT" }
+    readme = "README.md"
+    authors = [{ name = "Nathan Vaughn", email = "nath@nvaughn.email" }]
+    requires-python = ">=3.12"
+    dependencies = [
+        "flask-sqlalchemy>=3.1.1",    # ORM
+        "flask>=3.0.3",               # web framework
+        "gunicorn[eventlet]>=23.0.0", # deployment web server
+        "loguru>=0.7.2",              # logging
+        "lxml>=5.3.0",                # fast XML parser
+        "packaging>=24.1",            # PEP 440 version parsing
+        "psycogreen>=1.0.2",          # Greenlet support for psycopg2
+        "psycopg2-binary>=2.9.9",     # PostgreSQL client. Using binary files so it works with Alpine
+        "pydantic-settings>=2.5.2",   # config file parsing
+        "pyjson5>=1.6.6",             # fast json parser
+        "pymemcache>=4.0.0",          # Memcached client
+        "redis>=5.0.8",               # Redis client
+        "requests>=2.32.3",           # HTTP requests
+        "s3fs>=2024.9.0",             # S3 filesystem
+        "ulid-py>=1.1.0",             # ULID generation
+    ]
 
-[tool.poetry.dependencies]
-    python = "^3.12"
-    flask = "^3.0.3" # web framework
-    gunicorn = { extras = [
-        "eventlet",
-    ], version = "^23.0.0" } # deployment web server
-    flask-sqlalchemy = "^3.1.1" # ORM
-    loguru = "^0.7.2" # logging
-    pydantic-settings = "^2.4.0" # config file parsing
-    ulid-py = "^1.1.0" # ULID generation
-    packaging = "^24.1" # PEP 440 version parsing
-    pyjson5 = "^1.6.6" # fast json parser
-    lxml = "^5.3.0" # fast XML parser
-    requests = "^2.32.3" # HTTP requests
-    s3fs = "^2024.6.1" # S3 filesystem
-    psycopg2-binary = "^2.9.9" # PostgreSQL client. Using binary files so it works with Alpine
-    psycogreen = "^1.0.2" # Greenlet support for psycopg2
-    redis = "^5.0.8" # Redis client
-    pymemcache = "^4.0.0" # Memcached client
-
-
-
-[tool.poetry.group.dev.dependencies]
-    pytest                  = "8.3.2"
-    pytest-cov              = "5.0.0"
-    pre-commit              = "3.8.0"
-    pytest-flask-sqlalchemy = "^1.1.0"
-    freezegun               = "^1.5.1" # time mocking
+[tool.uv]
+    dev-dependencies = [
+        "pre-commit>=3.2.0",
+        "pre-commit-uv>=3.8.0",
+        "pytest>=7.3.1",
+        "pytest-cov>=4.1",
+        "pytest-flask-sqlalchemy>=1.1.0",
+        "freezegun>=1.5.1",               # time mocking
+    ]
+    # index-url = "http://localhost:5000/pypi/simple"
 
 [tool.coverage.run]
     omit = ["tests/*"]
@@ -50,12 +47,3 @@
 [tool.ruff]
     # i have an ultra-wide monitor and makes things easier to read
     line-length = 120
-
-    # [[tool.poetry.source]]
-    #     name     = "local"
-    #     url      = "http://localhost:5000/pypi/simple/"
-    #     priority = "primary"
-
-[build-system]
-    requires      = ["poetry-core"]
-    build-backend = "poetry.core.masonry.api"
