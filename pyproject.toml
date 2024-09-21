@@ -32,7 +32,7 @@
 
 
 [tool.poetry.group.dev.dependencies]
-    pytest                  = "8.3.2"
+    pytest                  = "8.3.3"
     pytest-cov              = "5.0.0"
     pre-commit              = "3.8.0"
     pytest-flask-sqlalchemy = "^1.1.0"
