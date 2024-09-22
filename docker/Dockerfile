@@ -4,9 +4,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
 # Install the dependencies
-COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/ /bin/uv sync --frozen
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
 # Copy the application code
 COPY app app
