@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from app.config import CacheDrivers
-from app.wsgi import Config
+from app.config import CacheDrivers, Config
 
 if Config.cache.driver == CacheDrivers.MEMORY:
     import app.data.cache.memory

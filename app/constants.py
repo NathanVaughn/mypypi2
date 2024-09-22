@@ -22,3 +22,6 @@ MINUTES_TO_SECONDS = 60
 
 # filesystem
 ASSETS_DIRECTORY = os.path.join(os.path.dirname(__file__), "assets")
+
+# patched by pytest
+IS_TESTING = False

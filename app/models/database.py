@@ -11,7 +11,7 @@ from loguru import logger
 from sqlalchemy import Uuid, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from app.wsgi import Config
+from app.config import Config
 
 if TYPE_CHECKING:
     from flask import Flask

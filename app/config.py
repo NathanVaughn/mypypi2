@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from http import HTTPStatus
 from typing import Literal, Self, Type
@@ -12,6 +13,8 @@ from pydantic_settings import (
     TomlConfigSettingsSource,
     YamlConfigSettingsSource,
 )
+
+import app.constants
 
 
 class StorageDrivers(Enum):
@@ -69,7 +72,10 @@ class StorageS3Config(BaseModel):
     region_name: str | None = None
     bucket_prefix: str = ""
     redirect_code: Literal[
-        HTTPStatus.MOVED_PERMANENTLY, HTTPStatus.FOUND, HTTPStatus.TEMPORARY_REDIRECT, HTTPStatus.PERMANENT_REDIRECT
+        HTTPStatus.MOVED_PERMANENTLY,
+        HTTPStatus.FOUND,
+        HTTPStatus.TEMPORARY_REDIRECT,
+        HTTPStatus.PERMANENT_REDIRECT,
     ] = HTTPStatus.PERMANENT_REDIRECT
 
     @field_validator("redirect_code", mode="before")
@@ -152,6 +158,7 @@ class _Config(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
+            init_settings,
             TomlConfigSettingsSource(settings_cls),
             JsonConfigSettingsSource(settings_cls),
             YamlConfigSettingsSource(settings_cls),
@@ -160,3 +167,17 @@ class _Config(BaseSettings):
             dotenv_settings,
             file_secret_settings,
         )
+
+
+if app.constants.IS_TESTING:
+    Config = _Config(
+        repositories=[RepositoryConfig(slug="pypi", simple_url="https://pypi.org/simple")],  # type: ignore
+        database=DatabaseConfig(url="sqlite:///:memory:"),
+        storage=StorageConfig(
+            driver=StorageDrivers.FILESYSTEM,
+            filesystem=StorageFilesystemConfig(directory=os.path.join("tmp", "storage")),
+        ),
+        cache=CacheConfig(driver=CacheDrivers.MEMORY),
+    )
+else:
+    Config = _Config()  # type: ignore

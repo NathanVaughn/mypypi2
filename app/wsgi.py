@@ -1,11 +1,7 @@
-import os
-
 from flask import Flask, Response, request
 from loguru import logger
 
-from app.config import StorageDrivers, StorageFilesystemConfig, _Config
-
-Config = _Config()  # type: ignore
+from app.config import Config
 
 
 def init_app() -> None:
@@ -20,7 +16,7 @@ def init_app() -> None:
     app.models.database.init_db(flask_app, create=True)
 
 
-def create_app(is_testing: bool = False) -> Flask:
+def create_app() -> Flask:
     """
     This is the main WSGI entrypoint
     """
@@ -39,14 +35,6 @@ def create_app(is_testing: bool = False) -> Flask:
 
         logger.info(text)
         return response
-
-    # load configuration
-    if is_testing:
-        flask_app.config["TESTING"] = True
-        Config.database.url = "sqlite:///:memory:"
-        Config.storage.driver = StorageDrivers.FILESYSTEM
-        Config.storage.filesystem = StorageFilesystemConfig(directory=os.path.join("tmp", "storage"))
-        Config.repositories = []
 
     # setup database
     # flask_app.config["SQLALCHEMY_ECHO"] = True

@@ -3,9 +3,14 @@ from typing import Generator
 import pytest
 from flask import Flask
 
-from app.models.package import Package
-from app.models.repository import Repository
-from app.wsgi import create_app
+from app import constants
+
+constants.IS_TESTING = True
+
+if True:
+    from app.models.package import Package
+    from app.models.repository import Repository
+    from app.wsgi import create_app
 
 
 @pytest.fixture
@@ -25,7 +30,7 @@ def package(repository: Repository) -> Package:
 
 @pytest.fixture
 def app() -> Flask:
-    return create_app(is_testing=True)
+    return create_app()
 
 
 @pytest.fixture
