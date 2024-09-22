@@ -14,10 +14,13 @@ class MemcachedCache(BaseCache):
     def _supports_ttl(self) -> bool:
         return True
 
-    def _set(self, key: str, value: Any, ttl: int) -> None:
+    def _set(self, key: str, value: Any, ttl: int | None) -> None:
         """
         Set a cache value
         """
+        if ttl is None:
+            ttl = 0
+
         self._connection.set(key, value, expire=ttl)
 
     def _get(self, key: str) -> Any | None:

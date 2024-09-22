@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from app.config import Config, StorageDrivers
+from app.config import StorageDrivers
+from app.wsgi import Config
 
 if Config.storage.driver == StorageDrivers.S3:
     import app.data.storage.s3

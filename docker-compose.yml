@@ -33,7 +33,7 @@ services:
     #   MYPYPI_CACHE__MEMCACHED_PORT: 11211
 
   db:
-    image: postgres:13
+    image: docker.io/library/postgres:13
     environment:
       POSTGRES_USER: mypypiuser
       POSTGRES_PASSWORD: mypypipass
@@ -42,4 +42,4 @@ services:
       - ./data/db/:/var/lib/postgresql/data
 
   cache:
-    image: redis:alpine
+    image: docker.io/library/redis:alpine

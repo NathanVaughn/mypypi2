@@ -33,6 +33,7 @@
         "pytest-flask-sqlalchemy>=1.1.0",
         "freezegun>=1.5.1",               # time mocking
     ]
+    package = false
     # index-url = "http://localhost:5000/pypi/simple"
 
 [tool.coverage.run]

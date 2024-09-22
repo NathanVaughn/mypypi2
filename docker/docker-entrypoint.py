@@ -7,7 +7,6 @@ subprocess.run(
     [
         "gunicorn",
         "--bind=0.0.0.0:80",
-        "--config=gunicorn-config.py",
         f"--workers={min(worker_count, 10)}",
         "--worker-class=eventlet",
         "app.wsgi:create_app()",

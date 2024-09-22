@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+import random
 import time
 import uuid
 from typing import TYPE_CHECKING
@@ -12,7 +12,7 @@ from loguru import logger
 from sqlalchemy import Uuid, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from app.config import Config
+from app.wsgi import Config
 
 if TYPE_CHECKING:
     from flask import Flask
@@ -41,11 +41,9 @@ def init_db(flask_app: Flask) -> None:
 
     # with multiple workers, make sure 10 aren't trying to
     # create tables all at the same time
-    # easiest fix is to sleep based on their ID, so they are hopefully sequential
-    # Docker always seems to start at PID 8
-    worker_id = int(os.getenv("GUNICORN_WORKER_ID", 8)) - 7
-    # make sure there are no negative values
-    time.sleep(max(0, worker_id))
+    # easiest fix is to sleep randomly
+    # choose a random number between 1 and 5
+    time.sleep(random.random() * 3)
 
     db.init_app(flask_app)
 

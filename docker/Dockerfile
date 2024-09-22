@@ -1,38 +1,16 @@
 # syntax=docker/dockerfile:1
-# ========================================
-# Export the poetry lock file to a requirements.txt file
-
-FROM docker.io/library/python:3.12-alpine AS poetry-exporter
-
-WORKDIR /work
-
-# Install poetry and the export plugin
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install poetry poetry-plugin-export
-
-COPY pyproject.toml pyproject.toml
-COPY poetry.lock poetry.lock
-
-# Export the lock file to a requirements.txt file
-RUN poetry export -o requirements.txt
-
-# ========================================
-# Build the final image
-
 FROM docker.io/library/python:3.12-alpine
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
 # Install the dependencies
-COPY --from=poetry-exporter /work/requirements.txt requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install pip wheel --upgrade \
- && python -m pip install -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/ /bin/uv sync --frozen
 
 # Copy the application code
 COPY app app
-COPY docker/docker-entrypoint.py docker-entrypoint.py
-COPY docker/gunicorn-config.py gunicorn-config.py
+COPY docker/docker-entrypoint.py ./
 
 EXPOSE 80
-CMD ["python", "docker-entrypoint.py"]
+CMD ["uv", "run", "docker-entrypoint.py"]

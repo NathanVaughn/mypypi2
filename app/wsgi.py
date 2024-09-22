@@ -3,7 +3,9 @@ import os
 from flask import Flask, Response, request
 from loguru import logger
 
-from app.config import Config, StorageDrivers, StorageFilesystemConfig
+from app.config import StorageDrivers, StorageFilesystemConfig, _Config
+
+Config = _Config()  # type: ignore
 
 
 def create_app(is_testing: bool = False) -> Flask:
@@ -39,10 +41,12 @@ def create_app(is_testing: bool = False) -> Flask:
     app.models.database.init_db(flask_app)
 
     # setup routes
+    from app.routes.favicon import favicon_bp
     from app.routes.file import file_bp
     from app.routes.healthcheck import healthcheck_bp
     from app.routes.simple import simple_bp
 
+    flask_app.register_blueprint(favicon_bp)
     flask_app.register_blueprint(file_bp)
     flask_app.register_blueprint(healthcheck_bp)
     flask_app.register_blueprint(simple_bp)

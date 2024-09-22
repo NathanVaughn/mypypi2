@@ -14,7 +14,7 @@ class RedisCache(BaseCache):
     def _supports_ttl(self) -> bool:
         return True
 
-    def _set(self, key: str, value: Any, ttl: int) -> None:
+    def _set(self, key: str, value: Any, ttl: int | None) -> None:
         """
         Set a cache value
         """

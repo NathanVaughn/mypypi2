@@ -160,6 +160,3 @@ class _Config(BaseSettings):
             dotenv_settings,
             file_secret_settings,
         )
-
-
-Config = _Config()  # type: ignore

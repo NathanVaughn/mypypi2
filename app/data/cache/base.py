@@ -4,6 +4,8 @@ import abc
 import datetime
 from typing import Any
 
+NEVER = "NEVER"
+
 
 class BaseCache(abc.ABC):
     EXPIRATION_SUFFIX = "_expiration"
@@ -38,15 +40,20 @@ class BaseCache(abc.ABC):
         """
         ...
 
-    def set(self, key: str, value: Any, ttl: int) -> None:
+    def set(self, key: str, value: Any, ttl: int | None) -> None:
         """
         Set a cache value, with a TTL in seconds
         """
         self._set(key, value, ttl=ttl)
 
         if not self._supports_ttl:
-            expiration = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
-            self._set(f"{key}{self.EXPIRATION_SUFFIX}", expiration.isoformat())
+            if ttl is not None:
+                expiration = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
+                expiration_value = expiration.isoformat()
+            else:
+                expiration_value = NEVER
+
+            self._set(f"{key}{self.EXPIRATION_SUFFIX}", expiration_value)
 
     def get(self, key: str) -> Any | None:
         """
@@ -54,10 +61,16 @@ class BaseCache(abc.ABC):
         """
         if not self._supports_ttl:
             expiration = self._get(f"{key}{self.EXPIRATION_SUFFIX}")
-            if expiration is None:
+
+            if expiration == NEVER:
+                # skip to end
+                pass
+
+            elif expiration is None:
+                # somehow expiration key is lost
                 return None
 
-            if datetime.datetime.fromisoformat(expiration) < datetime.datetime.now():
+            elif datetime.datetime.fromisoformat(expiration) < datetime.datetime.now():
                 self._delete(key)
                 self._delete(f"{key}{self.EXPIRATION_SUFFIX}")
                 return None
