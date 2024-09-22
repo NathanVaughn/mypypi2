@@ -8,7 +8,22 @@ from app.config import StorageDrivers, StorageFilesystemConfig, _Config
 Config = _Config()  # type: ignore
 
 
+def init_app() -> None:
+    """
+    This function should be called once before workers start to initialize the application
+    and database.
+    """
+    flask_app = Flask(__name__)
+    import app.models.database
+
+    flask_app.config["SQLALCHEMY_DATABASE_URI"] = Config.database.url
+    app.models.database.init_db(flask_app, create=True)
+
+
 def create_app(is_testing: bool = False) -> Flask:
+    """
+    This is the main WSGI entrypoint
+    """
     flask_app = Flask(__name__)
 
     @flask_app.before_request

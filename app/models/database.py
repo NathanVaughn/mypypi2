@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 import time
 import uuid
 from typing import TYPE_CHECKING
@@ -33,19 +32,20 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 
-def init_db(flask_app: Flask) -> None:
-    if not flask_app.config.get("TESTING"):
-        import psycogreen.eventlet
+def init_db(flask_app: Flask, create: bool = False) -> None:
+    """
+    Initialize the database. Pass create=True to create tables and exit.
+    #"""
+    # if not flask_app.config.get("TESTING"):
+    #     import psycogreen.eventlet
 
-        psycogreen.eventlet.patch_psycopg()
-
-    # with multiple workers, make sure 10 aren't trying to
-    # create tables all at the same time
-    # easiest fix is to sleep randomly
-    # choose a random number between 1 and 5
-    time.sleep(random.random() * 3)
+    #     psycogreen.eventlet.patch_psycopg()
 
     db.init_app(flask_app)
+
+    # exit if we don't need to create tables
+    if not create:
+        return
 
     # import models so sqlalchemy knows about them
     from app.models.code_file import CodeFile  # noqa
