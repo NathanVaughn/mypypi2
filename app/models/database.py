@@ -35,12 +35,7 @@ db = SQLAlchemy(model_class=Base)
 def init_db(flask_app: Flask, create: bool = False) -> None:
     """
     Initialize the database. Pass create=True to create tables and exit.
-    #"""
-    # if not flask_app.config.get("TESTING"):
-    #     import psycogreen.eventlet
-
-    #     psycogreen.eventlet.patch_psycopg()
-
+    """
     db.init_app(flask_app)
 
     # exit if we don't need to create tables
