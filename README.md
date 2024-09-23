@@ -60,6 +60,8 @@ directly from MyPyPi2.
 
 See [config.example.toml](https://github.com/NathanVaughn/mypypi2/blob/main/config.example.toml)
 for configuration options.
+See [docker-compose.yml](https://github.com/NathanVaughn/mypypi2/blob/main/docker-compose.yml)
+for an example database and cache server setup.
 
 A file named `config.toml`, `config.json` or `config.yaml` should be created
 in the application's working directory. The Docker container working directory
