@@ -6,15 +6,14 @@ from loguru import logger
 import app.packages.data
 import app.packages.simple
 import app.templates.simple_json
-from app.data.cache.wrappers import cache_permamently_decorator, cache_repository_timeout_function
+from app.data.cache.wrappers import cache_repository_timeout_function
+from app.models.enums import IndexFormat
 from app.utils import time_this_context, time_this_decorator
 
 simple_bp = Blueprint("simple", __name__)
 
 
-def _load_package_template(
-    repository_slug: str, package_name: str, index_format: app.packages.simple.IndexFormat
-) -> str:
+def _load_package_template(repository_slug: str, package_name: str, index_format: IndexFormat) -> Response:
     # get the package information
     # this function will update the data if needed as well
     package = app.packages.data.get_package(
@@ -23,17 +22,22 @@ def _load_package_template(
     )
 
     # render the appropriate template
-    if index_format == app.packages.simple.IndexFormat.json:
+    if index_format == IndexFormat.json:
         with time_this_context("Rendered JSON template"):
             response_content = app.templates.simple_json.render_template(package)
-    elif index_format == app.packages.simple.IndexFormat.html:
+    elif index_format == IndexFormat.html:
         with time_this_context("Rendered HTML template"):
             response_content = render_template(
                 "simple.html.j2",
                 package=package,
             )
 
-    return response_content
+    # return the response with the correct content type
+    content_type = app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format]
+    return Response(
+        response_content,
+        content_type=content_type,
+    )
 
 
 @simple_bp.route("/")
@@ -42,27 +46,6 @@ def simple_route_index():
     Base index route, which we do not support.
     """
     return Response("Not Implemented", status=HTTPStatus.NOT_IMPLEMENTED)
-
-
-@simple_bp.route("/<string:repository_slug>/simple/<string:package_name>")
-@cache_permamently_decorator
-def simple_route_missing_trailing_slash(repository_slug: str, package_name: str):
-    """
-    Redirects to the same route with a trailing slash
-    https://packaging.python.org/en/latest/specifications/simple-repository-api/#base-html-api
-    > "All URLs which respond with an HTML5 page MUST end with a `/` and the repository
-    > SHOULD redirect the URLs without a `/` to add a `/` to the end."
-    """
-    # two birds with one stone, normalize the name as well
-    # redirect to the version with the trailing slash
-    return redirect(
-        code=HTTPStatus.MOVED_PERMANENTLY,
-        location=url_for(
-            "simple.simple_route",
-            repository_slug=repository_slug,
-            package_name=app.packages.simple.normalize_name(package_name),
-        ),
-    )
 
 
 @simple_bp.route("/<string:repository_slug>/simple/<string:package_name>/")
@@ -97,15 +80,68 @@ def simple_route(repository_slug: str, package_name: str):
 
     # get the package information
     # this function will update the data if needed as well
-    response_content = cache_repository_timeout_function(
+    return cache_repository_timeout_function(
         _load_package_template,
         repository_slug=repository_slug,
         kwargs={"repository_slug": repository_slug, "package_name": package_name, "index_format": index_format},
     )
 
-    # return the response with the correct content type
-    content_type = app.packages.simple.PYPI_INDEX_FORMAT_CONTENT_TYPE_MAPPING[index_format]
-    return Response(
-        response_content,
-        content_type=content_type,
+
+@simple_bp.route("/<string:repository_slug>/simple/v1+html/<string:package_name>/")
+@time_this_decorator("Returned response")
+def simple_route_html(repository_slug: str, package_name: str):
+    """
+    This route is used to provide a simple index of a specific package
+    """
+    # per PEP 503, we can optionally redirect to the normalized name
+    # https://peps.python.org/pep-0503/#normalized-names
+    normalized_name = app.packages.simple.normalize_name(package_name)
+    if normalized_name != package_name:
+        return redirect(
+            code=HTTPStatus.MOVED_PERMANENTLY,
+            location=url_for(
+                "simple.simple_route_html",
+                repository_slug=repository_slug,
+                package_name=normalized_name,
+            ),
+        )
+
+    index_format = IndexFormat.html
+
+    # get the package information
+    # this function will update the data if needed as well
+    return cache_repository_timeout_function(
+        _load_package_template,
+        repository_slug=repository_slug,
+        kwargs={"repository_slug": repository_slug, "package_name": package_name, "index_format": index_format},
+    )
+
+
+@simple_bp.route("/<string:repository_slug>/simple/v1+json/<string:package_name>/")
+@time_this_decorator("Returned response")
+def simple_route_json(repository_slug: str, package_name: str):
+    """
+    This route is used to provide a simple index of a specific package
+    """
+    # per PEP 503, we can optionally redirect to the normalized name
+    # https://peps.python.org/pep-0503/#normalized-names
+    normalized_name = app.packages.simple.normalize_name(package_name)
+    if normalized_name != package_name:
+        return redirect(
+            code=HTTPStatus.MOVED_PERMANENTLY,
+            location=url_for(
+                "simple.simple_route_json",
+                repository_slug=repository_slug,
+                package_name=normalized_name,
+            ),
+        )
+
+    index_format = IndexFormat.json
+
+    # get the package information
+    # this function will update the data if needed as well
+    return cache_repository_timeout_function(
+        _load_package_template,
+        repository_slug=repository_slug,
+        kwargs={"repository_slug": repository_slug, "package_name": package_name, "index_format": index_format},
     )
