@@ -3,6 +3,9 @@ import os
 # file extensions
 METADATA_EXTENSION = ".metadata"
 
+# 1MB chunks
+DOWNLOAD_CHUNK_SIZE = 1024 * 1024
+
 # keys
 DATA_PREFIX = "data-"
 # https://packaging.python.org/en/latest/specifications/simple-repository-api/#rename-dist-info-metadata-in-the-simple-api

@@ -7,13 +7,12 @@ import flask
 import requests
 from loguru import logger
 
+from app.constants import DOWNLOAD_CHUNK_SIZE
+from app.data.storage.base import BaseStorage
 from app.models.package_file import PackageFile
 
 if TYPE_CHECKING:
     from app.models.package_file import PackageFile
-
-
-from app.data.storage.base import BaseStorage
 
 
 class FilesystemStorage(BaseStorage):
@@ -37,7 +36,7 @@ class FilesystemStorage(BaseStorage):
         logger.debug(f"Downloading {upstream_url} to {local_path.absolute()}")
         with open(local_path, "wb") as fp:
             with requests.get(upstream_url, stream=True) as response:
-                for chunk in response.iter_content(chunk_size=8192):
+                for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 
     def check_file(self, package_file: PackageFile) -> bool:

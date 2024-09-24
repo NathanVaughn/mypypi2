@@ -7,13 +7,12 @@ import requests
 import s3fs
 from loguru import logger
 
+from app.constants import DOWNLOAD_CHUNK_SIZE
+from app.data.storage.base import BaseStorage
 from app.models.package_file import PackageFile
 
 if TYPE_CHECKING:
     from app.models.package_file import PackageFile
-
-
-from app.data.storage.base import BaseStorage
 
 
 class S3Storage(BaseStorage):
@@ -70,8 +69,7 @@ class S3Storage(BaseStorage):
         logger.debug(f"Uploading {upstream_url} to {s3_url}")
         with self._interface.open(s3_url, "wb") as fp:
             with requests.get(upstream_url, stream=True) as response:
-                # 1MB chunks
-                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 
     def download_file(self, package_file: PackageFile) -> flask.BaseResponse:
