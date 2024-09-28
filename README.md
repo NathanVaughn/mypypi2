@@ -1,13 +1,13 @@
-# MyPyPi2
+# MyPyPI2
 
 ## About
 
-This is the next-generation of [MyPyPi](https://github.com/nathanvaughn/mypypi).
-MyPyPi2 is a simple pull-through cache for Python package index servers.
+This is the next-generation of [MyPyPI](https://github.com/nathanvaughn/mypypi).
+MyPyPI2 is a simple pull-through cache for Python package index servers.
 This allows you to have a local cache of packages that you depend on.
 This can help save bandwidth and handle upstream outages.
 
-Compared to the original MyPyPi, MyPyPi2 is a complete rewrite with significant
+Compared to the original MyPyPI, MyPyPI2 is a complete rewrite with significant
 performance improvements, and better adherence to the
 [Python Simple Repository API Specification](https://packaging.python.org/en/latest/specifications/simple-repository-api).
 
@@ -19,26 +19,26 @@ Azure Artifacts, Sonatype Nexus, etc.
 
 This is always going to be slower than using the actual upstream index.
 Since the upstream index knows when updates occur, it can cache content far more
-aggressively. Additionally, whenever MyPyPi2 needs to fetch data from the upstream
+aggressively. Additionally, whenever MyPyPI2 needs to fetch data from the upstream
 index, it needs to download the content, parse it, and insert it into its own
 database, and then return a response. Therefore, expect the first time a package
 is requested to be significantly slower than incremental or cached requests.
 
 However, in my experience, the performance still  tends to be better than other
 Python index servers like Azure Artifacts or Sonatype Nexus.
-This is because MyPyPi2 also supports
+This is because MyPyPI2 also supports
 [`.metadata`](https://packaging.python.org/en/latest/specifications/simple-repository-api/#serve-distribution-metadata-in-the-simple-repository-api)
 files from the upstream package server that allow `pip` and other tools
 to download a small separate file to determine package dependencies and other
 metadata. Most other index servers don't support this and force package managers
 to download full copies of possible package versions to figure out this information.
-Additionally, since MyPyPi2 supports the JSON API, it can be faster
+Additionally, since MyPyPI2 supports the JSON API, it can be faster
 to parse than the HTML API.
 
-When cached data is available though, MyPyPi2 should be pretty performant.
+When cached data is available though, MyPyPI2 should be pretty performant.
 When files are served from S3, by default the redirect is served with a `308`
 status code so clients should cache this redirect and not need to re-fetch it
-directly from MyPyPi2.
+directly from MyPyPI2.
 
 ## Features
 
