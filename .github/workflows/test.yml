@@ -20,3 +20,20 @@ jobs:
     uses: NathanVaughn/reusable-actions/.github/workflows/python-test-uv.yml@main
     with:
       python_version: ${{ matrix.python_version }}
+
+  build:
+    permissions:
+      contents: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha
+          push: false
