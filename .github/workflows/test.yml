@@ -26,14 +26,8 @@ jobs:
       contents: read
       packages: write
 
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha
-          push: false
+    uses: NathanVaughn/reusable-actions/.github/workflows/docker-build-push.yml@main
+    with:
+      dockerfile: docker/Dockerfile
+      context: .
+      push: false
