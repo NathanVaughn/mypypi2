@@ -15,8 +15,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: ["3.12"]
+        python_version: ["3.13", "3.12"]
 
     uses: NathanVaughn/reusable-actions/.github/workflows/python-test-uv.yml@main
     with:
       python_version: ${{ matrix.python_version }}
+
+  build:
+    permissions:
+      contents: read
+      packages: write
+
+    uses: NathanVaughn/reusable-actions/.github/workflows/docker-build-push.yml@main
+    with:
+      dockerfile: docker/Dockerfile
+      context: .
+      push: false

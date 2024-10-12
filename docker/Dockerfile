@@ -8,6 +8,9 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1
 
 # Install the dependencies
+RUN --mount=type=cache,target=/var/cache/apk \
+    ln -s /var/cache/apk /etc/apk/cache \
+ && apk add postgresql-dev
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
