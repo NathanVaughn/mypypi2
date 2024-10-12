@@ -23,7 +23,7 @@
     # SQLite: "sqlite:///mypypi.db"
     # SQLite (in-memory): "sqlite:///:memory:"
     # PostgreSQL: "postgresql://username:password@localhost:5432/database"
-    # PostgreSQL uses the psycopg2 driver. See this page for information on additional arguments: https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#psycopg2-connect-arguments
+    # PostgreSQL uses the psycopg3 driver. See this page for information on additional arguments: https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#psycopg2-connect-arguments
 
 [storage]
     driver = "filesystem" # The storage driver to use. Valid options are "filesystem" and "s3"

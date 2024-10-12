@@ -38,7 +38,9 @@ class Package(Base):
     Last time this package's data was updated
     """
 
-    code_files: Mapped[list[CodeFile]] = relationship("CodeFile", back_populates="package")
+    code_files: Mapped[list[CodeFile]] = relationship(
+        "CodeFile", back_populates="package", order_by="[CodeFile.version, CodeFile.filename]"
+    )
 
     @property
     def is_current(self) -> bool:

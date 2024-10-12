@@ -56,6 +56,10 @@ class DatabaseConfig(BaseModel):
         elif not v.startswith("postgresql://"):
             raise ValueError("Database must be PostgreSQL or SQLite")
 
+        # transparently use psycopg3 for postgres
+        if v.startswith("postgresql://"):
+            v = v.replace("postgresql://", "postgresql+psycopg://")
+
         return v
 
 
