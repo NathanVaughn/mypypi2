@@ -57,8 +57,8 @@ def init_db(flask_app: Flask, create: bool = False) -> None:
             try:
                 db.session.execute(text("SELECT 1"))
                 ready = True
-            except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError):
-                logger.info("Waiting for database to be ready")
+            except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError) as e:
+                logger.info(f"Waiting for database to be ready: {e}")
                 time.sleep(1)
 
         logger.debug("Initializing database")

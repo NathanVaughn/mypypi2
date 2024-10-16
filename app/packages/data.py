@@ -5,6 +5,7 @@ from loguru import logger
 
 import app.data.sql
 import app.data.storage.active
+import app.http
 from app.constants import CONTENT_TYPE_HEADER
 from app.models.code_file import CodeFile
 from app.models.exceptions import IndexParsingError, IndexTimeoutError, PackageNotFound
@@ -39,7 +40,7 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     headers = {"Accept": ",".join(content_types)}
     try:
         with time_this_context(f"Fetched {package.repository_url}"):
-            response = requests.get(url, headers=headers, timeout=package.repository.timeout_seconds)
+            response = app.http.get(url, headers=headers, timeout=package.repository.timeout_seconds)
             response.raise_for_status()
     except requests.exceptions.Timeout:
         # we need to handle this one specifically to pretend nothing happend

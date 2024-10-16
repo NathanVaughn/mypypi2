@@ -4,9 +4,9 @@ import pathlib
 from typing import TYPE_CHECKING
 
 import flask
-import requests
 from loguru import logger
 
+import app.http
 from app.constants import DOWNLOAD_CHUNK_SIZE
 from app.data.storage.base import BaseStorage
 from app.models.package_file import PackageFile
@@ -35,7 +35,7 @@ class FilesystemStorage(BaseStorage):
 
         logger.debug(f"Downloading {upstream_url} to {local_path.absolute()}")
         with open(local_path, "wb") as fp:
-            with requests.get(upstream_url, stream=True) as response:
+            with app.http.stream(upstream_url) as response:
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 

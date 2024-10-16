@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import flask
-import requests
 import s3fs
 from loguru import logger
 
+import app.http
 from app.constants import DOWNLOAD_CHUNK_SIZE
 from app.data.storage.base import BaseStorage
 from app.models.package_file import PackageFile
@@ -68,7 +68,7 @@ class S3Storage(BaseStorage):
 
         logger.debug(f"Uploading {upstream_url} to {s3_url}")
         with self._interface.open(s3_url, "wb") as fp:
-            with requests.get(upstream_url, stream=True) as response:
+            with app.http.stream(upstream_url) as response:
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 
