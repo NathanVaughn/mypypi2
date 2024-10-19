@@ -1,5 +1,5 @@
 {
-    "image": "ghcr.io/nathanvaughn/devcontainers/python:3.12",
+    "image": "ghcr.io/nathanvaughn/devcontainers/python:latest",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -23,7 +23,7 @@
         }
     },
     "mounts": [
-        "source=devcontainer-profile-${containerWorkspaceFolderBasename},target=/home/vscode/,type=volume"
+        "source=devcontainer-profile-${containerWorkspaceFolderBasename},target=/home/dev/,type=volume"
     ],
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {}
