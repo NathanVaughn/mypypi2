@@ -92,17 +92,18 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
 
     # add metadata file if available
     if metadata:
-        code_file.metadata_file = MetadataFile(
+        metadata_file = MetadataFile(
             # package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,
             code_file=code_file,
         )
+        code_file.metadata_file = metadata_file
 
         # if there were hashes, add them
         if isinstance(metadata, dict):
-            add_hashes(metadata, code_file.metadata_file)
+            add_hashes(metadata, metadata_file)
 
     return code_file
 
