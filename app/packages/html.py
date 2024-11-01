@@ -112,16 +112,17 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
     # "true" is an acceptable value
     # not guaranteed to be a "sha256=value" format
     if metadata:
-        code_file.metadata_file = MetadataFile(
+        metadata_file = MetadataFile(
             # package=package,
             filename=f"{filename}{METADATA_EXTENSION}",
             upstream_url=f"{upstream_url}{METADATA_EXTENSION}",
             version=version,
             code_file=code_file,
         )
+        code_file.metadata_file = metadata_file
 
         # if there was a hash, add it
-        add_hash(metadata, code_file.metadata_file)
+        add_hash(metadata, metadata_file)
 
     return code_file
 

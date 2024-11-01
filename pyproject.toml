@@ -23,17 +23,18 @@
         "ulid-py>=1.1.0",           # ULID generation
     ]
 
-[tool.uv]
-    dev-dependencies = [
+[dependency-groups]
+    dev = [
         "pre-commit>=3.2.0",
-        "pre-commit-uv>=3.8.0",
         "pytest>=7.3.1",
         "pytest-cov>=4.1",
         "pytest-flask-sqlalchemy>=1.1.0",
         "freezegun>=1.5.1",               # time mocking
     ]
-    package = false
-    # index-url = "http://localhost:5000/pypi/simple"
+
+# [[tool.uv.index]]
+#     name = "local"
+#     url = "http://localhost:5000/pypi/simple"
 
 [tool.coverage.run]
     omit = ["tests/*"]
