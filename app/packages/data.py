@@ -73,8 +73,10 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
     for code_file in code_files:
         # if we have already seen this filename, skip it
         if code_file.filename in unique_code_filenames:
-            logger.warning(f"Discarding duplicate code file {
-                           code_file.filename}. This should not happen. The upstream registry is not configured properly.")
+            logger.warning(
+                f"Discarding duplicate code file {
+                           code_file.filename}. This should not happen. The upstream registry is not configured properly."
+            )
             continue
 
         unique_code_filenames.add(code_file.filename)
@@ -142,8 +144,10 @@ def update_package_data(repository: Repository, package: Package) -> Package:
         if code_file.metadata_file:
             code_file.metadata_file.package = package
 
-    logger.debug(f"Saving {len(to_save_code_files)
-                           } new code files for package {package.log_name}")
+    logger.debug(
+        f"Saving {len(to_save_code_files)
+                           } new code files for package {package.log_name}"
+    )
     package.last_updated = datetime.datetime.now()
     app.data.sql.save()
 
