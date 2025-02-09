@@ -18,7 +18,7 @@
 
 [database]
     url = "postgresql://mypypiuser:mypypipass@db:5432/mypypi" # The URL to the database. This must be a valid SQLAlchemy URL for SQLite or PostgreSQL.
-    # SQLite is not recommended and can be easily overwhelmed by a high volume of simulataneous requests.
+    # SQLite is not recommended and can be easily overwhelmed by a high volume of simultaneous requests.
     # Examples:
     # SQLite: "sqlite:///mypypi.db"
     # SQLite (in-memory): "sqlite:///:memory:"
@@ -35,7 +35,7 @@
     region_name       = "us-east-1"                          # [Optional] The region name for the S3-compatible storage service. Cloudflare R2 uses "auto"
     bucket_name       = "mypypi-files"                       # The name of the bucket to store files in
     bucket_prefix     = ""                                   # [Optional] A prefix to add to all keys in the bucket
-    public_url_prefix = "https://mycdn.example.com/pip/"     # Prefix to add to URLs for files stored in the S3-compatible storage service. This allows you to use a CDN or a seperate domain to serve files from the storage provider. If using S3 without Cloudfront, this will be something like "https://mypypi-files.s3.us-east-1.amazonaws.com/"
+    public_url_prefix = "https://mycdn.example.com/pip/"     # Prefix to add to URLs for files stored in the S3-compatible storage service. This allows you to use a CDN or a separate domain to serve files from the storage provider. If using S3 without Cloudfront, this will be something like "https://mypypi-files.s3.us-east-1.amazonaws.com/"
     redirect_code     = 308                                  # [Optional] The HTTP status code to use for redirects to files stored in the S3-compatible storage service. Valid options are 301, 302, 307, 308. Defaults to 308.
 
 [storage.filesystem]
