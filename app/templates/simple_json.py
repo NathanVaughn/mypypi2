@@ -14,6 +14,7 @@ def render_template(package: Package) -> str:
     # add meta key
     data["meta"] = {}
     data["meta"]["api-version"] = "1.0"
+    data["meta"]["tracks"] = [package.repository_url]
     # we return 1.0 and not 1.1 because we do not support the version list
     # added in 1.1
     # https://packaging.python.org/en/latest/specifications/simple-repository-api/#additional-fields-for-the-simple-api-for-package-indexes

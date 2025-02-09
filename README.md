@@ -55,6 +55,7 @@ directly from MyPyPI2.
 - Content Negotiation via [URL path](https://packaging.python.org/en/latest/specifications/simple-repository-api/#endpoint-configuration)
 - Legacy `data-dist-info-metadata` JSON keys and HTML attributes
 - `pip`, `poetry`, and `uv` compatible
+- Implementation of [PEP 708](https://peps.python.org/pep-0708/)
 
 ## Setup
 
