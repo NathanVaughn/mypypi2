@@ -36,6 +36,12 @@ def create_app() -> Flask:
         logger.info(text)
         return response
 
+    # set some variables for external urls
+    # https://flask.palletsprojects.com/en/stable/config/#SERVER_NAME
+    flask_app.config["SERVER_NAME"] = Config.base_url.host
+    flask_app.config["PREFERRED_URL_SCHEME"] = Config.base_url.scheme
+    flask_app.config["APPLICATION_ROOT"] = Config.base_url.path
+
     # setup database
     # flask_app.config["SQLALCHEMY_ECHO"] = True
     import app.models.database

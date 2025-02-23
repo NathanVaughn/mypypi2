@@ -143,6 +143,7 @@ class _Config(BaseSettings):
         yaml_file="config.yaml",
     )
 
+    base_url: HttpUrl
     repositories: list[RepositoryConfig]
     database: DatabaseConfig
     storage: StorageConfig
