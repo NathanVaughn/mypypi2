@@ -4,7 +4,7 @@ import subprocess
 # first, intialize the database
 import app.wsgi
 
-app.wsgi.init_app()
+app.wsgi.init_app_db(app.wsgi.app_factory())
 
 # now, start the server
 worker_count = (multiprocessing.cpu_count() * 2) + 1

@@ -4,12 +4,15 @@ from loguru import logger
 from app.config import Config
 
 
-def init_app() -> None:
+def app_factory() -> Flask:
+    return Flask(__name__)
+
+
+def init_app_db(flask_app: Flask) -> None:
     """
     This function should be called once before workers start to initialize the application
     and database.
     """
-    flask_app = Flask(__name__)
     import app.models.database
 
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = Config.database.url
@@ -20,7 +23,7 @@ def create_app() -> Flask:
     """
     This is the main WSGI entrypoint
     """
-    flask_app = Flask(__name__)
+    flask_app = app_factory()
 
     @flask_app.before_request
     def log_before_request() -> None:
@@ -39,15 +42,12 @@ def create_app() -> Flask:
     # set some variables for external urls
     # https://flask.palletsprojects.com/en/stable/config/#SERVER_NAME
     flask_app.config["SERVER_NAME"] = Config.base_url.host
-    flask_app.config["PREFERRED_URL_SCHEME"] = Config.base_url.scheme
+    # preferred url scheme is only used oustide of the request context
     flask_app.config["APPLICATION_ROOT"] = Config.base_url.path
 
     # setup database
     # flask_app.config["SQLALCHEMY_ECHO"] = True
-    import app.models.database
-
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = Config.database.url
-    app.models.database.init_db(flask_app)
+    init_app_db(flask_app)
 
     # setup routes
     from app.routes.favicon import favicon_bp
