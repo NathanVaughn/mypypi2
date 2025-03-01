@@ -32,9 +32,11 @@
         "freezegun>=1.5.1",               # time mocking
     ]
 
-# [[tool.uv.index]]
-#     name = "local"
-#     url = "http://localhost:5000/pypi/simple"
+[[tool.uv.index]]
+    # dogfood
+    name = "mypypi"
+    url = "https://pypi.nathanv.app/pypi/simple"
+    default = true
 
 [tool.coverage.run]
     omit = ["tests/*"]
