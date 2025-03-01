@@ -43,8 +43,7 @@ class S3Storage(BaseStorage):
         """
         Build the path to the file in S3 for upload
         """
-        return f"{self._bucket_name}/{self._bucket_prefix}/{
-            self._get_path(package_file)}"
+        return f"{self._bucket_name}/{self._bucket_prefix}/{self._get_path(package_file)}"
 
     def _download_path(self, package_file: PackageFile) -> str:
         """

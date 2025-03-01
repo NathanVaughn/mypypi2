@@ -46,10 +46,7 @@ class PackageNotFound(HTTPException):
         repository_slug: str,
         package_name: str,
     ):
-        super().__init__(
-            description=f"Package {
-                package_name} not found in repository {repository_slug}"
-        )
+        super().__init__(description=f"Package {package_name} not found in repository {repository_slug}")
 
 
 class RepositoryNotFound(HTTPException):
@@ -71,10 +68,7 @@ class PackageFileNotFound(HTTPException):
     code = HTTPStatus.NOT_FOUND
 
     def __init__(self, package: Package, filename: str):
-        super().__init__(
-            description=f"Package file {
-                filename} not found in {package.log_name}"
-        )
+        super().__init__(description=f"Package file {filename} not found in {package.log_name}")
 
 
 class IndexParsingError(HTTPException):
