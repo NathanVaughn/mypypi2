@@ -57,6 +57,7 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
         raise IndexParsingError(url)
 
     # parse the response
+    # TODO parse package-level project status
     index_format = PYPI_CONTENT_TYPE_INDEX_FORMAT_MAPPING[content_type]
     if index_format == IndexFormat.json:
         code_files = parse_simple_json(response.text, package)

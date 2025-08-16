@@ -40,6 +40,10 @@ class CodeFile(PackageFile):
     """
     Upload time of the file
     """
+    provenance: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
+    """
+    Optional URL to the provenance of the file
+    """
     # setting lazy=joined here will ensure that the data for the
     # metadata file is always returned when this is queried
     # This is a huge performance boost when rendering templates

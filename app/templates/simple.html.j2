@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="pypi:repository-version" content="1.1">
+        <meta name="pypi:repository-version" content="1.4">
         <meta name="pypi:tracks" content="{{ package.repository_url }}">
+        {% if package.status is not none %}
+        <meta name="pypi:project-status" content="{{ package.status }}">
+        {% endif %}
+        {% if package.status_reason is not none %}
+        <meta name="pypi:project-status-reason" content="{{ package.status_reason }}">
+        {% endif %}
         <title>Links for {{ package.name }}</title>
     </head>
 
     <body>
         <h1>Links for {{ package.name }}</h1>
         {% for cf in package.code_files -%}
-            <a href="{{ cf.html_download_url }}"{% if cf.requires_python is not none %} data-requires-python="{{ cf.requires_python | escape }}"{% endif %}{% if cf.metadata_file %} data-dist-info-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}" data-core-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}"{% endif %}{% if cf.is_yanked %} data-yanked="{{ cf.yanked }}"{% endif %}>{{ cf.filename }}</a><br />
+            <a href="{{ cf.html_download_url }}"{% if cf.requires_python is not none %} data-requires-python="{{ cf.requires_python | escape }}"{% endif %}{% if cf.metadata_file %} data-dist-info-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}" data-core-metadata="{% if cf.metadata_file.hashes %}{{ cf.metadata_file.hash_value }}{% else %}true{% endif %}"{% endif %}{% if cf.is_yanked %} data-yanked="{{ cf.yanked }}"{% endif %}{% if cf.provenance %} data-provenance="{{ cf.provenance }}"{% endif %}>{{ cf.filename }}</a><br />
         {% endfor %}
     </body>
 </html>

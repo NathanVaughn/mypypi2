@@ -67,6 +67,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
 
     # optional fields
     # get python requires
+    provenance = anchor.attrib.get(f"{DATA_PREFIX}provenance", None)
     requires_python = anchor.attrib.get(f"{DATA_PREFIX}requires-python", None)
     if isinstance(requires_python, str):
         requires_python = html.unescape(requires_python)
@@ -98,6 +99,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
         is_yanked=is_yanked,
         yanked_reason=yanked_reason,
         version=version,
+        provenance=provenance,
     )
 
     # add a hash to the code file
@@ -137,11 +139,6 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     # let any exceptions bubble up
     upstream_tree = lxml.html.fromstring(html_content)
 
-    # hold a list of records we parse
-    code_files: list[CodeFile] = []
-
     # iterate over all anchor tags
     # tried using threadpoolexecutor, but it was slower
-    code_files = [_parse_single_record(record, package) for record in upstream_tree.iter("a")]
-
-    return code_files
+    return [_parse_single_record(record, package) for record in upstream_tree.iter("a")]

@@ -37,6 +37,15 @@ class Package(Base):
     """
     Last time this package's data was updated
     """
+    # https://blog.pypi.org/posts/2025-08-14-project-status-markers/
+    status: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
+    """
+    Optional status of the package.
+    """
+    status_reason: Mapped[str | None] = mapped_column(Text, nullable=True, default=None)
+    """
+    Optional status reason of the package.
+    """
 
     code_files: Mapped[list[CodeFile]] = relationship("CodeFile", back_populates="package")
 
@@ -60,6 +69,13 @@ class Package(Base):
         Package name for logging
         """
         return f"{self.repository.slug}:{self.name}"
+
+    @property
+    def versions(self) -> list[str]:
+        """
+        Return a list of all versions of this package.
+        """
+        return sorted(set({code_file.version for code_file in self.code_files if code_file.version}), reverse=True)
 
     @property
     def child_count(self) -> int:
