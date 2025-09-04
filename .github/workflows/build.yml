@@ -41,7 +41,9 @@ jobs:
       platform: linux/amd64
       tags: |
         ghcr.io/nathanvaughn/mypypi2:${{ needs.get-version.outputs.version }}
+        ghcr.io/nathanvaughn/mypypi2:latest
         docker.io/nathanvaughn/mypypi2:${{ needs.get-version.outputs.version }}
+        docker.io/nathanvaughn/mypypi2:latest
       dockerfile: docker/Dockerfile
       context: .
     secrets:
