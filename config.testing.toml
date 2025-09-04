@@ -1,0 +1,20 @@
+base_url = "http://localhost:5000/"
+
+[[repositories]]
+    slug            = "pypi"
+    simple_url      = "https://pypi.org/simple/"
+    cache_minutes   = 10
+    timeout_seconds = 10
+
+[database]
+    url = "sqlite:///mypypi.db"
+
+[storage]
+    driver = "filesystem"
+
+[storage.filesystem]
+    directory = "./data/packages/"
+
+[cache]
+    driver = "database"
+

@@ -35,7 +35,7 @@ def add_hashes(hash_dict: dict, package_file: PackageFile) -> None:
             MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
 
 
-def _parse_single_record(record: dict, package: Package) -> CodeFile:
+def _parse_single_record(record: dict, package: Package, index: int = 0) -> CodeFile:
     """
     Parse a single record
     """
@@ -44,11 +44,11 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     upstream_url = app.packages.simple.urljoin(package.repository_url, record["url"])
 
     # optional fields
-    requires_python = record.get("requires-python", None)
-    size = record.get("size", None)
+    requires_python = record.get("requires-python")
+    size = record.get("size")
 
     # convert upload time to datetime object
-    upload_time = record.get("upload-time", None)
+    upload_time = record.get("upload-time")
     if isinstance(upload_time, str):
         upload_time = datetime.datetime.fromisoformat(upload_time)
 
@@ -77,6 +77,7 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
         version=version,
         size=size,
         upload_time=upload_time,
+        sort_order=index,
     )
 
     # add hashes to the code file
@@ -84,11 +85,11 @@ def _parse_single_record(record: dict, package: Package) -> CodeFile:
     add_hashes(hashes, code_file)
 
     # grab metadata info in order of preference
-    metadata = record.get(METADATA_KEY, None)
+    metadata = record.get(METADATA_KEY)
     if metadata is None:
-        metadata = record.get(METADATA_KEY_LEGACY, None)
+        metadata = record.get(METADATA_KEY_LEGACY)
         if metadata is None:
-            metadata = record.get(METADATA_KEY_LEGACY2, None)
+            metadata = record.get(METADATA_KEY_LEGACY2)
 
     # add metadata file if available
     if metadata:
@@ -120,6 +121,4 @@ def parse_simple_json(json_content: str, package: Package) -> list[CodeFile]:
     data = pyjson5.loads(json_content)
 
     # tried using threadpoolexecutor, but it was slower
-    code_files = [_parse_single_record(record, package) for record in data["files"]]
-
-    return code_files
+    return [_parse_single_record(record, package, i) for i, record in enumerate(data["files"])]

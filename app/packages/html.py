@@ -53,7 +53,7 @@ def add_hash(given: str, package_file: PackageFile) -> None:
         MetadataFileHash(metadata_file=package_file, kind=kind, value=value)
 
 
-def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
+def _parse_single_record(anchor: Any, package: Package, index: int = 0) -> CodeFile:
     # required fields
     # inner text is filename
     filename: str = anchor.text
@@ -98,6 +98,7 @@ def _parse_single_record(anchor: Any, package: Package) -> CodeFile:
         is_yanked=is_yanked,
         yanked_reason=yanked_reason,
         version=version,
+        sort_order=index,
     )
 
     # add a hash to the code file
@@ -137,11 +138,6 @@ def parse_simple_html(html_content: str, package: Package) -> list[CodeFile]:
     # let any exceptions bubble up
     upstream_tree = lxml.html.fromstring(html_content)
 
-    # hold a list of records we parse
-    code_files: list[CodeFile] = []
-
     # iterate over all anchor tags
     # tried using threadpoolexecutor, but it was slower
-    code_files = [_parse_single_record(record, package) for record in upstream_tree.iter("a")]
-
-    return code_files
+    return [_parse_single_record(record, package, i) for i, record in enumerate(upstream_tree.iter("a"))]

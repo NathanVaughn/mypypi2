@@ -41,9 +41,13 @@ def create_app() -> Flask:
 
     # set some variables for external urls
     # https://flask.palletsprojects.com/en/stable/config/#SERVER_NAME
-    flask_app.config["SERVER_NAME"] = Config.base_url.host
-    # preferred url scheme is only used oustide of the request context
+    host = Config.base_url.host
+    if Config.base_url.port not in (80, 443):
+        host = f"{host}:{Config.base_url.port}"
+
+    flask_app.config["SERVER_NAME"] = host
     flask_app.config["APPLICATION_ROOT"] = Config.base_url.path
+    flask_app.config["PREFERRED_URL_SCHEME"] = Config.base_url.scheme
 
     # setup database
     # flask_app.config["SQLALCHEMY_ECHO"] = True
