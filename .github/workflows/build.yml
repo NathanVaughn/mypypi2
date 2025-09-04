@@ -21,6 +21,8 @@ jobs:
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: false
 
       - name: Get Version Number
         id: get-version-step
