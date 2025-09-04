@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import Blueprint, Response, redirect, render_template, request
+from flask import Blueprint, Response, redirect, render_template, request, url_for
 from loguru import logger
 
 import app.packages.data
@@ -8,7 +8,7 @@ import app.packages.simple
 import app.templates.simple_json
 from app.data.cache.wrappers import cache_repository_timeout_function
 from app.models.enums import IndexFormat
-from app.utils import time_this_context, time_this_decorator, url_for_scheme
+from app.utils import time_this_context, time_this_decorator
 
 simple_bp = Blueprint("simple", __name__)
 
@@ -60,7 +60,7 @@ def simple_route(repository_slug: str, package_name: str):
     if normalized_name != package_name:
         return redirect(
             code=HTTPStatus.MOVED_PERMANENTLY,
-            location=url_for_scheme(
+            location=url_for(
                 "simple.simple_route",
                 repository_slug=repository_slug,
                 package_name=normalized_name,
@@ -99,7 +99,7 @@ def simple_route_html(repository_slug: str, package_name: str):
     if normalized_name != package_name:
         return redirect(
             code=HTTPStatus.MOVED_PERMANENTLY,
-            location=url_for_scheme(
+            location=url_for(
                 "simple.simple_route_html",
                 repository_slug=repository_slug,
                 package_name=normalized_name,
@@ -129,7 +129,7 @@ def simple_route_json(repository_slug: str, package_name: str):
     if normalized_name != package_name:
         return redirect(
             code=HTTPStatus.MOVED_PERMANENTLY,
-            location=url_for_scheme(
+            location=url_for(
                 "simple.simple_route_json",
                 repository_slug=repository_slug,
                 package_name=normalized_name,

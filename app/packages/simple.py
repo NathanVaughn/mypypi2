@@ -165,7 +165,7 @@ def determine_index_format(accept_header: str | None, format_query: str | None) 
     content_types.sort(key=lambda x: x.quality, reverse=True)
 
     # if there are no content types, return None
-    if len(content_types) == 0:
+    if not content_types:
         return None
 
     # return top pick

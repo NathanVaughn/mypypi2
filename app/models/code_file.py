@@ -3,12 +3,12 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
+from flask import url_for
 from sqlalchemy import Boolean, DateTime, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.package_file import PackageFile
-from app.utils import url_for_scheme
 
 if TYPE_CHECKING:
     from app.models.code_file_hash import CodeFileHash  # pragma: no cover
@@ -39,6 +39,10 @@ class CodeFile(PackageFile):
     upload_time: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True, default=None)
     """
     Upload time of the file
+    """
+    sort_order: Mapped[int] = mapped_column(Integer)
+    """
+    Order the file appears in the list of files.
     """
     # setting lazy=joined here will ensure that the data for the
     # metadata file is always returned when this is queried
@@ -71,7 +75,7 @@ class CodeFile(PackageFile):
         """
         Return the download URL for this file through our proxy.
         """
-        return url_for_scheme(
+        return url_for(
             "file.file_route",
             repository_slug=self.package.repository.slug,
             package_name=self.package.name,
@@ -105,6 +109,7 @@ class CodeFile(PackageFile):
         self.yanked_reason = new.yanked_reason
         self.size = new.size
         self.upload_time = new.upload_time
+        self.sort_order = new.sort_order
 
         # hashes
         if self.hashes_dict != new.hashes_dict:
