@@ -13,8 +13,8 @@ base_url = "http://localhost:5000/"
     driver = "filesystem"
 
 [storage.filesystem]
-    directory = "./data/packages/"
+    directory = "/workspaces/mypypi2/data/packages/"
 
 [cache]
-    driver = "database"
+    driver = "memory"
 

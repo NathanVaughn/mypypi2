@@ -42,12 +42,12 @@ def fetch_package_data(package: Package) -> list[CodeFile]:
         with time_this_context(f"Fetched {package.repository_url}"):
             response = app.http.get(url, headers=headers, timeout=package.repository.timeout_seconds)
             response.raise_for_status()
-    except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout as e:
         # we need to handle this one specifically to pretend nothing happend
-        raise IndexTimeoutError
-    except Exception:
+        raise IndexTimeoutError from e
+    except Exception as e:
         # if we have any error, we need to raise a PackageNotFound
-        raise PackageNotFound(package_name=package.name, repository_slug=package.repository.slug)
+        raise PackageNotFound(package_name=package.name, repository_slug=package.repository.slug) from e
 
     # now, figure out how to parse the response.
     content_type = response.headers.get(CONTENT_TYPE_HEADER)
@@ -94,7 +94,7 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
     logger.debug(f"Creating package {package.log_name}")
 
     try:
-        package.code_files = fetch_package_data(package)
+        package.code_files = fetch_package_data(package)[:10]
     except IndexTimeoutError:
         # since we have nothing to work with, raise a not found error
         raise PackageNotFound(package_name=package.name, repository_slug=repository.slug)
@@ -144,6 +144,9 @@ def update_package_data(repository: Repository, package: Package) -> Package:
         code_file.package = package
         if code_file.metadata_file:
             code_file.metadata_file.package = package
+
+    # also have to update existing code files list
+    package.code_files += to_save_code_files
 
     logger.debug(f"Saving {len(to_save_code_files)} new code files for package {package.log_name}")
     package.last_updated = datetime.datetime.now()

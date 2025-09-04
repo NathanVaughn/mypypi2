@@ -34,6 +34,7 @@ class FilesystemStorage(BaseStorage):
         upstream_url = package_file.upstream_url
 
         logger.debug(f"Downloading {upstream_url} to {local_path.absolute()}")
+
         with open(local_path, "wb") as fp:
             with app.http.stream(upstream_url) as response:
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
@@ -49,6 +50,6 @@ class FilesystemStorage(BaseStorage):
         """
         Download a file
         """
-        path = self._path(package_file)
-        logger.debug(f"Sending {path}")
-        return flask.send_file(path, as_attachment=True)
+        local_path = self._path(package_file)
+        logger.debug(f"Sending {local_path}")
+        return flask.send_file(local_path, as_attachment=True)
