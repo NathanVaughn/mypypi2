@@ -7,8 +7,27 @@ on:
       - main
 
 jobs:
-  build:
+  get-version:
     if: "${{ !contains(github.event.head_commit.message, 'ci skip') }}"
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      version: ${{ steps.get-version-step.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Get Version Number
+        id: get-version-step
+        run: echo "version=$(uv version --short)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: get-version
 
     permissions:
       contents: read
@@ -19,8 +38,8 @@ jobs:
       attest_id: image1
       platform: linux/amd64
       tags: |
-        ghcr.io/nathanvaughn/mypypi2:latest
-        docker.io/nathanvaughn/mypypi2:latest
+        ghcr.io/nathanvaughn/mypypi2:${{ needs.get-version.outputs.version }}
+        docker.io/nathanvaughn/mypypi2:${{ needs.get-version.outputs.version }}
       dockerfile: docker/Dockerfile
       context: .
     secrets:
