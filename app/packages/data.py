@@ -94,7 +94,7 @@ def create_package_data(repository: Repository, package_name: str) -> Package:
     logger.debug(f"Creating package {package.log_name}")
 
     try:
-        package.code_files = fetch_package_data(package)[:10]
+        package.code_files = fetch_package_data(package)
     except IndexTimeoutError:
         # since we have nothing to work with, raise a not found error
         raise PackageNotFound(package_name=package.name, repository_slug=repository.slug)
