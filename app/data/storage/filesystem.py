@@ -46,7 +46,7 @@ class FilesystemStorage(BaseStorage):
         """
         return self._path(package_file).exists()
 
-    def download_file(self, package_file: PackageFile) -> flask.BaseResponse:
+    def download_file(self, package_file: PackageFile) -> flask.Response:
         """
         Download a file
         """

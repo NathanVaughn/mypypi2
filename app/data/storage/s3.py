@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import flask
 import s3fs
+import werkzeug.wrappers.response
 from loguru import logger
 
 import app.http
@@ -71,7 +72,7 @@ class S3Storage(BaseStorage):
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 
-    def download_file(self, package_file: PackageFile) -> flask.BaseResponse:
+    def download_file(self, package_file: PackageFile) -> werkzeug.wrappers.response.Response:
         """
         Download a file
         """
