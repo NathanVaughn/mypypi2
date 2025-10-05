@@ -59,7 +59,7 @@ class S3Storage(BaseStorage):
         s3_url = self._cache_path(package_file)
         return self._interface.exists(s3_url)
 
-    def upload_file(self, package_file: PackageFile) -> None:
+    def save_file(self, package_file: PackageFile) -> None:
         """
         Take a file from an upstream URL and save it
         """
@@ -72,7 +72,7 @@ class S3Storage(BaseStorage):
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
                     fp.write(chunk)
 
-    def download_file(self, package_file: PackageFile) -> werkzeug.wrappers.response.Response:
+    def send_file(self, package_file: PackageFile) -> werkzeug.wrappers.response.Response:
         """
         Download a file
         """

@@ -201,8 +201,11 @@ def get_package_file(repository_slug: str, package_name: str, filename: str) -> 
 
     # try to find the package in the database
     # this shouldn't be the first time we're hearing of this package name
-    # so if it is, we can raise an exception
-    package = app.data.sql.get_package_with_exception(repository, package_name)
+    # but just in case, try updating/creating it
+    try:
+        package = app.data.sql.get_package_with_exception(repository, package_name)
+    except PackageNotFound:
+        package = create_package_data(repository, package_name)
 
     # try to find the file in the database
     package_file = app.data.sql.get_package_file_with_exception(repository, package, filename)

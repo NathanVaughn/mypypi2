@@ -18,4 +18,4 @@ def file_route(repository_slug: str, package_name: str, version: str, filename: 
     # and then exist at a future time
     package_file = app.packages.data.get_package_file(repository_slug, package_name, filename)
 
-    return app.data.storage.active.StorageDriver.download_file(package_file)
+    return app.data.storage.active.StorageDriver.send_file(package_file)

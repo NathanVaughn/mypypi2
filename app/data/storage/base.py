@@ -20,9 +20,9 @@ class BaseStorage(abc.ABC):
         return f"{package_file.package.repository.slug}/{package_file.package.name}/{package_file.version_text}/{package_file.filename}"
 
     @abc.abstractmethod
-    def upload_file(self, package_file: PackageFile) -> None:
+    def save_file(self, package_file: PackageFile) -> None:
         """
-        Upload a file
+        Save a file
         """
         ...
 
@@ -35,16 +35,16 @@ class BaseStorage(abc.ABC):
 
     def cache_file(self, package_file: PackageFile) -> None:
         """
-        Cache a file
+        Cache a file. Basically, just save it if it doesn't already exist
         """
         if not self.check_file(package_file):
-            self.upload_file(package_file)
+            self.save_file(package_file)
         else:
             logger.debug(f"File {package_file.filename} already exists")
 
     @abc.abstractmethod
-    def download_file(self, package_file: PackageFile) -> flask.Response:
+    def send_file(self, package_file: PackageFile) -> flask.Response:
         """
-        Download a file
+        Send a file
         """
         ...

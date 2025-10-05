@@ -26,7 +26,7 @@ class FilesystemStorage(BaseStorage):
         """
         return self._local_dir.joinpath(self._get_path(package_file))
 
-    def upload_file(self, package_file: PackageFile) -> None:
+    def save_file(self, package_file: PackageFile) -> None:
         """
         Take a file from an upstream URL and save it
         """
@@ -34,6 +34,9 @@ class FilesystemStorage(BaseStorage):
         upstream_url = package_file.upstream_url
 
         logger.debug(f"Downloading {upstream_url} to {local_path.absolute()}")
+
+        # need to make sure the parent directory exists
+        local_path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(local_path, "wb") as fp:
             with app.http.stream(upstream_url) as response:
@@ -46,7 +49,7 @@ class FilesystemStorage(BaseStorage):
         """
         return self._path(package_file).exists()
 
-    def download_file(self, package_file: PackageFile) -> flask.Response:
+    def send_file(self, package_file: PackageFile) -> flask.Response:
         """
         Download a file
         """
