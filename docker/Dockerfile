@@ -4,6 +4,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
+# Install build dependencies for greenlet
+RUN apk add --no-cache build-base
+
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
 
