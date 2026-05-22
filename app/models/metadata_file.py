@@ -31,7 +31,7 @@ class MetadataFile(PackageFile):
         """
         A list of hashes for this file
         """
-        return relationship("MetadataFileHash", back_populates="metadata_file", lazy="joined")
+        return relationship("MetadataFileHash", back_populates="metadata_file", lazy="joined", cascade="delete")
 
     def update(self, new: MetadataFile) -> None:
         """

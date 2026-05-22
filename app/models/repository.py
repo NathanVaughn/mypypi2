@@ -38,7 +38,7 @@ class Repository(Base):
     Number of seconds to wait for a response from the upstream server
     """
 
-    packages: Mapped[list[Package]] = relationship("Package", back_populates="repository")
+    packages: Mapped[list[Package]] = relationship("Package", back_populates="repository", cascade="delete")
 
     @validates("simple_url")
     def validate_simple_url(self, key: str, simple_url: str) -> str:

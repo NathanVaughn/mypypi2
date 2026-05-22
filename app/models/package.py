@@ -39,7 +39,7 @@ class Package(Base):
     """
 
     code_files: Mapped[list[CodeFile]] = relationship(
-        "CodeFile", back_populates="package", order_by="CodeFile.sort_order"
+        "CodeFile", back_populates="package", order_by="CodeFile.sort_order", cascade="delete"
     )
 
     @property

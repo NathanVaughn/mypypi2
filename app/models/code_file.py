@@ -49,14 +49,14 @@ class CodeFile(PackageFile):
     # This is a huge performance boost when rendering templates
     # with lots of files. Without this, every single record
     # with a metadata file would result in a seperate query.
-    metadata_file: Mapped[MetadataFile | None] = relationship("MetadataFile", back_populates="code_file", lazy="joined")
+    metadata_file: Mapped[MetadataFile | None] = relationship("MetadataFile", back_populates="code_file", lazy="joined", cascade="delete")
 
     @declared_attr
     def hashes(cls) -> Mapped[list[CodeFileHash]]:
         """
         A list of hashes for this file
         """
-        return relationship("CodeFileHash", back_populates="code_file", lazy="joined")
+        return relationship("CodeFileHash", back_populates="code_file", lazy="joined", cascade="delete")
 
     # utility properties
     @property
