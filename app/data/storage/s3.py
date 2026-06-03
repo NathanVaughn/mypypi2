@@ -70,7 +70,7 @@ class S3Storage(BaseStorage):
         with self._interface.open(s3_url, "wb") as fp:
             with app.http.stream(upstream_url) as response:
                 for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
-                    fp.write(chunk) # pyright: ignore
+                    fp.write(chunk)  # pyright: ignore
 
     def send_file(self, package_file: PackageFile) -> werkzeug.wrappers.response.Response:
         """
