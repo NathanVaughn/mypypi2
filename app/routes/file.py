@@ -1,6 +1,5 @@
 from flask import Blueprint
 
-import app.data.sql
 import app.data.storage.active
 import app.packages.data
 from app.data.cache.wrappers import cache_repository_timeout_decorator
