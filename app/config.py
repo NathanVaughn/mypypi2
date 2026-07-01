@@ -172,8 +172,8 @@ class _Config(BaseSettings):
 
 if app.constants.IS_TESTING:
     Config = _Config(
-        base_url="http://localhost:5000",  # type: ignore
-        repositories=[RepositoryConfig(slug="pypi", simple_url="https://pypi.org/simple")],  # type: ignore
+        base_url="http://localhost:5000",  # ty:ignore[invalid-argument-type]
+        repositories=[RepositoryConfig(slug="pypi", simple_url="https://pypi.org/simple")],  # ty:ignore[invalid-argument-type]
         database=DatabaseConfig(url="sqlite:///:memory:"),
         storage=StorageConfig(
             driver=StorageDrivers.FILESYSTEM,

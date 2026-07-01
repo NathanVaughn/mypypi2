@@ -25,12 +25,12 @@
 
 [dependency-groups]
     dev = [
-        "pre-commit>=3.2.0",
         "pytest>=7.3.1",
         "pytest-cov>=4.1",
         "pytest-flask-sqlalchemy>=1.1.0",
         "freezegun>=1.5.1",               # time mocking
-    ]
+        "prek>=0.4.5",
+]
 
 [[tool.uv.index]]
     # dogfood
@@ -41,12 +41,9 @@
 [tool.coverage.run]
     omit = ["tests/*"]
 
-[tool.pyright]
-    typeCheckingMode           = "basic"
-    venvPath                   = "."
-    venv                       = ".venv"
-    reportMissingParameterType = true
-
 [tool.ruff]
     # i have an ultra-wide monitor and makes things easier to read
     line-length = 120
+
+[tool.ty.rules]
+    invalid-method-override = "ignore"
