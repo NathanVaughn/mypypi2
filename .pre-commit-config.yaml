@@ -25,10 +25,9 @@ repos:
     repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.19
 -   hooks:
-    -   id: pyright
-    repo: https://github.com/RobertCraigie/pyright-python
-    # 1.1.395 has a bug that doesn't like flask Blueprint creations
-    rev: v1.1.410
+    -   id: ty
+    repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.55
 -   hooks:
     -   id: markdownlint
     repo: https://github.com/igorshubovych/markdownlint-cli

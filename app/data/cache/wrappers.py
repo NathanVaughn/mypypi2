@@ -13,7 +13,7 @@ def _key_generator(func: Callable, **kwargs: Any) -> str:
     """
     Generate a cache key for the given function and arguments.
     """
-    return "-".join((func.__qualname__, *(str(i) for (k, v) in kwargs.items() for i in (k, v))))
+    return "-".join((func.__qualname__, *(str(i) for (k, v) in kwargs.items() for i in (k, v))))  # ty:ignore[unresolved-attribute]
 
 
 def get_or_set(key: str, func: Callable[..., _R], ttl: int | None) -> _R:
