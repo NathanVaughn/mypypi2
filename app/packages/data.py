@@ -149,7 +149,7 @@ def update_package_data(repository: Repository, package: Package) -> Package:
     package.code_files += to_save_code_files
 
     logger.debug(f"Saving {len(to_save_code_files)} new code files for package {package.log_name}")
-    package.last_updated = datetime.datetime.now()
+    package.last_updated = datetime.datetime.now(tz=datetime.UTC)
     app.data.sql.save()
 
     return package

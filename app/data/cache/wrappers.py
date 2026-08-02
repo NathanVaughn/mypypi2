@@ -1,12 +1,11 @@
 import functools
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any
 
 from loguru import logger
 
 import app.data.sql
 from app.data.cache.active import CacheDriver
-
-_R = TypeVar("_R")
 
 
 def _key_generator(func: Callable, **kwargs: Any) -> str:
@@ -16,7 +15,7 @@ def _key_generator(func: Callable, **kwargs: Any) -> str:
     return "-".join((func.__qualname__, *(str(i) for (k, v) in kwargs.items() for i in (k, v))))  # ty:ignore[unresolved-attribute]
 
 
-def get_or_set(key: str, func: Callable[..., _R], ttl: int | None) -> _R:
+def get_or_set[R](key: str, func: Callable[..., R], ttl: int | None) -> R:
     """
     Get a key from the cache, or set it if it does not exist.
     """
@@ -48,7 +47,7 @@ def cache_permamently_decorator(func: Callable) -> Callable:
     return wrapper
 
 
-def cache_repository_timeout_function(func: Callable[..., _R], repository_slug: str, kwargs: dict[str, Any]) -> _R:
+def cache_repository_timeout_function[R](func: Callable[..., R], repository_slug: str, kwargs: dict[str, Any]) -> R:
     """
     Caches a function based on the given repository slug.
     Expects the repository_slug to be passed as a keyword argument.

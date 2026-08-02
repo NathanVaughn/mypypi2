@@ -48,7 +48,7 @@ def init_db(flask_app: Flask, create: bool = False) -> None:
     from app.models.metadata_file import MetadataFile  # noqa
     from app.models.metadata_file_hash import MetadataFileHash  # noqa
     from app.models.package import Package  # noqa
-    from app.models.repository import Repository  # noqa
+    from app.models.repository import Repository
     from app.models.cache import Cache  # noqa
 
     with flask_app.app_context():

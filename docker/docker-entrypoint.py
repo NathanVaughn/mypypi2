@@ -15,5 +15,6 @@ subprocess.run(
         "--bind=0.0.0.0:80",
         f"--workers={min(worker_count, 10)}",
         "app.wsgi:create_app()",
-    ]
+    ],
+    check=True,
 )

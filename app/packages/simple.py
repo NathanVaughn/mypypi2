@@ -184,7 +184,7 @@ def parse_version(filename: str) -> str | None:
         except packaging.utils.InvalidWheelFilename:
             return None
 
-    elif filename.endswith(".zip") or filename.endswith(".tar.gz"):
+    elif filename.endswith((".zip", ".tar.gz")):
         try:
             _, version = packaging.utils.parse_sdist_filename(filename)
             return str(version)

@@ -10,11 +10,11 @@ def test_is_current(package: Package) -> None:
     """
     Test is_current attribute
     """
-    package.last_updated = datetime.datetime(2020, 1, 1, 11, 59, 59)
+    package.last_updated = datetime.datetime(2020, 1, 1, 11, 59, 59, tzinfo=datetime.UTC)
     package.repository.cache_minutes = 10
     assert package.is_current is True
 
-    package.last_updated = datetime.datetime(2020, 1, 1, 11, 49, 00)
+    package.last_updated = datetime.datetime(2020, 1, 1, 11, 49, 00, tzinfo=datetime.UTC)
     package.repository.cache_minutes = 10
     assert package.is_current is False
 
