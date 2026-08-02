@@ -47,7 +47,9 @@ class Package(Base):
         """
         Is the package data up-to-date?
         """
-        return self.last_updated > datetime.datetime.now() - datetime.timedelta(minutes=self.repository.cache_minutes)
+        return self.last_updated > datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
+            minutes=self.repository.cache_minutes
+        )
 
     @property
     def repository_url(self) -> str:

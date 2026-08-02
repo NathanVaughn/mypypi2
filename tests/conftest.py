@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from flask import Flask
@@ -8,9 +8,9 @@ from app import constants
 # this must be set before importing models
 constants.IS_TESTING = True
 
-from app.models.package import Package  # noqa: E402
-from app.models.repository import Repository  # noqa: E402
-from app.wsgi import create_app  # noqa: E402
+from app.models.package import Package
+from app.models.repository import Repository
+from app.wsgi import create_app
 
 
 @pytest.fixture

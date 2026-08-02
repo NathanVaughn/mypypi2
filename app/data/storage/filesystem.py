@@ -38,10 +38,8 @@ class FilesystemStorage(BaseStorage):
         # need to make sure the parent directory exists
         local_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(local_path, "wb") as fp:
-            with app.http.stream(upstream_url) as response:
-                for chunk in response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE):
-                    fp.write(chunk)
+        with open(local_path, "wb") as fp, app.http.stream(upstream_url) as response:
+            fp.writelines(response.iter_content(chunk_size=DOWNLOAD_CHUNK_SIZE))
 
     def check_file(self, package_file: PackageFile) -> bool:
         """

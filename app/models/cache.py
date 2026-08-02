@@ -33,4 +33,4 @@ class Cache(Base):
         """
         Is the cache value still valid?
         """
-        return self.expiration < datetime.datetime.now()
+        return self.expiration < datetime.datetime.now(tz=datetime.UTC)

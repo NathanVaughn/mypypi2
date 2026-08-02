@@ -90,7 +90,7 @@ def test_update() -> None:
         is_yanked=False,
         yanked_reason=None,
         size=12345,
-        upload_time=datetime.datetime.now(),
+        upload_time=datetime.datetime.now(),  # noqa: DTZ005
     )
     CodeFileHash(code_file=file1, kind="sha256", value="1234567890abcdef")
 
@@ -103,7 +103,7 @@ def test_update() -> None:
         is_yanked=True,
         yanked_reason="reason",
         size=6789,
-        upload_time=datetime.datetime(2021, 1, 1),
+        upload_time=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC),
     )
     CodeFileHash(code_file=file2, kind="md5", value="abcdef1234567890")
 
@@ -117,7 +117,7 @@ def test_update() -> None:
     assert file1.is_yanked is True
     assert file1.yanked_reason == "reason"
     assert file1.size == 6789
-    assert file1.upload_time == datetime.datetime(2021, 1, 1)
+    assert file1.upload_time == datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC)
     assert file1.hashes[0].kind == "sha256"
     assert file1.hashes[0].value == "1234567890abcdef"
     assert file1.hashes[1].kind == "md5"

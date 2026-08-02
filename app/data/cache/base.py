@@ -48,7 +48,7 @@ class BaseCache(abc.ABC):
 
         if not self._supports_ttl:
             if ttl is not None:
-                expiration = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
+                expiration = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=ttl)
                 expiration_value = expiration.isoformat()
             else:
                 expiration_value = NEVER
@@ -70,7 +70,7 @@ class BaseCache(abc.ABC):
                 # somehow expiration key is lost
                 return None
 
-            elif datetime.datetime.fromisoformat(expiration) < datetime.datetime.now():
+            elif datetime.datetime.fromisoformat(expiration) < datetime.datetime.now(tz=datetime.UTC):
                 self._delete(key)
                 self._delete(f"{key}{self.EXPIRATION_SUFFIX}")
                 return None

@@ -1,7 +1,7 @@
 import os
 from enum import Enum
 from http import HTTPStatus
-from typing import Literal, Self, Type
+from typing import Literal, Self
 
 from loguru import logger
 from pydantic import BaseModel, HttpUrl, field_validator, model_validator
@@ -152,7 +152,7 @@ class _Config(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
@@ -172,8 +172,8 @@ class _Config(BaseSettings):
 
 if app.constants.IS_TESTING:
     Config = _Config(
-        base_url="http://localhost:5000",  # ty:ignore[invalid-argument-type]
-        repositories=[RepositoryConfig(slug="pypi", simple_url="https://pypi.org/simple")],  # ty:ignore[invalid-argument-type]
+        base_url="http://localhost:5000",
+        repositories=[RepositoryConfig(slug="pypi", simple_url="https://pypi.org/simple")],
         database=DatabaseConfig(url="sqlite:///:memory:"),
         storage=StorageConfig(
             driver=StorageDrivers.FILESYSTEM,
@@ -182,4 +182,4 @@ if app.constants.IS_TESTING:
         cache=CacheConfig(driver=CacheDrivers.MEMORY),
     )
 else:
-    Config = _Config()  # type: ignore
+    Config = _Config()

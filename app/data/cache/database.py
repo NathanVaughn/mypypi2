@@ -17,7 +17,9 @@ class DatabaseCache(BaseCache):
         Set a cache value
         """
         cache = Cache(
-            key=key, value=pickle.dumps(value), expiration=datetime.datetime.now() + datetime.timedelta(seconds=ttl)
+            key=key,
+            value=pickle.dumps(value),
+            expiration=datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=ttl),
         )
         app.data.sql.session_save(cache)
 
