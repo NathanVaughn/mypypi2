@@ -26,7 +26,7 @@
         "source=devcontainer-profile-${containerWorkspaceFolderBasename},target=/home/dev/,type=volume"
     ],
     "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+        "ghcr.io/devcontainers/features/docker-in-docker:4": {"moby": false}
     },
     "forwardPorts": [
         5000
